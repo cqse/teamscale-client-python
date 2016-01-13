@@ -135,3 +135,15 @@ class TeamscaleClient:
         """
         return "%s/p/%s/%s/" % (self.url, self.project, service_name)
 
+    def read_json_from_file(self, file_path):
+        """Reads JSON content from a file and parses it to ensure basic integrity.
+
+        Args:
+            file_path (str): File from which to read the JSON content.
+
+        Returns:
+            The parsed JSON data."""
+        with open(file_path) as json_file:
+            json_data = json.load(json_file)
+            return json_data
+
