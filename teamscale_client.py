@@ -45,7 +45,26 @@ class TeamscaleClient:
         """Uploads a list of findings
 
         Args:
-            findings: findings data in json format
+            findings: findings data in json format.
+                The findings should have the following format::
+
+                    [
+                        {
+                            findings: [
+                                {
+                                    findingTypeId: "<external-finding-type-id>",
+                                    message: "<findings message>",
+                                    assessment: RED/YELLOW,
+                                    startLine: 1,
+                                    endLine: 1,
+                                    startOffset: 1,
+                                    endOffset: 26
+                                }
+                            ],
+                            path: "path/to/file/in/teamscale"
+                        },
+                        ...
+                    ]
             timestamp (int): timestamp (unix format) for which to upload the findings
             message (str): The message to use for the generated upload commit
             partition (str): The partition's id into which the findings should be added
@@ -59,7 +78,19 @@ class TeamscaleClient:
         """Uploads a list of metrics
 
         Args:
-            metrics: metrics data in json format
+            metrics: metrics data in json format.
+                The metrics should have the following format::
+
+                    [
+                        {
+                            "metrics": {
+                                "<metric-id-1>": <metric-value>,
+                                    "<metric-id-2>": <metric-value>
+                            },
+                            "path": "path/to/file/in/teamscale"
+                        },
+                        ...
+                    ]
             timestamp (int): timestamp (unix format) for which to upload the metrics
             message (str): The message to use for the generated upload commit
             partition (str): The partition's id into which the metrics should be added
@@ -97,7 +128,7 @@ class TeamscaleClient:
         """Returns the full url pointing to a service.
 
         Args:
-           service_name: the name of the service for which the url should be generated
+           service_name(str): the name of the service for which the url should be generated
 
         Returns:
             str: The full url
