@@ -4,7 +4,7 @@ python:
 
 install:
     - pip install travis-sphinx sphinx
-    - pip install -e -q . 
+    - pip install -e . 
 
 script:
     - python setup.py build
