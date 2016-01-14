@@ -49,18 +49,18 @@ class TeamscaleClient:
 
                     [
                         {
-                            findings: [
+                            "findings": [
                                 {
-                                    findingTypeId: "<external-finding-type-id>",
-                                    message: "<findings message>",
-                                    assessment: RED/YELLOW,
-                                    startLine: 1,
-                                    endLine: 1,
-                                    startOffset: 1,
-                                    endOffset: 26
+                                    "findingTypeId" : "<external-finding-type-id>",
+                                    "message" : "<findings message>",
+                                    "assessment" : RED/YELLOW,
+                                    "startLine" : 1,
+                                    "endLine" : 1,
+                                    "startOffset" : 1,
+                                    "endOffset" : 26
                                 }
                             ],
-                            path: "path/to/file/in/teamscale"
+                            "path" : "path/to/file/in/teamscale"
                         },
                         ...
                     ]
@@ -87,7 +87,7 @@ class TeamscaleClient:
                         {
                             "metrics": {
                                 "<metric-id-1>": <metric-value>,
-                                    "<metric-id-2>": <metric-value>
+                                "<metric-id-2>": <metric-value>
                             },
                             "path": "path/to/file/in/teamscale"
                         },
