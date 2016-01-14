@@ -24,12 +24,12 @@ class TeamscaleClient:
         self.project = project
         self.sslverify = sslverify
 
-    def put(self, url, json, parameters):
+    def put(self, url, jsontext, parameters):
         """Sends a put request to the given service url with the json payload as content.
 
         Args:
             url (str):  The URL for which to execute a PUT request
-            json: The JSON Object to attach as content
+            jsontext: The JSON Object to attach as content
             parameters (dict): parameters to attach to the url
 
         Returns:
@@ -38,9 +38,9 @@ class TeamscaleClient:
         Raises:
             Exception: If anything goes wrong
         """
-        response = requests.put(url, params=parameters, json=json, headers={'Content-Type': 'application/json'}, auth=self.auth_header, verify=self.sslverify)
+        response = requests.put(url, params=parameters, json=jsontext, headers={'Content-Type': 'application/json'}, auth=self.auth_header, verify=self.sslverify)
         if response.status_code != 200:
-            raise Exception("ERROR: PUT " + url + ": {r.status_code}:{r.text}".format(r=response))
+            raise Exception("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
     def upload_findings(self, findings, timestamp, message, partition):
