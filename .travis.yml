@@ -3,9 +3,10 @@ python:
   - "2.7"
 
 install:
-    - pip install travis-sphinx sphinx requests
+    - pip install travis-sphinx sphinx
 
 script:
+    - python setup.py build
     - travis-sphinx --source=docs build
 
 after_success:
