@@ -1,6 +1,7 @@
 import requests
 import base64
 import simplejson as json
+from requests.auth import HTTPBasicAuth
 
 class TeamscaleClient:
     """Basic Python service client to access Teamscale's REST Api.
@@ -20,7 +21,7 @@ class TeamscaleClient:
         """
         self.url = url
         self.username = username
-        self.auth_header = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+        self.auth_header = HTTPBasicAuth(username, password)
         self.project = project
 
     def put(self, url, json, parameters):
@@ -37,7 +38,7 @@ class TeamscaleClient:
         Raises:
             Exception: If anything goes wrong
         """
-        response = requests.put(url, params=parameters, json=json, headers={'Content-Type':'application/json', "Authorization" : "Basic %s" % self.auth_header})
+        response = requests.put(url, params=parameters, json=json, headers={'Content-Type':'application/json'}, auth=self.auth_header)
         if response.status_code != 200:
             raise Exception("ERROR: PUT "+url+": {}:{}".format(response.status_code, response.text))
         return response
