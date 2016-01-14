@@ -131,12 +131,12 @@ class TeamscaleClient:
         return self.put(service_url, json_data, parameters)
 
 
-    def upload_metric_definitions(self, metric_descriptions):
-        """Uploads metric descriptions in json format
+    def upload_metric_definitions(self, metric_definitions):
+        """Uploads metric definitions in json format
 
         Args:
-            metric_descriptions: metric descriptions in json format
-                The descriptions should have the following format::
+            metric_definitions: metric descriptions in json format
+                The definitions should have the following format::
 
                     [
                         {
@@ -163,7 +163,7 @@ class TeamscaleClient:
         """
         service_url = self.get_global_service_url("add-external-metric-description")
         parameters = {}
-        return self.put(service_url, metric_descriptions, parameters)
+        return self.put(service_url, metric_definitions, parameters)
 
     def get_global_service_url(self, service_name):
         """Returns the full url pointing to a global service.
