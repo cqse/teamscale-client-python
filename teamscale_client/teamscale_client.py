@@ -8,17 +8,15 @@ class TeamscaleClient:
 
     Request handling done with:
     http://docs.python-requests.org/en/latest/
+
+    Args:
+        url (str): The url to Teamscale (including the port)
+        username (str): The username to use for authentication
+        password (str): The password/api key to use for authentication
+        project (str): The project on which to work
     """
 
     def __init__(self, url, username, password, project):
-        """Creates a new TeamscaleClient
-
-        Args:
-            url (str): The url to Teamscale (including the port)
-            username (str): The username to use for authentication
-            password (str): The password/api key to use for authentication
-            project (str): The project on which to work
-        """
         self.url = url
         self.username = username
         self.auth_header = HTTPBasicAuth(username, password)
