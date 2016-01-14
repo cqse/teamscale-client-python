@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "teamscale-client",
-    version = "0.0.4",
+    version = "0.0.5",
     author = "Thomas Kinnen - CQSE GmbH",
     author_email = "kinnen@cqse.eu",
     description = ("A simple service client to interact with Teamscale's REST API."),
