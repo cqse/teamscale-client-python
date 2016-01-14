@@ -1,5 +1,5 @@
 from __future__ import print_function
-from teamscale_client.teamscale_client import TeamscaleClient
+from teamscale_client import TeamscaleClient
 
 TEAMSCALE_URL = "http://localhost:8080"
 
