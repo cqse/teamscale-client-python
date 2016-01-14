@@ -13,7 +13,6 @@ Contents:
 .. toctree::
    :maxdepth: 4
 
-   example
    teamscale_client
 
 
