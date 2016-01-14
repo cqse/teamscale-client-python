@@ -1,5 +1,6 @@
 import requests
 import base64
+import simplejson as json
 
 class TeamscaleClient:
     """Basic Python service client to access Teamscale's REST Api.
