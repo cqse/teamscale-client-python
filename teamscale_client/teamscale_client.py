@@ -2,6 +2,7 @@ import requests
 import simplejson as json
 from requests.auth import HTTPBasicAuth
 
+
 class TeamscaleClient:
     """Basic Python service client to access Teamscale's REST Api.
 
@@ -13,20 +14,22 @@ class TeamscaleClient:
         username (str): The username to use for authentication
         password (str): The password/api key to use for authentication
         project (str): The project on which to work
+        sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
     """
 
-    def __init__(self, url, username, password, project):
+    def __init__(self, url, username, password, project, sslverify=True):
         self.url = url
         self.username = username
         self.auth_header = HTTPBasicAuth(username, password)
         self.project = project
+        self.sslverify = sslverify
 
-    def put(self, url, json, parameters):
+    def put(self, url, jsontext, parameters):
         """Sends a put request to the given service url with the json payload as content.
 
         Args:
             url (str):  The URL for which to execute a PUT request
-            json: The JSON Object to attach as content
+            jsontext: The JSON Object to attach as content
             parameters (dict): parameters to attach to the url
 
         Returns:
@@ -35,9 +38,9 @@ class TeamscaleClient:
         Raises:
             Exception: If anything goes wrong
         """
-        response = requests.put(url, params=parameters, json=json, headers={'Content-Type':'application/json'}, auth=self.auth_header)
+        response = requests.put(url, params=parameters, json=jsontext, headers={'Content-Type': 'application/json'}, auth=self.auth_header, verify=self.sslverify)
         if response.status_code != 200:
-            raise Exception("ERROR: PUT "+url+": {}:{}".format(response.status_code, response.text))
+            raise Exception("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
     def upload_findings(self, findings, timestamp, message, partition):
@@ -123,13 +126,12 @@ class TeamscaleClient:
         """
         service_url = self.get_project_service_url(service_name)
         parameters = {
-            "t" : timestamp,
-            "message" : message,
-            "partition" : partition,
-            "skip-session" : "true"
+            "t": timestamp,
+            "message": message,
+            "partition": partition,
+            "skip-session": "true"
         }
         return self.put(service_url, json_data, parameters)
-
 
     def upload_metric_definitions(self, metric_definitions):
         """Uploads metric definitions in json format
@@ -185,7 +187,7 @@ class TeamscaleClient:
         Returns:
             str: The full url
         """
-        return "%s/p/%s/%s/" % (self.url, self.project, service_name)
+        return "{client.url}/p/{client.project}/{service}/".format(client=self, service=service_name)
 
     def read_json_from_file(self, file_path):
         """Reads JSON content from a file and parses it to ensure basic integrity.
@@ -198,4 +200,3 @@ class TeamscaleClient:
         with open(file_path) as json_file:
             json_data = json.load(json_file)
             return json_data
-
