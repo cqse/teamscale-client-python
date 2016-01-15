@@ -88,7 +88,7 @@ class TeamscaleClient:
         """Adds descriptions of findings.
 
         Args:
-            descriptions (list): List of ``FindingDescription``s to add to Teamscale.
+            descriptions (list): List of ``FindingDescription`` to add to Teamscale.
         Returns:
             requests.Response: request's response
         """
