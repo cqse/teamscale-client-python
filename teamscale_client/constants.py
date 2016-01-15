@@ -1,3 +1,6 @@
+"""This module contains multiple constants collections typically used when
+communicating metrics and findings with Teamscale."""
+
 class Assessment:
     """Constants to be used as assessment levels."""
 

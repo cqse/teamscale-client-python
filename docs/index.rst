@@ -14,6 +14,7 @@ Contents:
    :maxdepth: 4
 
    teamscale_client
+   constants
 
 
 Indices and tables
