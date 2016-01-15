@@ -1,7 +1,16 @@
+import collections
 import requests
 import simplejson as json
 import time
 from requests.auth import HTTPBasicAuth
+
+FindingDescription = collections.namedtuple('FindingDescriptions', ['typeid', 'description', 'enablement'])
+"""Description of finding to be added at configuration time."""
+
+
+class ServiceError(Exception):
+    """Teamscale service returned an error."""
+    pass
 
 
 class TeamscaleClient:
@@ -25,7 +34,25 @@ class TeamscaleClient:
         self.project = project
         self.sslverify = sslverify
 
-    def put(self, url, jsontext, parameters):
+    def get(self, url, parameters=None):
+        """Sends a get request to the given service url.
+
+        Args:
+            url (str):  The URL for which to execute a PUT request
+            parameters (dict): parameters to attach to the url
+
+        Returns:
+            requests.Response: request's response
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+        return response
+
+    def put(self, url, jsontext, parameters=None):
         """Sends a put request to the given service url with the json payload as content.
 
         Args:
@@ -37,12 +64,38 @@ class TeamscaleClient:
             requests.Response: request's response
 
         Raises:
-            Exception: If anything goes wrong
+            ServiceError: If anything goes wrong
         """
         response = requests.put(url, params=parameters, json=jsontext, headers={'Content-Type': 'application/json'}, auth=self.auth_header, verify=self.sslverify)
         if response.status_code != 200:
-            raise Exception("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+            raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
+
+    def add_findings_group(self, name, mapping_pattern):
+        """Adds group of findings.
+
+        Args:
+            name (str): Name of group.
+            mapping_pattern (str): Regular expression to match a finding's ``typeid`` in order to belong to this group.
+        Returns:
+            requests.Response: request's response
+        """
+        url = self.get_global_service_url('add-external-findings-group')
+        payload = [{'groupName': name, 'mapping': mapping_pattern}]
+        return self.put(url, payload)
+
+    def add_finding_descriptions(self, descriptions):
+        """Adds descriptions of findings.
+
+        Args:
+            descriptions (list): List of ``FindingDescription``s to add to Teamscale.
+        Returns:
+            requests.Response: request's response
+        """
+
+        url = self.get_global_service_url('add-external-finding-descriptions')
+        payload = [{'typeId': d.typeid, 'description': d.description, 'enablement': d.enablement} for d in descriptions]
+        response = self.put(url, payload)
 
     def upload_findings(self, findings, timestamp, message, partition):
         """Uploads a list of findings
@@ -191,6 +244,7 @@ class TeamscaleClient:
         """
         return "{client.url}/p/{client.project}/{service}/".format(client=self, service=service_name)
 
+    @classmethod
     def read_json_from_file(self, file_path):
         """Reads JSON content from a file and parses it to ensure basic integrity.
 
