@@ -250,7 +250,7 @@ class TeamscaleClient:
         return "{client.url}/p/{client.project}/{service}/".format(client=self, service=service_name)
 
     @classmethod
-    def read_json_from_file(self, file_path):
+    def read_json_from_file(cls, file_path):
         """Reads JSON content from a file and parses it to ensure basic integrity.
 
         Args:
