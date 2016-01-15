@@ -1,5 +1,6 @@
 import requests
 import simplejson as json
+import time
 from requests.auth import HTTPBasicAuth
 
 
@@ -125,8 +126,9 @@ class TeamscaleClient:
             Exception: If anything goes wrong
         """
         service_url = self.get_project_service_url(service_name)
+        timestamp_seconds = time.mktime(timestamp.timetuple())
         parameters = {
-            "t": int(timestamp.timestamp() * 1000),
+            "t": int(timestamp_seconds * 1000),
             "message": message,
             "partition": partition,
             "skip-session": "true"

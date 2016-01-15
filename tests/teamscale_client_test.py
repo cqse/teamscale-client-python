@@ -1,6 +1,8 @@
 import requests
 import responses
 import re
+import datetime
+
 from teamscale_client.teamscale_client import TeamscaleClient
 
 URL = "http://localhost:8080"
@@ -25,14 +27,14 @@ def test_put():
 def test_upload_findings():
     responses.add(responses.PUT, get_project_service_mock('add-external-findings'),
                       body='success', status=200)
-    resp = get_client().upload_findings([], 18073649127634, "Test message", "partition-name")
+    resp = get_client().upload_findings([], datetime.datetime.now(), "Test message", "partition-name")
     assert resp.text == "success"
 
 @responses.activate
 def test_upload_metrics():
     responses.add(responses.PUT, get_project_service_mock('add-external-metrics'),
                       body='success', status=200)
-    resp = get_client().upload_metrics([], 18073649127634, "Test message", "partition-name")
+    resp = get_client().upload_metrics([], datetime.datetime.now(), "Test message", "partition-name")
     assert resp.text == "success"
 
 @responses.activate
