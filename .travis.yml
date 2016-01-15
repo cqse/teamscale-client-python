@@ -6,7 +6,9 @@ python:
   - "2.7"
   - "3.4"
 
-cache: pip
+cache:
+  directories:
+      - $HOME/.cache/pip
 
 install:
     - pip install travis-sphinx sphinx
