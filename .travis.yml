@@ -14,4 +14,4 @@ script:
     - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then travis-sphinx --source=docs build; fi
 
 after_success:
-    - travis-sphinx deploy
+    - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then travis-sphinx deploy; fi
