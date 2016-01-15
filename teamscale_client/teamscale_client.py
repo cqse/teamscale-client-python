@@ -67,7 +67,7 @@ class TeamscaleClient:
                         },
                         ...
                     ]
-            timestamp (int): timestamp (unix format) for which to upload the findings
+            timestamp (datetime.datetime): timestamp for which to upload the findings
             message (str): The message to use for the generated upload commit
             partition (str): The partition's id into which the findings should be added
 
@@ -96,7 +96,7 @@ class TeamscaleClient:
                         },
                         ...
                     ]
-            timestamp (int): timestamp (unix format) for which to upload the metrics
+            timestamp (datetime.datetime): timestamp for which to upload the metrics
             message (str): The message to use for the generated upload commit
             partition (str): The partition's id into which the metrics should be added
 
@@ -114,7 +114,7 @@ class TeamscaleClient:
         Args:
             service_name (str): The service name to which to upload the data
             json_data: data in json format
-            timestamp (int): timestamp (unix format) for which to upload the data
+            timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
             message (str): The message to use for the generated upload commit
             partition (str): The partition's id into which the data should be added
 
@@ -126,7 +126,7 @@ class TeamscaleClient:
         """
         service_url = self.get_project_service_url(service_name)
         parameters = {
-            "t": timestamp,
+            "t": int(timestamp.timestamp() * 1000),
             "message": message,
             "partition": partition,
             "skip-session": "true"
