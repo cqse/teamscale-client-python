@@ -97,6 +97,11 @@ class TeamscaleClient:
         payload = [{'typeId': d.typeid, 'description': d.description, 'enablement': d.enablement} for d in descriptions]
         response = self.put(url, payload)
 
+    def update_findings_schema(self):
+        """Triggers refresh of finding groups in analysis profiles."""
+        url = self.get_global_service_url('update-findings-schema')
+        return self.get(url, {'projects': self.project})
+
     def upload_findings(self, findings, timestamp, message, partition):
         """Uploads a list of findings
 
