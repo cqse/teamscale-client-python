@@ -25,6 +25,12 @@ setup(
     ],
     install_requires=[
           'simplejson',
-          'requests'
+          'requests>=2.0'
     ],
+
+    tests_require=[
+          'pytest',
+          'responses'
+    ],
+    setup_requires=["pytest-runner"]
 )
