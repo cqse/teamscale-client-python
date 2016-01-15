@@ -1,6 +1,6 @@
 import requests
 import responses
-from teamscale_client import TeamscaleClient
+from teamscale_client.teamscale_client import TeamscaleClient
 
 def get_client():
     return TeamscaleClient("http://localhost:8080", "admin", "admin", "foo")
