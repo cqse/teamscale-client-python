@@ -1,4 +1,7 @@
 from __future__ import print_function
+
+import datetime
+
 from teamscale_client import TeamscaleClient
 
 TEAMSCALE_URL = "http://localhost:8080"
@@ -26,5 +29,5 @@ if __name__ == '__main__':
         }
     ]
     client = TeamscaleClient(TEAMSCALE_URL, USERNAME, PASSWORD, PROJECT_NAME)
-    response = client.upload_findings(findings, 1459554747999, "TestCommit", "test-partition")
+    response = client.upload_findings(findings, datetime.datetime.now(), "TestCommit", "test-partition")
     print("Request result: %s" % (response.text,))
