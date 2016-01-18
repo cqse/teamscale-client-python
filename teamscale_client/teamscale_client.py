@@ -95,7 +95,7 @@ class TeamscaleClient:
 
         url = self.get_global_service_url('add-external-finding-descriptions')
         payload = [{'typeId': d.typeid, 'description': d.description, 'enablement': d.enablement} for d in descriptions]
-        response = self.put(url, payload)
+        return self.put(url, payload)
 
     def update_findings_schema(self):
         """Triggers refresh of finding groups in analysis profiles."""
