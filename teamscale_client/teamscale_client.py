@@ -189,7 +189,8 @@ class TeamscaleClient:
             "t": int(timestamp_seconds * 1000),
             "message": message,
             "partition": partition,
-            "skip-session": "true"
+            "skip-session": "true",
+            "adjusttimestamp": "true"
         }
         return self.put(service_url, json_data, parameters)
 
