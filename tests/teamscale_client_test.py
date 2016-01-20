@@ -1,9 +1,15 @@
-import requests
-import responses
-import re
 import datetime
+import re
 
+import responses
+from teamscale_client.constants import CoverageFormats
 from teamscale_client.teamscale_client import TeamscaleClient
+
+"""All tests mocked using the responses api:
+
+https://github.com/getsentry/responses
+"""
+
 
 URL = "http://localhost:8080"
 
@@ -44,3 +50,12 @@ def test_upload_metric_description():
     resp = get_client().upload_metric_definitions([])
     assert resp.text == "success"
 
+@responses.activate
+def test_coverage_upload():
+    files = ["tests/data/file1.txt", "tests/data/file2.txt"]
+    responses.add(responses.POST, get_project_service_mock('external-report'),
+                      body='success', status=200)
+    resp = get_client().upload_coverage_data(files, CoverageFormats.CTC, datetime.datetime.now(), "Test Message", "partition-name")
+    assert resp.text == "success"
+    assert "file1.txt" in responses.calls[0].request.body.decode() != -1
+    assert "file2.txt" in responses.calls[0].request.body.decode() != -1

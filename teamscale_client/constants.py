@@ -41,3 +41,16 @@ class MetricProperties:
     LOW_IS_BAD = "LOW_IS_BAD"
     """Normally high values are considered bad, use this to inverse."""
 
+class CoverageFormats:
+    """Possible coverage formats that Teamscale can interpret."""
+
+    CTC = "CTC"
+
+    COBERTURA = "COBERTURA"
+
+    GCOV = "GCOV"
+
+    LCOV = "LCOV"
+
+    XR_BABOON = "XR_BABOON"
+
