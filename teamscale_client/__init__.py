@@ -103,7 +103,7 @@ class TeamscaleClient:
         """Uploads a list of findings
 
         Args:
-            findings (List[:class:`data.FileFindings`): the findings data 
+            findings (List[:class:`data.FileFindings`]): the findings data 
             timestamp (datetime.datetime): timestamp for which to upload the findings
             message (str): The message to use for the generated upload commit
             partition (str): The partition's id into which the findings should be added
