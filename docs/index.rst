@@ -17,6 +17,7 @@ Contents:
    constants
    data
    utils
+   faq
 
 
 Indices and tables
