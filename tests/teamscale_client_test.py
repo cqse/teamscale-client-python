@@ -62,8 +62,8 @@ def test_coverage_upload():
                       body='success', status=200)
     resp = get_client().upload_coverage_data(files, CoverageFormats.CTC, datetime.datetime.now(), "Test Message", "partition-name")
     assert resp.text == "success"
-    assert "file1.txt" in responses.calls[0].request.body.decode() != -1
-    assert "file2.txt" in responses.calls[0].request.body.decode() != -1
+    assert "file1.txt" in responses.calls[0].request.body.decode()
+    assert "file2.txt" in responses.calls[0].request.body.decode()
 
 def test_finding_json_serialization():
     finding = Finding("test-id", "message")
