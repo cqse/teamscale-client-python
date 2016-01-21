@@ -1,14 +1,19 @@
-import datetime
-import re
-
-import responses
-from teamscale_client.constants import CoverageFormats
-from teamscale_client.teamscale_client import TeamscaleClient
-
 """All tests mocked using the responses api:
 
 https://github.com/getsentry/responses
 """
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import datetime
+import re
+import responses
+
+from teamscale_client import TeamscaleClient
+from teamscale_client.constants import CoverageFormats
+from teamscale_client.data import Finding, FileFindings
+from teamscale_client.utils import to_json
 
 
 URL = "http://localhost:8080"
@@ -59,3 +64,8 @@ def test_coverage_upload():
     assert resp.text == "success"
     assert "file1.txt" in responses.calls[0].request.body.decode() != -1
     assert "file2.txt" in responses.calls[0].request.body.decode() != -1
+
+def test_finding_json_serialization():
+    finding = Finding("test-id", "message")
+    findings = FileFindings([finding], "path/to/file")
+    assert '{"content": null, "findings": [{"assessment": "YELLOW", "endLine": 0, "endOffset": 0, "findingTypeId": "test-id", "identifier": null, "message": "message", "startLine": 0, "startOffset": 0}], "path": "path/to/file"}' == to_json(findings)

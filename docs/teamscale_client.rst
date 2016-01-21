@@ -1,5 +1,5 @@
-teamscale_client module
-=======================
+The TeamscaleClient
+===================
 
 .. automodule:: teamscale_client
     :members:

@@ -15,6 +15,8 @@ Contents:
 
    teamscale_client
    constants
+   data
+   utils
 
 
 Indices and tables

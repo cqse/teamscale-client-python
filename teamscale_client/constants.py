@@ -1,12 +1,30 @@
 """This module contains multiple constants collections typically used when
 communicating metrics and findings with Teamscale."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 class Assessment:
     """Constants to be used as assessment levels."""
 
     RED = "RED"
 
     YELLOW = "YELLOW"
+
+class Enablement:
+    """The enablement describes which rating a finding should receive."""
+
+    RED = "RED"
+    """The finding should always be rated red."""
+
+    YELLOW = "YELLOW"
+    """The finding should always be rated yellow."""
+
+    AUTO = "AUTO"
+    """The assessment provided by the concrete finding is used."""
+
+    OFF = "OFF"
+    """The finding is disabled by default."""
 
 class MetricAggregation:
     """Class that contains valid aggregation strategies."""

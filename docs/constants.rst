@@ -1,7 +1,7 @@
-constants module
+Useful Constants
 ================
 
-.. automodule:: constants
+.. automodule:: teamscale_client.constants
     :members:
     :undoc-members:
     :show-inheritance:
