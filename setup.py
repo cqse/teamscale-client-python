@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="teamscale-client",
-    version="0.0.7",
+    version="0.0.8",
     author="Thomas Kinnen - CQSE GmbH",
     author_email="kinnen@cqse.eu",
     description=("A simple service client to interact with Teamscale's REST API."),
