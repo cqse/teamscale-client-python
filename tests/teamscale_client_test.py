@@ -38,7 +38,9 @@ def test_put():
 def test_upload_findings():
     responses.add(responses.PUT, get_project_service_mock('add-external-findings'),
                       body='success', status=200)
-    resp = get_client().upload_findings([], datetime.datetime.now(), "Test message", "partition-name")
+    resp = get_client().upload_findings(_get_test_findings(), datetime.datetime.now(), "Test message", "partition-name")
+    assert "content" in responses.calls[0].request.body
+    assert "test-id" in responses.calls[0].request.body
     assert resp.text == "success"
 
 @responses.activate
@@ -65,7 +67,10 @@ def test_coverage_upload():
     assert "file1.txt" in responses.calls[0].request.body.decode()
     assert "file2.txt" in responses.calls[0].request.body.decode()
 
-def test_finding_json_serialization():
+def _get_test_findings():
     finding = Finding("test-id", "message")
-    findings = FileFindings([finding], "path/to/file")
-    assert '{"content": null, "findings": [{"assessment": "YELLOW", "endLine": 0, "endOffset": 0, "findingTypeId": "test-id", "identifier": null, "message": "message", "startLine": 0, "startOffset": 0}], "path": "path/to/file"}' == to_json(findings)
+    return [FileFindings([finding], "path/to/file")]
+
+def test_finding_json_serialization():
+    findings = _get_test_findings()
+    assert '[{"content": null, "findings": [{"assessment": "YELLOW", "endLine": 0, "endOffset": 0, "findingTypeId": "test-id", "identifier": null, "message": "message", "startLine": 0, "startOffset": 0}], "path": "path/to/file"}]' == to_json(findings)

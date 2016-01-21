@@ -8,6 +8,7 @@ import time
 import simplejson as json
 
 from teamscale_client.data import FindingDescription, ServiceError
+from teamscale_client.utils import to_json
 
 class TeamscaleClient:
     """Basic Python service client to access Teamscale's REST Api.
@@ -102,26 +103,7 @@ class TeamscaleClient:
         """Uploads a list of findings
 
         Args:
-            findings: findings data in json format.
-                The findings should have the following format::
-
-                    [
-                        {
-                            "findings": [
-                                {
-                                    "findingTypeId" : "<external-finding-type-id>",
-                                    "message" : "<findings message>",
-                                    "assessment" : RED/YELLOW,
-                                    "startLine" : 1,
-                                    "endLine" : 1,
-                                    "startOffset" : 1,
-                                    "endOffset" : 26
-                                }
-                            ],
-                            "path" : "path/to/file/in/teamscale"
-                        },
-                        ...
-                    ]
+            findings (List[:class:`data.FileFindings`): the findings data 
             timestamp (datetime.datetime): timestamp for which to upload the findings
             message (str): The message to use for the generated upload commit
             partition (str): The partition's id into which the findings should be added
@@ -132,7 +114,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        return self._upload_external_data("add-external-findings", findings, timestamp, message, partition)
+        return self._upload_external_data("add-external-findings", to_json(findings), timestamp, message, partition)
 
     def upload_metrics(self, metrics, timestamp, message, partition):
         """Uploads a list of metrics
