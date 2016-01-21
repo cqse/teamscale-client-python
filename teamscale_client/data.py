@@ -17,8 +17,8 @@ class Finding(object):
                                             This value is only important if in Teamscale the finding enablement 
                                             is set to auto, otherwise the setting from Teamscale will be used.
         start_offset (int): Offset from the beginning of the file, where the finding area starts (zero-based, inclusive).
-        end_offset (int): Offset from the beginning of the file, where the finding area ends (zero-based, inclusive).
-        start_line (int): The finding's first line (one-based, inclusive). Can be left blank, if the offsets are given.
+        end_offset (int): Offset from the beginning of the file, where the finding area ends (zero-based, inclusive).  (See also: :ref:`FAQ - Offsets <faq-offsets>`).
+        start_line (int): The finding's first line (one-based, inclusive). Can be left blank, if the offsets are given. (See also: :ref:`FAQ - Offsets <faq-offsets>`).
         end_line (int): The finding's last line (one-based, inclusive). Can be left blank, if the offsets are given.
         identifier (Optional[str]): Advanced usage! Path to special elements in Teamscale, e.g. Simulink model parts. If this is given, offsets and lines do not need to be filled.  
     """
