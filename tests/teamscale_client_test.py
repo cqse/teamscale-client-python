@@ -49,7 +49,7 @@ def test_upload_metrics():
     responses.add(responses.PUT, get_project_service_mock('add-external-metrics'),
                       body='success', status=200)
     resp = get_client().upload_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
-    assert '"[{\\"metrics\\": {\\"metric-1\\": 1, \\"metric-2\\": [1, 3, 4]}, \\"path\\": \\"test/path\\"}]"' == responses.calls[0].request.body.decode()
+    assert '"[{\\"metrics\\": {\\"metric-1\\": 1, \\"metric-2\\": [1, 3, 4]}, \\"path\\": \\"test/path\\"}]"' == responses.calls[0].request.body
     assert resp.text == "success"
 
 @responses.activate

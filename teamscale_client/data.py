@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import collections
-from docutils.parsers.rst.directives import path
 
 from teamscale_client.constants import Assessment, MetricAggregation, MetricValueType, MetricProperties
 from teamscale_client.utils import auto_str
