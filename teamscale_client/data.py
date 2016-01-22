@@ -2,9 +2,11 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import collections
+from docutils.parsers.rst.directives import path
 
 from teamscale_client.constants import Assessment, MetricAggregation, MetricValueType, MetricProperties
 from teamscale_client.utils import auto_str
+
 
 @auto_str
 class Finding(object):
@@ -80,6 +82,22 @@ class MetricDescription(object):
             "properties" : properties,
             "valueType" : value_type
         }
+
+@auto_str
+class MetricEntry(object):
+    """A container for adding metric values to a file.
+    
+    Args:
+        path (str): Path to a resource in Teamscale (usually a file). 
+                    This can also point to architecture components using the following syntax: ``-architectures-/<architecture-name>/path/to/component/``
+        metrics (dict[str, object]): A dictionary mapping from metric_id to metric value. The value depends on the metric type: Numeric: ``int``, Timestamp: ``int - unix timestamp in milliseconds``, Assessment: ``[<GREENVALUE>,<YELLOWVALUE>,<REDVALUE>]``
+    """
+
+    def __init__(self, path, metrics):
+        self.path = path
+        self.metrics = metrics
+
+
 
 class ServiceError(Exception):
     """Teamscale service returned an error."""

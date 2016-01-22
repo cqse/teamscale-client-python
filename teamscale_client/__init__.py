@@ -120,19 +120,7 @@ class TeamscaleClient:
         """Uploads a list of metrics
 
         Args:
-            metrics: metrics data in json format.
-                The metrics should have the following format::
-
-                    [
-                        {
-                            "metrics": {
-                                "<metric-id-1>": <metric-value>,
-                                "<metric-id-2>": <metric-value>
-                            },
-                            "path": "path/to/file/in/teamscale"
-                        },
-                        ...
-                    ]
+            metrics (List[:class:`data.MetricEntry`]): metrics data
             timestamp (datetime.datetime): timestamp for which to upload the metrics
             message (str): The message to use for the generated upload commit
             partition (str): The partition's id into which the metrics should be added (See also: :ref:`FAQ - Partitions<faq-partition>`).
@@ -143,7 +131,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        return self._upload_external_data("add-external-metrics", metrics, timestamp, message, partition)
+        return self._upload_external_data("add-external-metrics", to_json(metrics), timestamp, message, partition)
 
     def _upload_external_data(self, service_name, json_data, timestamp, message, partition):
         """Uploads externals data in json format

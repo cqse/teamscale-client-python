@@ -12,7 +12,7 @@ import responses
 
 from teamscale_client import TeamscaleClient
 from teamscale_client.constants import CoverageFormats
-from teamscale_client.data import Finding, FileFindings, MetricDescription
+from teamscale_client.data import Finding, FileFindings, MetricDescription, MetricEntry
 from teamscale_client.utils import to_json
 
 
@@ -45,9 +45,11 @@ def test_upload_findings():
 
 @responses.activate
 def test_upload_metrics():
+    metric = MetricEntry("test/path", {"metric-1": 1, "metric-2" : [1, 3, 4]})
     responses.add(responses.PUT, get_project_service_mock('add-external-metrics'),
                       body='success', status=200)
-    resp = get_client().upload_metrics([], datetime.datetime.now(), "Test message", "partition-name")
+    resp = get_client().upload_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
+    assert '"[{\\"metrics\\": {\\"metric-1\\": 1, \\"metric-2\\": [1, 3, 4]}, \\"path\\": \\"test/path\\"}]"' == responses.calls[0].request.body.decode()
     assert resp.text == "success"
 
 @responses.activate
