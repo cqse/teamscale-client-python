@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+prefixMappings=<list>\n  <com.teamscale.ide.client.PrefixMapping>\n    <projectId>teamscale-client-python</projectId>\n    <localPrefix></localPrefix>\n    <teamscalePrefix></teamscalePrefix>\n  </com.teamscale.ide.client.PrefixMapping>\n</list>
+teamscaleEnabled=true
+teamscaleProject=teamscale-client-python
+teamscaleServer=Teamscale Live Demo
