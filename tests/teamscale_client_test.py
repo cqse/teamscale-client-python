@@ -12,7 +12,7 @@ import responses
 
 from teamscale_client import TeamscaleClient
 from teamscale_client.constants import CoverageFormats
-from teamscale_client.data import Finding, FileFindings
+from teamscale_client.data import Finding, FileFindings, MetricDescription
 from teamscale_client.utils import to_json
 
 
@@ -52,9 +52,11 @@ def test_upload_metrics():
 
 @responses.activate
 def test_upload_metric_description():
+    description = MetricDescription("metric_i,", "Metric Name", "Great Description", "awesome group")
     responses.add(responses.PUT, get_global_service_mock('add-external-metric-description'),
                       body='success', status=200)
-    resp = get_client().upload_metric_definitions([])
+    resp = get_client().upload_metric_definitions([description])
+    assert '{"analysisGroup": "awesome group", "metricDefinition": {"aggregation": "SUM", "description": "Great Description", "name": "Metric Name", "properties": ["SIZE_METRIC"], "valueType": "NUMERIC"}, "metricId": "metric_i,"}' == to_json(description)
     assert resp.text == "success"
 
 @responses.activate

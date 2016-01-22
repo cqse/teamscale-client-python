@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import collections
 
-from teamscale_client.constants import Assessment
+from teamscale_client.constants import Assessment, MetricAggregation, MetricValueType, MetricProperties
 from teamscale_client.utils import auto_str
 
 @auto_str
@@ -56,6 +56,30 @@ FindingDescription = collections.namedtuple('FindingDescriptions', ['typeid', 'd
         description (str): The text to display that explains what this finding type is about (and ideally how to fix it). This text will be the same for each concrete instance of the finding.
         enablement (constants.Enablement): Describes the default enablement setting for this finding type, used when it is added to the analysis profile.
 """
+
+@auto_str
+class MetricDescription(object):
+    """Description of a metric type to be addded at configuration time.
+    
+    Args:
+        metric_id (str): The globally unique metric id.
+        display_name (str): The metric's name that is displayed in the UI.
+        description (str): A description explaining what this metric means.
+        group_id (str): the name of an analysis group under which the metric is placed (used to group the metrics in the analysis profile).
+        aggregation (constants.MetricAggregation): How this metric is supposed to be aggregated up the directory hierarchy. Defaults to ``SUM``.
+        value_type (constants.MetricValueType): Determines the metric's type. Defaults to ``NUMERIC``.
+        properties (set[constants.MetricProperties]): Determines the metric's properties. This has effects on how/if the metric is displayed and assessed. Defaults to ``(SIZE_METRIC, )``. 
+        """
+    def __init__(self, metric_id, display_name, description, group_id, aggregation=MetricAggregation.SUM, value_type=MetricValueType.NUMERIC, properties=(MetricProperties.SIZE_METRIC,)):
+        self.metricId = metric_id
+        self.analysisGroup = group_id
+        self.metricDefinition = {
+            "name": display_name,
+            "aggregation" : aggregation,
+            "description" : description,
+            "properties" : properties,
+            "valueType" : value_type
+        }
 
 class ServiceError(Exception):
     """Teamscale service returned an error."""
