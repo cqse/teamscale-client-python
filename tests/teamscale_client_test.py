@@ -49,7 +49,7 @@ def test_upload_metrics():
     responses.add(responses.PUT, get_project_service_mock('add-external-metrics'),
                       body='success', status=200)
     resp = get_client().upload_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
-    assert '"[{\\"metrics\\": {\\"metric-1\\": 1, \\"metric-2\\": [1, 3, 4]}, \\"path\\": \\"test/path\\"}]"' == responses.calls[0].request.body
+    assert '[{"metrics": {"metric-1": 1, "metric-2": [1, 3, 4]}, "path": "test/path"}]' == responses.calls[0].request.body
     assert resp.text == "success"
 
 @responses.activate
@@ -57,7 +57,7 @@ def test_upload_metric_description():
     description = MetricDescription("metric_i,", "Metric Name", "Great Description", "awesome group")
     responses.add(responses.PUT, get_global_service_mock('add-external-metric-description'),
                       body='success', status=200)
-    resp = get_client().upload_metric_definitions([description])
+    resp = get_client().add_metric_descriptions([description])
     assert '{"analysisGroup": "awesome group", "metricDefinition": {"aggregation": "SUM", "description": "Great Description", "name": "Metric Name", "properties": ["SIZE_METRIC"], "valueType": "NUMERIC"}, "metricId": "metric_i,"}' == to_json(description)
     assert resp.text == "success"
 

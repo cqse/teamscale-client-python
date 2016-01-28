@@ -31,8 +31,7 @@ if __name__ == '__main__':
     print("Request result: %s" % (response.text,))
 
     # A manual step to add the new groups to existing analysis profiles has to be done.
-    python2 = sys.version_info[0] == 2
-    if python2:
+    if sys.version_info[0] == 2:
         raw_input("Please create the project or update the analysis profile used by the project to contain the new groups. Then Press ENTER to continue.")
     else:
         input("Please create the projetc or update the analysis profile used by the project to contain the new groups. Then Press ENTER to continue.")
