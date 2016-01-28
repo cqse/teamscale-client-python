@@ -6,7 +6,10 @@ from __future__ import unicode_literals
 import datetime
 import sys
 
-from teamscale_client import TeamscaleClient, FindingDescription
+from teamscale_client import TeamscaleClient
+from teamscale_client.constants import Enablement
+from teamscale_client.data import Finding, FileFindings, FindingDescription
+
 
 TEAMSCALE_URL = "http://localhost:8080"
 
@@ -25,7 +28,7 @@ if __name__ == '__main__':
     # Make Teamscale aware of a new findings type, which mappes to the previously
     # created group
     descriptions = [
-        FindingDescription("externals-1", "A test finding description", "RED")
+        FindingDescription("externals-1", "A test finding description", Enablement.RED)
     ]
     response = client.add_finding_descriptions(descriptions)
     print("Request result: %s" % (response.text,))
@@ -42,20 +45,10 @@ if __name__ == '__main__':
 
     # Upload findings to Teamscale
     findings = [
-        {
-            "findings": [
-                {
-                    "findingTypeId": "externals-1",
-                    "message": "test",
-                    "assessment": "RED",
-                    "startLine": 1,
-                    "endLine": 1,
-                    "startOffset": 1,
-                    "endOffset": 26
-                }
-            ],
-            "path": "src/Foo.java"
-        }
+        FileFindings([
+                      Finding("externals-1", "test", start_offset=0, end_offset=26)
+                      ],
+                      "src/Foo.java")
     ]
     response = client.upload_findings(findings, datetime.datetime.now(), "TestCommit", "test-partition")
     print("Request result: %s" % (response.text,))
