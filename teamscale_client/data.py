@@ -49,7 +49,7 @@ class FileFindings(object):
         self.content = content
 
 
-FindingDescription = collections.namedtuple('FindingDescriptions', ['typeid', 'description', 'enablement'])
+FindingDescription = collections.namedtuple('FindingDescription', ['typeid', 'description', 'enablement'])
 """Description of a finding type to be added at configuration time.
 
     Args:
