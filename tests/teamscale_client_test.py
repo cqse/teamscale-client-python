@@ -77,4 +77,4 @@ def _get_test_findings():
 
 def test_finding_json_serialization():
     findings = _get_test_findings()
-    assert '[{"content": null, "findings": [{"assessment": "YELLOW", "endLine": 0, "endOffset": 0, "findingTypeId": "test-id", "identifier": null, "message": "message", "startLine": 0, "startOffset": 0}], "path": "path/to/file"}]' == to_json(findings)
+    assert '[{"content": null, "findings": [{"assessment": "YELLOW", "endLine": null, "endOffset": null, "findingTypeId": "test-id", "identifier": null, "message": "message", "startLine": null, "startOffset": null}], "path": "path/to/file"}]' == to_json(findings)
