@@ -16,7 +16,7 @@ TEAMSCALE_URL = "http://localhost:8080"
 USERNAME = "admin"
 PASSWORD = "admin"
 
-PROJECT_NAME = "foo"
+PROJECT_NAME = "test"
 
 if __name__ == '__main__':
     client = TeamscaleClient(TEAMSCALE_URL, USERNAME, PASSWORD, PROJECT_NAME)
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     # Upload findings to Teamscale
     findings = [
         FileFindings([
-                      Finding("externals-1", "test", start_offset=0, end_offset=26)
+                      Finding("externals-1", "test2", start_line=3)
                       ],
                       "src/Foo.java")
     ]

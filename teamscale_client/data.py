@@ -17,14 +17,14 @@ class Finding(object):
         assesssment (constants.Assessment): The assessment this finding should have. Default is `YELLOW`. 
                                             This value is only important if in Teamscale the finding enablement 
                                             is set to auto, otherwise the setting from Teamscale will be used.
-        start_offset (int): Offset from the beginning of the file, where the finding area starts (zero-based, inclusive).
-        end_offset (int): Offset from the beginning of the file, where the finding area ends (zero-based, inclusive).  (See also: :ref:`FAQ - Offsets <faq-offsets>`).
-        start_line (int): The finding's first line (one-based, inclusive). Can be left blank, if the offsets are given. (See also: :ref:`FAQ - Offsets <faq-offsets>`).
-        end_line (int): The finding's last line (one-based, inclusive). Can be left blank, if the offsets are given.
+        start_offset (int): Offset from the beginning of the file, where the finding area starts (zero-based, inclusive). Can be left blank, if the start/endline are given. (See also: :ref:`FAQ - Offsets <faq-offsets>`).
+        end_offset (int): Offset from the beginning of the file, where the finding area ends (zero-based, inclusive). Can be left blank, if the start/endline are given. (See also: :ref:`FAQ - Offsets <faq-offsets>`).
+        start_line (int): The finding's first line (one-based, inclusive). Can be left blank, if the offsets are given. 
+        end_line (int): The finding's last line (one-based, inclusive). Can be left blank, if the offsets or start_line are given.
         identifier (Optional[str]): Advanced usage! Path to special elements in Teamscale, e.g. Simulink model parts. If this is given, offsets and lines do not need to be filled.  
     """
 
-    def __init__(self, finding_type_id, message, assessment=Assessment.YELLOW, start_offset=0, end_offset=0, start_line=0, end_line=0, identifier=None):
+    def __init__(self, finding_type_id, message, assessment=Assessment.YELLOW, start_offset=None, end_offset=None, start_line=None, end_line=None, identifier=None):
         self.findingTypeId = finding_type_id
         self.message = message
         self.assessment = assessment
