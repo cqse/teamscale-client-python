@@ -195,7 +195,9 @@ class TeamscaleClient:
         parameters = {
             "t": self._get_timestamp_ms(timestamp),
             "message": message,
-            "partition": partition
+            "partition": partition,
+            "format": coverage_format,
+            "adjusttimestamp": "true"
         }
         multiple_files = [('report', open(filename, 'rb')) for filename in coverage_files]
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify, files=multiple_files)
