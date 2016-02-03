@@ -89,7 +89,7 @@ class MetricEntry(object):
     Args:
         path (str): Path to a resource in Teamscale (usually a file). 
                     This can also point to architecture components using the following syntax: ``-architectures-/<architecture-name>/path/to/component/``
-        metrics (dict[str, object]): A dictionary mapping from metric_id to metric value. The value depends on the metric type: Numeric: ``int``, Timestamp: ``int - unix timestamp in milliseconds``, Assessment: ``[<GREENVALUE>,<YELLOWVALUE>,<REDVALUE>]``
+        metrics (dict[str, object]): A dictionary mapping from metric_id to metric value. The value depends on the metric type: Numeric: ``double``, Timestamp: ``int - unix timestamp in milliseconds``, Assessment: ``[<GREENVALUE>,<YELLOWVALUE>,<REDVALUE>]``
     """
 
     def __init__(self, path, metrics):
