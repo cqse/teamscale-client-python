@@ -209,7 +209,7 @@ class TeamscaleClient:
         """Uploads a list of none-code metrics
 
         Args:
-            metrics (List[:class:`data.NonCodeMetricEntry`]): metrics data
+            metrics (List[:class:`data.NoneCodeMetricEntry`]): metrics data
             timestamp (datetime.datetime): timestamp for which to upload the metrics
             message (str): The message to use for the generated upload commit
             partition (str): The partition's id into which the metrics should be added (See also: :ref:`FAQ - Partitions<faq-partition>`).

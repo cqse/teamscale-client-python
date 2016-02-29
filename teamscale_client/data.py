@@ -114,7 +114,7 @@ class NoneCodeMetrics(object):
     
     Args:
         content (str): The content displayed as content for the path
-        assessment (dict[:class:`data.AssessmentMetricColors`, int]): The assessment distribution for this path. 
+        assessment (dict[:class:`constants.AssessmentMetricColors`, int]): The assessment distribution for this path. 
         time (double): The time used to create this result (e.g. unit test run time, or build duration).
     """
 
