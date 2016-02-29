@@ -11,6 +11,15 @@ class Assessment:
 
     YELLOW = "YELLOW"
 
+class AssessmentMetricColors:
+    """Constants used for colors in assessment metrics. """
+
+    RED = "RED"
+
+    YELLOW = "YELLOW"
+
+    GREEN = "GREEN"
+
 class Enablement:
     """The enablement describes which rating a finding should receive."""
 

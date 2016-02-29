@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import collections
 
-from teamscale_client.constants import Assessment, MetricAggregation, MetricValueType, MetricProperties
+from teamscale_client.constants import Assessment, MetricAggregation, MetricValueType, MetricProperties, AssessmentMetricColors
 from teamscale_client.utils import auto_str
 
 
@@ -96,7 +96,32 @@ class MetricEntry(object):
         self.path = path
         self.metrics = metrics
 
+@auto_str
+class NoneCodeMetricEntry(object):
+    """A container for adding none code metrics to a project.
+    
+    Args:
+        path (str): Arbitrary path to which the none-code metrics shall be attached  
+        metrics (:class:`NoneCodeMetrics`): The metrics for this path 
+    """
+    def __init__(self, path, metrics):
+        self.path = path
+        self.metrics = metrics
 
+@auto_str
+class NoneCodeMetrics(object):
+    """Container for none-code metric values.
+    
+    Args:
+        content (str): The content displayed as content for the path
+        assessment (dict[:class:`data.AssessmentMetricColors`, int]): The assessment distribution for this path. 
+        time (double): The time used to create this result (e.g. unit test run time, or build duration).
+    """
+
+    def __init__(self, content="", assessment={}, time=0.0):
+        self.content = content
+        self.assessment = assessment
+        self.time = time
 
 class ServiceError(Exception):
     """Teamscale service returned an error."""
