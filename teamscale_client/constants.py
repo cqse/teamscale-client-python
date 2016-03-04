@@ -81,3 +81,4 @@ class CoverageFormats:
 
     XR_BABOON = "XR_BABOON"
 
+    JACOCO = "JACOCO"
