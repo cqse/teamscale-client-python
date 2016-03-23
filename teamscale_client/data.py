@@ -114,12 +114,14 @@ class NoneCodeMetrics(object):
     
     Args:
         content (str): The content displayed as content for the path
+        count (int): The count value.
         assessment (dict[:class:`constants.AssessmentMetricColors`, int]): The assessment distribution for this path. 
         time (double): The time used to create this result (e.g. unit test run time, or build duration).
     """
 
-    def __init__(self, content="", assessment={}, time=0.0):
+    def __init__(self, content="", count=1, assessment={}, time=0.0):
         self.content = content
+        self.count = count
         self.assessment = assessment
         self.time = time
 
