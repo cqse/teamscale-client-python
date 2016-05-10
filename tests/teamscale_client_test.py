@@ -80,6 +80,16 @@ def test_coverage_upload():
     assert "file1.txt" in responses.calls[0].request.body.decode()
     assert "file2.txt" in responses.calls[0].request.body.decode()
 
+@responses.activate
+def test_architecture_upload():
+    paths = {"archs/first.architecture" : "tests/data/file1.txt", "archs/second.architecture" : "tests/data/file2.txt"}
+    responses.add(responses.POST, get_project_service_mock('architecture-upload'),
+                      body='success', status=200)
+    resp = get_client().upload_architectures(paths, datetime.datetime.now(), "Test Message", "partition-name")
+    assert resp.text == "success"
+    assert "file1.txt" in responses.calls[0].request.body.decode()
+    assert "file2.txt" in responses.calls[0].request.body.decode()
+
 def _get_test_findings():
     finding = Finding("test-id", "message")
     return [FileFindings([finding], "path/to/file")]
