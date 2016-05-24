@@ -12,11 +12,11 @@ from teamscale_client.constants import CoverageFormats
 TEAMSCALE_URL = "http://localhost:8080"
 
 USERNAME = "admin"
-PASSWORD = "admin"
+PASSWORD = "F0VzQ_2Q2wqGmBFBrI6EIVWVK4QxR55o"
 
 PROJECT_NAME = "test"
 
 if __name__ == '__main__':
     client = TeamscaleClient(TEAMSCALE_URL, USERNAME, PASSWORD, PROJECT_NAME)
 
-    client.upload_architectures({"architectures/system.architecture": "/home/user/a/path/to/system.architecture"}, datetime.datetime.now(), "Upload architecture", "test-partition")
+    client.upload_architectures({"archs/abap.architecture": "/home/kinnen/repos/conqat-cqse_bmw/engine/eu.cqse.conqat.engine.abap/abap_exporter.architecture"}, datetime.datetime.now(), "Upload architecture")
