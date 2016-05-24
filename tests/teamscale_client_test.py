@@ -95,7 +95,7 @@ def test_add_baseline():
                       body='success', status=200)
     resp = get_client().add_baseline(baseline)
     assert resp.text == "success"
-    assert "Baseline 1" in responses.calls[0].request.body.decode()
+    assert "Baseline 1" in responses.calls[0].request.body
 
 @responses.activate
 def test_architecture_upload():

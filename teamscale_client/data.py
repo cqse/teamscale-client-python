@@ -151,7 +151,12 @@ class Baseline(object):
         return datetime.datetime.fromtimestamp(float(self._timestamp))
 
     def _set_date(self, date_object):
-        self.timestamp = long(time.mktime(date_object.timetuple())*1000)
+        import sys
+        if sys.version_info > (3,):
+            long_type = int
+        else:
+            long_type = long
+        self.timestamp = long_type(time.mktime(date_object.timetuple())*1000)
 
     date = property(_get_date, _set_date)
 
