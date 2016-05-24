@@ -2,6 +2,8 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import collections
+import datetime
+import time
 
 from teamscale_client.constants import Assessment, MetricAggregation, MetricValueType, MetricProperties, AssessmentMetricColors
 from teamscale_client.utils import auto_str
@@ -124,6 +126,34 @@ class NoneCodeMetrics(object):
         self.count = count
         self.assessment = assessment
         self.time = time
+
+@auto_str
+class Baseline(object):
+    """Represents a Teamscale baseline. Either the date or the timestamp must be given
+
+    Args:
+        name (str): The baseline's name
+        description (str): The baseline's description
+        date (Optional[datetime.datetime]): The date for which the baseline is set
+        date (Optional[long]): The timestamp (in ms) for which the baseline is set
+    """
+
+    def __init__(self, name, description, date=None, timestamp=None):
+        if timestamp is None and date is None:
+            raise Exception("Either date or timestamp must be given.")
+        self.name = name
+        self.description = description
+        self.timestamp = timestamp
+        if(date is not None):
+            self._set_date(date)
+
+    def _get_date(self):
+        return datetime.datetime.fromtimestamp(float(self._timestamp))
+
+    def _set_date(self, date_object):
+        self.timestamp = long(time.mktime(date_object.timetuple())*1000)
+
+    date = property(_get_date, _set_date)
 
 class ServiceError(Exception):
     """Teamscale service returned an error."""

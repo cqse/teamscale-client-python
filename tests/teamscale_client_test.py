@@ -12,7 +12,7 @@ import responses
 
 from teamscale_client import TeamscaleClient
 from teamscale_client.constants import CoverageFormats, AssessmentMetricColors
-from teamscale_client.data import Finding, FileFindings, MetricDescription, MetricEntry, NoneCodeMetrics, NoneCodeMetricEntry
+from teamscale_client.data import Finding, FileFindings, MetricDescription, MetricEntry, NoneCodeMetrics, NoneCodeMetricEntry, Baseline
 from teamscale_client.utils import to_json
 
 
@@ -79,6 +79,23 @@ def test_coverage_upload():
     assert resp.text == "success"
     assert "file1.txt" in responses.calls[0].request.body.decode()
     assert "file2.txt" in responses.calls[0].request.body.decode()
+
+@responses.activate
+def test_get_baseline():
+    responses.add(responses.GET, get_project_service_mock('baselines'),
+                      status=200, content_type="application/json", body='[{ "name": "Baseline 1", "description": "Test description", "timestamp": 123192873091 }]')
+    resp = get_client().get_baselines()
+    assert len(resp) == 1
+    assert resp[0].name == "Baseline 1"
+
+@responses.activate
+def test_add_baseline():
+    baseline = Baseline("Baseline 1", "Test description", datetime.datetime.now())
+    responses.add(responses.PUT, get_project_service_mock('baselines'),
+                      body='success', status=200)
+    resp = get_client().add_baseline(baseline)
+    assert resp.text == "success"
+    assert "Baseline 1" in responses.calls[0].request.body.decode()
 
 @responses.activate
 def test_architecture_upload():
