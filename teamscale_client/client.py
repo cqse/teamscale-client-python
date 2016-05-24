@@ -264,7 +264,6 @@ class TeamscaleClient:
         response = requests.get(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
-        print response.text
         return [ Baseline(x['name'], x['description'], timestamp=x['timestamp']) for x in response.json() ]
 
     def add_baseline(self, baseline):
