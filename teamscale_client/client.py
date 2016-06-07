@@ -230,11 +230,11 @@ class TeamscaleClient:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
 
-    def upload_none_code_metrics(self, metrics, timestamp, message, partition):
-        """Uploads a list of none-code metrics
+    def upload_non_code_metrics(self, metrics, timestamp, message, partition):
+        """Uploads a list of non-code metrics
 
         Args:
-            metrics (List[:class:`data.NoneCodeMetricEntry`]): metrics data
+            metrics (List[:class:`data.NonCodeMetricEntry`]): metrics data
             timestamp (datetime.datetime): timestamp for which to upload the metrics
             message (str): The message to use for the generated upload commit
             partition (str): The partition's id into which the metrics should be added (See also: :ref:`FAQ - Partitions<faq-partition>`).
@@ -245,7 +245,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        return self._upload_external_data("add-none-code-metrics", metrics, timestamp, message, partition)
+        return self._upload_external_data("add-non-code-metrics", metrics, timestamp, message, partition)
 
     def get_baselines(self):
         """Retrieves a list of baselines from the server for the currently active project.

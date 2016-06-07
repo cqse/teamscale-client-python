@@ -99,29 +99,18 @@ class MetricEntry(object):
         self.metrics = metrics
 
 @auto_str
-class NoneCodeMetricEntry(object):
-    """A container for adding none code metrics to a project.
+class NonCodeMetricEntry(object):
+    """A container for adding non-code metrics to a project.
     
     Args:
-        path (str): Arbitrary path to which the none-code metrics shall be attached  
-        metrics (:class:`NoneCodeMetrics`): The metrics for this path 
-    """
-    def __init__(self, path, metrics):
-        self.path = path
-        self.metrics = metrics
-
-@auto_str
-class NoneCodeMetrics(object):
-    """Container for none-code metric values.
-    
-    Args:
-        content (str): The content displayed as content for the path
+        path (str): Arbitrary path to which the non-code metrics shall be attached.
+        content (str): The content displayed as content for the path.
         count (int): The count value.
-        assessment (dict[:class:`constants.AssessmentMetricColors`, int]): The assessment distribution for this path. 
+        assessment (dict[:class:`constants.AssessmentMetricColors`, int]): The assessment distribution for this path.
         time (double): The time used to create this result (e.g. unit test run time, or build duration).
     """
-
-    def __init__(self, content="", count=1, assessment={}, time=0.0):
+    def __init__(self, path, content="", count=1, assessment={}, time=0.0)
+        self.path = path
         self.content = content
         self.count = count
         self.assessment = assessment
