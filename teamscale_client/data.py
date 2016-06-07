@@ -109,7 +109,7 @@ class NonCodeMetricEntry(object):
         assessment (dict[:class:`constants.AssessmentMetricColors`, int]): The assessment distribution for this path.
         time (double): The time used to create this result (e.g. unit test run time, or build duration).
     """
-    def __init__(self, path, content="", count=1, assessment={}, time=0.0)
+    def __init__(self, path, content="", count=1, assessment={}, time=0.0):
         self.path = path
         self.content = content
         self.count = count
