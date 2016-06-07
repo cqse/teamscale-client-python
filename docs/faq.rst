@@ -6,7 +6,7 @@ Frequently Asked Questions
 What is the `partition` parameter used for?
 -------------------------------------------
 
-A partition denotes a `set of findings/metrics/architectures/none-code-metrics` uploaded in one session. The data present (or not present) in the upload into a partition will be used to determine if each finding/metric/etc. is old, new or has been deleted. 
+A partition denotes a `set of findings/metrics/architectures/non-code-metrics` uploaded in one session. The data present (or not present) in the upload into a partition will be used to determine if each finding/metric/etc. is old, new or has been deleted. 
 
 Partition ids must be unique within a project, independent of the uploaded content. It is important that even if you upload metrics in one call and findings in another, that partitions must not overlap!
 
