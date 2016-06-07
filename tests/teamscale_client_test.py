@@ -12,7 +12,7 @@ import responses
 
 from teamscale_client import TeamscaleClient
 from teamscale_client.constants import CoverageFormats, AssessmentMetricColors
-from teamscale_client.data import Finding, FileFindings, MetricDescription, MetricEntry, NoneCodeMetrics, NoneCodeMetricEntry, Baseline
+from teamscale_client.data import Finding, FileFindings, MetricDescription, MetricEntry, NonCodeMetricEntry, Baseline
 from teamscale_client.utils import to_json
 
 
@@ -54,11 +54,11 @@ def test_upload_metrics():
 
 @responses.activate
 def test_upload_none_code_metrics():
-    metric = NoneCodeMetricEntry("metric1/none/code/metric/path", [NoneCodeMetrics("This is a test content", 2, {AssessmentMetricColors.RED: 2, AssessmentMetricColors.GREEN : 1}, 25.0)])
+    metric = NonCodeMetricEntry("metric1/none/code/metric/path", "This is a test content", 2, {AssessmentMetricColors.RED: 2, AssessmentMetricColors.GREEN : 1}, 25.0)
     responses.add(responses.PUT, get_project_service_mock("add-none-code-metrics"),
                       body='success', status=200)
     resp = get_client().upload_none_code_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
-    assert '[{"metrics": [{"assessment": {"GREEN": 1, "RED": 2}, "content": "This is a test content", "count": 2, "time": 25.0}], "path": "metric1/none/code/metric/path"}]' == responses.calls[0].request.body
+    assert '[{"assessment": {"GREEN": 1, "RED": 2}, "content": "This is a test content", "count": 2, "time": 25.0, "path": "metric1/none/code/metric/path"}]' == responses.calls[0].request.body
     assert resp.text == "success"
 
 @responses.activate
