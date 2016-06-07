@@ -58,7 +58,7 @@ def test_upload_non_code_metrics():
     responses.add(responses.PUT, get_project_service_mock("add-non-code-metrics"),
                       body='success', status=200)
     resp = get_client().upload_non_code_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
-    assert '[{"assessment": {"GREEN": 1, "RED": 2}, "content": "This is a test content", "count": 2, "time": 25.0, "path": "metric1/non/code/metric/path"}]' == responses.calls[0].request.body
+    assert '[{"assessment": {"GREEN": 1, "RED": 2}, "content": "This is a test content", "count": 2, "path": "metric1/non/code/metric/path", "time": 25.0}]' == responses.calls[0].request.body
     assert resp.text == "success"
 
 @responses.activate
