@@ -18,6 +18,7 @@ Contents:
    data
    utils
    faq
+   how_to_findings
 
 
 Indices and tables

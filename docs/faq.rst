@@ -21,3 +21,4 @@ Therefore: Use a separate partition for every distinct tool/server upload you ar
 If I provide offset information with a finding, how does Teamscale handle newlines to figure out where exactly the offset points at?
 ------------------------------------------------------------------------------------------------------------------------------------
 Teamscale assumes UNIX linebreaks. Currently, there is no way to override this. Mostly, Teamscale will figure out the correct position, as offsets are aligned to token boundaries.
+
