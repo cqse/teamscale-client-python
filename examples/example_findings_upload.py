@@ -14,7 +14,7 @@ from teamscale_client.data import Finding, FileFindings, FindingDescription
 TEAMSCALE_URL = "http://localhost:8080"
 
 USERNAME = "admin"
-PASSWORD = "admin"
+PASSWORD = "IDE-ACCESS-KEY"
 
 PROJECT_NAME = "test"
 
