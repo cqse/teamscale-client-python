@@ -98,6 +98,13 @@ def test_add_baseline():
     assert "Baseline 1" in responses.calls[0].request.body
 
 @responses.activate
+def test_delete_baseline():
+    responses.add(responses.DELETE, get_project_service_mock('baselines'),
+                      body='success', status=200)
+    resp = get_client().delete_baseline("Baseline 1")
+    assert resp.text == "success"
+
+@responses.activate
 def test_architecture_upload():
     paths = {"archs/first.architecture" : "tests/data/file1.txt", "archs/second.architecture" : "tests/data/file2.txt"}
     responses.add(responses.POST, get_project_service_mock('architecture-upload'),
