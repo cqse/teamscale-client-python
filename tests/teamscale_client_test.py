@@ -106,6 +106,7 @@ def test_delete_baseline():
 
 @responses.activate
 def test_architecture_upload():
+    # Just reuse text files for testing, it's just a mock anyway
     paths = {"archs/first.architecture" : "tests/data/file1.txt", "archs/second.architecture" : "tests/data/file2.txt"}
     responses.add(responses.POST, get_project_service_mock('architecture-upload'),
                       body='success', status=200)

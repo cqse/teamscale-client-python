@@ -227,8 +227,8 @@ class TeamscaleClient:
         """Upload architectures to Teamscale. It is expected that the given architectures can be be read from the filesystem.
 
         Args:
-            architectures (dict): mappping of teamscale paths to real architecture files that should be uploaded. Files must be readable.
-            timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
+            architectures (dict): mappping of teamscale paths to architecture files that should be uploaded. Files must be readable.
+            timestamp (datetime.datetime): timestamp for which to upload the data
             message (str): The message to use for the generated upload commit
 
         Returns:
@@ -242,8 +242,8 @@ class TeamscaleClient:
             "t": self._get_timestamp_ms(timestamp),
             "message": message
         }
-        multiple_files = [(path, open(filename, 'rb')) for path, filename in architectures.items()]
-        response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify, files=multiple_files)
+        architecture_files = [(path, open(filename, 'rb')) for path, filename in architectures.items()]
+        response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify, files=architecture_files)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
