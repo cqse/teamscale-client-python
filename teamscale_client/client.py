@@ -22,14 +22,16 @@ class TeamscaleClient:
         password (str): The password/api key to use for authentication
         project (str): The project on which to work
         sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
+        branch: The branch name for which to upload/retrieve data
     """
 
-    def __init__(self, url, username, password, project, sslverify=True):
+    def __init__(self, url, username, password, project, sslverify=True, branch=None):
         self.url = url
         self.username = username
         self.auth_header = HTTPBasicAuth(username, password)
         self.project = project
         self.sslverify = sslverify
+        self.branch = branch
 
     def get(self, url, parameters=None):
         """Sends a GET request to the given service url.
@@ -170,7 +172,7 @@ class TeamscaleClient:
         """
         service_url = self.get_project_service_url(service_name)
         parameters = {
-            "t": self._get_timestamp_ms(timestamp),
+            "t": self._get_timestamp_parameter(timestamp),
             "message": message,
             "partition": partition,
             "skip-session": "true",
@@ -211,7 +213,7 @@ class TeamscaleClient:
         """
         service_url = self.get_project_service_url("external-report")
         parameters = {
-            "t": self._get_timestamp_ms(timestamp),
+            "t": self._get_timestamp_parameter(timestamp),
             "message": message,
             "partition": partition,
             "format": coverage_format,
@@ -239,7 +241,7 @@ class TeamscaleClient:
         """
         service_url = self.get_project_service_url("architecture-upload")
         parameters = {
-            "t": self._get_timestamp_ms(timestamp),
+            "t": self._get_timestamp_parameter(timestamp),
             "message": message
         }
         architecture_files = [(path, open(filename, 'rb')) for path, filename in architectures.items()]
@@ -316,17 +318,20 @@ class TeamscaleClient:
         service_url += baseline.name
         return self.put(service_url, parameters={}, data=to_json(baseline))
 
-    def _get_timestamp_ms(self, timestamp):
-        """Returns the timestamp  in ms.
+    def _get_timestamp_parameter(self, timestamp):
+        """Returns the timestamp parameter. Will use the branch parameter if it is set.
 
         Args:
             timestamp (datetime.datetime): The timestamp to convert
 
         Returns:
-            int: timestamp in ms
+            str: timestamp in ms
         """
         timestamp_seconds = time.mktime(timestamp.timetuple())
-        return int(timestamp_seconds * 1000)
+        timestamp_ms = str(int(timestamp_seconds * 1000))
+        if self.branch is not None:
+            return self.branch + ":" + timestamp_ms
+        return timestamp_ms
 
     def get_global_service_url(self, service_name):
         """Returns the full url pointing to a global service.
