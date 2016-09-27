@@ -133,8 +133,14 @@ class Baseline(object):
         self.name = name
         self.description = description
         self.timestamp = timestamp
-        if(date is not None):
+        if date is not None:
             self._set_date(date)
+
+    def __hash__(self):
+        return hash((self.name, self.description, self.timestamp))
+
+    def __eq__(self, other):
+        return isinstance(other, Baseline) and hash(other) == hash(self)
 
     def _get_date(self):
         return datetime.datetime.fromtimestamp(float(self._timestamp))
