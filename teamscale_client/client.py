@@ -22,14 +22,16 @@ class TeamscaleClient:
         password (str): The password/api key to use for authentication
         project (str): The project on which to work
         sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
+        timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
     """
 
-    def __init__(self, url, username, password, project, sslverify=True):
+    def __init__(self, url, username, password, project, sslverify=True, timeout=30.0):
         self.url = url
         self.username = username
         self.auth_header = HTTPBasicAuth(username, password)
         self.project = project
         self.sslverify = sslverify
+        self.timeout = timeout
 
     def get(self, url, parameters=None):
         """Sends a GET request to the given service url.
@@ -44,7 +46,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify)
+        response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
@@ -64,7 +66,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        response = requests.put(url, params=parameters, json=json, data=data, headers={'Content-Type': 'application/json'}, auth=self.auth_header, verify=self.sslverify)
+        response = requests.put(url, params=parameters, json=json, data=data, headers={'Content-Type': 'application/json'}, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout)
         if response.status_code != 200:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
@@ -82,7 +84,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        response = requests.delete(url, params=parameters, auth=self.auth_header, verify=self.sslverify)
+        response = requests.delete(url, params=parameters, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout)
         if response.status_code != 200:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
@@ -218,7 +220,7 @@ class TeamscaleClient:
             "adjusttimestamp": "true"
         }
         multiple_files = [('report', open(filename, 'rb')) for filename in coverage_files]
-        response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify, files=multiple_files)
+        response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify, files=multiple_files, timeout=self.timeout)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
@@ -243,7 +245,7 @@ class TeamscaleClient:
             "message": message
         }
         architecture_files = [(path, open(filename, 'rb')) for path, filename in architectures.items()]
-        response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify, files=architecture_files)
+        response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify, files=architecture_files, timeout=self.timeout)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
@@ -279,7 +281,7 @@ class TeamscaleClient:
             "detail": True
         }
         headers = {'Accept' : 'application/json'}
-        response = requests.get(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers)
+        response = requests.get(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers, timeout=self.timeout)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return [ Baseline(x['name'], x['description'], timestamp=x['timestamp']) for x in response.json() ]
