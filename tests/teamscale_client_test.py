@@ -19,6 +19,8 @@ from teamscale_client.utils import to_json
 URL = "http://localhost:8080"
 
 def get_client():
+    responses.add(responses.GET, get_global_service_mock('service-api-info'),
+                      status=200, content_type="application/json", body='{ "apiVersion": 2 }')
     return TeamscaleClient(URL, "admin", "admin", "foo")
 
 def get_project_service_mock(service_id):
@@ -39,8 +41,8 @@ def test_upload_findings():
     responses.add(responses.PUT, get_project_service_mock('add-external-findings'),
                       body='success', status=200)
     resp = get_client().upload_findings(_get_test_findings(), datetime.datetime.now(), "Test message", "partition-name")
-    assert "content" in responses.calls[0].request.body
-    assert "test-id" in responses.calls[0].request.body
+    assert "content" in responses.calls[2].request.body
+    assert "test-id" in responses.calls[2].request.body
     assert resp.text == "success"
 
 @responses.activate
@@ -49,7 +51,7 @@ def test_upload_metrics():
     responses.add(responses.PUT, get_project_service_mock('add-external-metrics'),
                       body='success', status=200)
     resp = get_client().upload_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
-    assert '[{"metrics": {"metric-1": 1, "metric-2": [1, 3, 4]}, "path": "test/path"}]' == responses.calls[0].request.body
+    assert '[{"metrics": {"metric-1": 1, "metric-2": [1, 3, 4]}, "path": "test/path"}]' == responses.calls[2].request.body
     assert resp.text == "success"
 
 @responses.activate
@@ -58,7 +60,7 @@ def test_upload_non_code_metrics():
     responses.add(responses.PUT, get_project_service_mock("add-non-code-metrics"),
                       body='success', status=200)
     resp = get_client().upload_non_code_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
-    assert '[{"assessment": {"GREEN": 1, "RED": 2}, "content": "This is a test content", "count": 2, "path": "metric1/non/code/metric/path", "time": 25.0}]' == responses.calls[0].request.body
+    assert '[{"assessment": {"GREEN": 1, "RED": 2}, "content": "This is a test content", "count": 2, "path": "metric1/non/code/metric/path", "time": 25.0}]' == responses.calls[2].request.body
     assert resp.text == "success"
 
 @responses.activate
@@ -77,8 +79,8 @@ def test_coverage_upload():
                       body='success', status=200)
     resp = get_client().upload_coverage_data(files, CoverageFormats.CTC, datetime.datetime.now(), "Test Message", "partition-name")
     assert resp.text == "success"
-    assert "file1.txt" in responses.calls[0].request.body.decode()
-    assert "file2.txt" in responses.calls[0].request.body.decode()
+    assert "file1.txt" in responses.calls[2].request.body.decode()
+    assert "file2.txt" in responses.calls[2].request.body.decode()
 
 @responses.activate
 def test_get_baseline():
@@ -95,7 +97,7 @@ def test_add_baseline():
                       body='success', status=200)
     resp = get_client().add_baseline(baseline)
     assert resp.text == "success"
-    assert "Baseline 1" in responses.calls[0].request.body
+    assert "Baseline 1" in responses.calls[2].request.body
 
 @responses.activate
 def test_delete_baseline():
@@ -112,8 +114,8 @@ def test_architecture_upload():
                       body='success', status=200)
     resp = get_client().upload_architectures(paths, datetime.datetime.now(), "Test Message")
     assert resp.text == "success"
-    assert "file1.txt" in responses.calls[0].request.body.decode()
-    assert "file2.txt" in responses.calls[0].request.body.decode()
+    assert "file1.txt" in responses.calls[2].request.body.decode()
+    assert "file2.txt" in responses.calls[2].request.body.decode()
 
 def _get_test_findings():
     finding = Finding("test-id", "message")
