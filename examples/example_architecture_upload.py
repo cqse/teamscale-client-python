@@ -19,4 +19,4 @@ PROJECT_NAME = "test"
 if __name__ == '__main__':
     client = TeamscaleClient(TEAMSCALE_URL, USERNAME, PASSWORD, PROJECT_NAME)
 
-    client.upload_architectures({"archs/abap.architecture": "/home/kinnen/repos/conqat-cqse_bmw/engine/eu.cqse.conqat.engine.abap/abap_exporter.architecture"}, datetime.datetime.now(), "Upload architecture")
+    client.upload_architectures({"architectures/system.architecture": "/path/to/system.architecture"}, datetime.datetime.now(), "Upload architecture")
