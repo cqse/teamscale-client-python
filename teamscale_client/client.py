@@ -23,15 +23,30 @@ class TeamscaleClient:
         project (str): The project on which to work
         sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
         timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
+        branch: The branch name for which to upload/retrieve data
     """
 
-    def __init__(self, url, username, password, project, sslverify=True, timeout=30.0):
+    def __init__(self, url, username, password, project, sslverify=True, timeout=30.0, branch=None):
         self.url = url
         self.username = username
         self.auth_header = HTTPBasicAuth(username, password)
         self.project = project
         self.sslverify = sslverify
         self.timeout = timeout
+        self.branch = branch
+        self.check_api_version()
+
+    def check_api_version(self):
+        """Verifies the server's api version and connectivity.
+
+        Raises:
+            ServiceError: If the version does not match or the server cannot be found.
+        """
+        url = self.get_global_service_url('service-api-info')
+        response = self.get(url)
+        apiVersion = response.json()['apiVersion']
+        if apiVersion < 2:
+            raise ServiceError("Server api version " + str(apiVersion) + " too low and not compatible. This client requires Teamscale 3.0 or newer.");
 
     def get(self, url, parameters=None):
         """Sends a GET request to the given service url.
@@ -46,7 +61,8 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout)
+        headers = {'Accept' : 'application/json'}
+        response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers, timeout=self.timeout)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
@@ -172,7 +188,7 @@ class TeamscaleClient:
         """
         service_url = self.get_project_service_url(service_name)
         parameters = {
-            "t": self._get_timestamp_ms(timestamp),
+            "t": self._get_timestamp_parameter(timestamp),
             "message": message,
             "partition": partition,
             "skip-session": "true",
@@ -213,7 +229,7 @@ class TeamscaleClient:
         """
         service_url = self.get_project_service_url("external-report")
         parameters = {
-            "t": self._get_timestamp_ms(timestamp),
+            "t": self._get_timestamp_parameter(timestamp),
             "message": message,
             "partition": partition,
             "format": coverage_format,
@@ -241,7 +257,7 @@ class TeamscaleClient:
         """
         service_url = self.get_project_service_url("architecture-upload")
         parameters = {
-            "t": self._get_timestamp_ms(timestamp),
+            "t": self._get_timestamp_parameter(timestamp),
             "message": message
         }
         architecture_files = [(path, open(filename, 'rb')) for path, filename in architectures.items()]
@@ -318,17 +334,20 @@ class TeamscaleClient:
         service_url += baseline.name
         return self.put(service_url, parameters={}, data=to_json(baseline))
 
-    def _get_timestamp_ms(self, timestamp):
-        """Returns the timestamp  in ms.
+    def _get_timestamp_parameter(self, timestamp):
+        """Returns the timestamp parameter. Will use the branch parameter if it is set.
 
         Args:
             timestamp (datetime.datetime): The timestamp to convert
 
         Returns:
-            int: timestamp in ms
+            str: timestamp in ms
         """
         timestamp_seconds = time.mktime(timestamp.timetuple())
-        return int(timestamp_seconds * 1000)
+        timestamp_ms = str(int(timestamp_seconds * 1000))
+        if self.branch is not None:
+            return self.branch + ":" + timestamp_ms
+        return timestamp_ms
 
     def get_global_service_url(self, service_name):
         """Returns the full url pointing to a global service.
