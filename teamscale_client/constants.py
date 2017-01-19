@@ -82,3 +82,9 @@ class CoverageFormats:
     XR_BABOON = "XR_BABOON"
 
     JACOCO = "JACOCO"
+    
+    DOT_COVER = "DOT_COVER"
+    
+    MS_COVERAGE = "MS_COVERAGE"
+    
+    ROSLYN = "ROSLYN"
