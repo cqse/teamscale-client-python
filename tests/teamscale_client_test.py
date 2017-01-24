@@ -66,7 +66,7 @@ def test_upload_non_code_metrics():
 @responses.activate
 def test_upload_metric_description():
     description = MetricDescription("metric_i,", "Metric Name", "Great Description", "awesome group")
-    responses.add(responses.PUT, get_global_service_mock('add-external-metric-description'),
+    responses.add(responses.PUT, get_global_service_mock('external-metric'),
                       body='success', status=200)
     resp = get_client().add_metric_descriptions([description])
     assert '{"analysisGroup": "awesome group", "metricDefinition": {"aggregation": "SUM", "description": "Great Description", "name": "Metric Name", "properties": ["SIZE_METRIC"], "valueType": "NUMERIC"}, "metricId": "metric_i,"}' == to_json(description)

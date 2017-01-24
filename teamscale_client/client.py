@@ -208,7 +208,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        service_url = self.get_global_service_url("add-external-metric-description")
+        service_url = self.get_global_service_url("external-metric")
         return self.put(service_url, data=to_json(metric_descriptions))
 
     def upload_coverage_data(self, coverage_files, coverage_format, timestamp, message, partition):
