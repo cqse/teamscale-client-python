@@ -114,7 +114,7 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
-        url = self.get_global_service_url('add-external-findings-group')
+        url = self.get_global_service_url('external-findings-group')
         payload = [{'groupName': name, 'mapping': mapping_pattern}]
         return self.put(url, payload)
 
