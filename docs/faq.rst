@@ -14,7 +14,7 @@ If you only have one place where you upload data, you can always use the same pa
 
 A simple way to think about this, is that the findings are stored into different buckets, each containing a certain set of findings. If the items in each individual bucket are updated, the difference to the previous version can be calculated without affecting any items from other buckets.
 
-Therefore: Use a separate partition for every distinct tool/server upload you are doing, but use the same paratition name every time for each upload of a newer version of the same distinct tool/server.
+Therefore: Use a separate partition for every distinct tool/server upload you are doing, but use the same partition name every time for each upload of a newer version of the same distinct tool/server.
 
 .. _faq-offsets:
 
