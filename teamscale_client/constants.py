@@ -88,3 +88,16 @@ class CoverageFormats:
     MS_COVERAGE = "MS_COVERAGE"
     
     ROSLYN = "ROSLYN"
+
+class ConnectorType:
+    """Connector types."""
+
+    TFS = "TFS"
+
+    FILE_SYSTEM = "File System"
+
+    MULTI_VERSION_FILE_SYSTEM = "Multi-Version File System"
+
+    GIT = "Git"
+
+    SVN = "Subversion"

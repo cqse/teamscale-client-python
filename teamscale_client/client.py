@@ -7,8 +7,9 @@ import time
 
 import simplejson as json
 
-from teamscale_client.data import ServiceError, Baseline
+from teamscale_client.data import ServiceError, Baseline, ProjectInfo
 from teamscale_client.utils import to_json
+
 
 class TeamscaleClient:
     """Basic Python service client to access Teamscale's REST Api.
@@ -46,7 +47,8 @@ class TeamscaleClient:
         response = self.get(url)
         apiVersion = response.json()['apiVersion']
         if apiVersion < 2:
-            raise ServiceError("Server api version " + str(apiVersion) + " too low and not compatible. This client requires Teamscale 3.0 or newer.");
+            raise ServiceError("Server api version " + str(
+                apiVersion) + " too low and not compatible. This client requires Teamscale 3.0 or newer.");
 
     def get(self, url, parameters=None):
         """Sends a GET request to the given service url.
@@ -61,8 +63,9 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        headers = {'Accept' : 'application/json'}
-        response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers, timeout=self.timeout)
+        headers = {'Accept': 'application/json'}
+        response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers,
+                                timeout=self.timeout)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
@@ -82,7 +85,10 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        response = requests.put(url, params=parameters, json=json, data=data, headers={'Content-Type': 'application/json'}, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout)
+        headers = {'Accept': 'application/json','Content-Type': 'application/json'}
+        response = requests.put(url, params=parameters, json=json, data=data,
+                                headers=headers, auth=self.auth_header,
+                                verify=self.sslverify, timeout=self.timeout)
         if response.status_code != 200:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
@@ -100,7 +106,8 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        response = requests.delete(url, params=parameters, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout)
+        response = requests.delete(url, params=parameters, auth=self.auth_header, verify=self.sslverify,
+                                   timeout=self.timeout)
         if response.status_code != 200:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
@@ -236,7 +243,8 @@ class TeamscaleClient:
             "adjusttimestamp": "true"
         }
         multiple_files = [('report', open(filename, 'rb')) for filename in coverage_files]
-        response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify, files=multiple_files, timeout=self.timeout)
+        response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
+                                 files=multiple_files, timeout=self.timeout)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
@@ -261,7 +269,8 @@ class TeamscaleClient:
             "message": message
         }
         architecture_files = [(path, open(filename, 'rb')) for path, filename in architectures.items()]
-        response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify, files=architecture_files, timeout=self.timeout)
+        response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
+                                 files=architecture_files, timeout=self.timeout)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
@@ -287,7 +296,7 @@ class TeamscaleClient:
         """Retrieves a list of baselines from the server for the currently active project.
 
         Returns:
-            List[:class:`data.Basenline`]): The list of baselines.
+            List[:class:`data.Baseline`]): The list of baselines.
 
         Raises:
             ServiceError: If anything goes wrong
@@ -296,11 +305,12 @@ class TeamscaleClient:
         parameters = {
             "detail": True
         }
-        headers = {'Accept' : 'application/json'}
-        response = requests.get(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers, timeout=self.timeout)
+        headers = {'Accept': 'application/json'}
+        response = requests.get(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
+                                headers=headers, timeout=self.timeout)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
-        return [ Baseline(x['name'], x['description'], timestamp=x['timestamp']) for x in response.json() ]
+        return [Baseline(x['name'], x['description'], timestamp=x['timestamp']) for x in response.json()]
 
     def delete_baseline(self, baseline_name):
         """Deletes a baseline from the currently active project.
@@ -333,6 +343,80 @@ class TeamscaleClient:
         service_url = self.get_project_service_url("baselines")
         service_url += baseline.name
         return self.put(service_url, parameters={}, data=to_json(baseline))
+
+    def get_projects(self):
+        """Retrieves a list of projects from the server.
+
+        Returns:
+            List[:class:`data.ProjectInfo`]): The list of projects.
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        service_url = self.get_global_service_url("projects")
+        parameters = {
+            "detail": True
+        }
+        headers = {'Accept': 'application/json'}
+        response = requests.get(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
+                                headers=headers, timeout=self.timeout)
+        print response.json()
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return [
+            ProjectInfo(project_id=x['id'], name=x['name'], description=x['description'],
+                        creation_timestamp=x['creationTimestamp'], alias=x.get('alias'),
+                        deleting=x['deleting'], reanalyzing=x['reanalyzing']) for x in response.json()]
+
+    def add_project(self, project_configuration, only_config_update=False):
+        """Adds a project to Teamscale. Re-adding a project with an existing id will update the original project
+        if `only_config_update` is set to `True`.
+
+        Args:
+            project_configuration (data.ProjectConfiguration): The project that is to be added (or updated)
+            only_config_update (bool): Whether the project configuration should only be updated
+        Returns:
+            requests.Response: object generated by the upload request
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        service_url = self.get_global_service_url("create-project")
+        parameters = {
+            "only-config-update": only_config_update
+        }
+        response = self.put(service_url, parameters=parameters, data=to_json(project_configuration), )
+
+        if TeamscaleClient._response_indicates_failure(response):
+            raise ServiceError(
+                "ERROR: GET {url}: {status_code}:{message}".format(url=service_url, status_code=response.status_code,
+                                                                   message=TeamscaleClient._get_response_message(
+                                                                       response)))
+        return response
+
+    @staticmethod
+    def _response_indicates_failure(response):
+        """Returns a value that indicates whether the given response signals a failed request.
+
+        Args:
+            response (requests.Response): The server response.
+
+        Returns:
+            A value that indicates whether the given response signals a failed request.
+        """
+        return response.status_code != 200 or TeamscaleClient._get_response_message(response) != 'success'
+
+    @staticmethod
+    def _get_response_message(response):
+        """Returns the message enclosed in the provided server response.
+
+        Args:
+            response (requests.Response): The server response.
+
+        Returns:
+            A string containing the server response message.
+        """
+        return response.json().get('message')
 
     def _get_timestamp_parameter(self, timestamp):
         """Returns the timestamp parameter. Will use the branch parameter if it is set.
