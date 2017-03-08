@@ -4,8 +4,9 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from teamscale_client import TeamscaleClient
-from teamscale_client.data import ProjectConfiguration, FileSystemSourceCodeConnectorConfiguration, GitSourceCodeConnectorConfiguration, \
-    MultiVersionFileSystemSourceCodeConnectorConfiguration, TFSSourceCodeConnectorConfiguration, SubversionSourceCodeConnectorConfiguration
+from teamscale_client.data import ProjectConfiguration, FileSystemSourceCodeConnectorConfiguration, \
+    GitSourceCodeConnectorConfiguration,  MultiVersionFileSystemSourceCodeConnectorConfiguration, \
+    TFSSourceCodeConnectorConfiguration, SubversionSourceCodeConnectorConfiguration
 
 TEAMSCALE_URL = "http://localhost:8080"
 
@@ -29,76 +30,76 @@ def show_projects(client):
     print([str(project) for project in projects])
 
 
-def add_project_via_file_system_connector():
+def create_project_with_file_system_connector():
     file_system_config = FileSystemSourceCodeConnectorConfiguration(input_directory=LOCAL_PATH,
                                                                     repository_identifier="Local",
                                                                     included_file_names=INCLUDE_PATTERN)
     project_configuration = ProjectConfiguration(name="Test Project", project_id="test-project",
                                                  profile=ANALYSIS_PROFILE, connectors=[file_system_config])
-    client.add_project(project_configuration)
+    client.create_project(project_configuration)
 
 
-def update_project_via_file_system_connector():
+def update_project_with_file_system_connector():
     file_system_config = FileSystemSourceCodeConnectorConfiguration(input_directory=LOCAL_PATH,
                                                                     repository_identifier="Local",
                                                                     included_file_names=INCLUDE_PATTERN)
     project_configuration = ProjectConfiguration(name="Test Project", project_id="test-project",
                                                  profile=ANALYSIS_PROFILE, connectors=[file_system_config],
                                                  alias="Teamscale Python Client")
-    client.add_project(project_configuration, only_config_update=True)
+    client.update_project(project_configuration)
 
 
-def add_project_via_git_connector():
+def create_project_with_git_connector():
     git_config = GitSourceCodeConnectorConfiguration(branch_name="master", account=ACCOUNT_NAME_GIT,
                                                      repository_identifier="Git", included_file_names=INCLUDE_PATTERN)
     project_configuration = ProjectConfiguration(name="Test Project 2", project_id="test-project-002",
                                                  profile=ANALYSIS_PROFILE, connectors=[git_config])
-    client.add_project(project_configuration)
+    client.create_project(project_configuration)
 
 
-def add_project_via_multiversion_file_system_connector():
+def create_project_with_multiversion_file_system_connector():
     mvfsc_config = MultiVersionFileSystemSourceCodeConnectorConfiguration(input_directory=LOCAL_PATH_MULTIVERSION,
                                                                           repository_identifier="Local-Multiversion",
                                                                           included_file_names=INCLUDE_PATTERN)
     project_configuration = ProjectConfiguration(name="Test Project 3", project_id="test-project-003",
                                                  profile=ANALYSIS_PROFILE, connectors=[mvfsc_config])
-    client.add_project(project_configuration)
+    client.create_project(project_configuration)
 
 
-def add_project_via_tfs_connector():
+def create_project_with_tfs_connector():
     tfs_config = TFSSourceCodeConnectorConfiguration(account=ACCOUNT_NAME_TFS, repository_identifier="TFS",
                                                      included_file_names=INCLUDE_PATTERN)
     project_configuration = ProjectConfiguration(name="Test Project 4", project_id="test-project-004",
                                                  profile=ANALYSIS_PROFILE, connectors=[tfs_config])
-    client.add_project(project_configuration)
+    client.create_project(project_configuration)
 
 
-def add_project_via_svn_connector():
+def create_project_with_svn_connector():
     svn_config = SubversionSourceCodeConnectorConfiguration(account=ACCOUNT_NAME_SVN, repository_identifier="SVN",
                                                             included_file_names=INCLUDE_PATTERN)
     project_configuration = ProjectConfiguration(name="Test Project 5", project_id="test-project-005",
                                                  profile=ANALYSIS_PROFILE, connectors=[svn_config])
-    client.add_project(project_configuration)
+    client.create_project(project_configuration)
 
 
 if __name__ == '__main__':
     client = TeamscaleClient(TEAMSCALE_URL, USERNAME, PASSWORD, PROJECT_NAME)
     show_projects(client)
 
-    add_project_via_file_system_connector()
+    create_project_with_file_system_connector()
     show_projects(client)
 
-    update_project_via_file_system_connector()
+    update_project_with_file_system_connector()
     show_projects(client)
 
-    add_project_via_git_connector()
+    create_project_with_git_connector()
     show_projects(client)
 
-    add_project_via_multiversion_file_system_connector()
+    create_project_with_multiversion_file_system_connector()
     show_projects(client)
 
-    add_project_via_tfs_connector()
+    create_project_with_tfs_connector()
     show_projects(client)
 
-    add_project_via_svn_connector()
+    create_project_with_svn_connector()
     show_projects(client)

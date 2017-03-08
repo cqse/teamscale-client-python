@@ -144,6 +144,6 @@ def test_add_project():
 
     responses.add(responses.PUT, get_global_service_mock('create-project'),
                       body='{"message": "success"}', status=200)
-    resp = get_client().add_project(project_configuration)
-    assert not TeamscaleClient._response_indicates_failure(resp)
+    resp = get_client().create_project(project_configuration)
+    assert resp.status_code == 200 and TeamscaleClient._get_response_message(resp) == 'success'
 
