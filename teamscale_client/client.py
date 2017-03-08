@@ -414,11 +414,11 @@ class TeamscaleClient:
         }
         response = self.put(service_url, parameters=parameters, data=to_json(project_configuration))
 
-        if response.status_code != 200 or TeamscaleClient._get_response_message(response) != 'success':
+        response_message = TeamscaleClient._get_response_message(response)
+        if response_message != 'success':
             raise ServiceError(
                 "ERROR: GET {url}: {status_code}:{message}".format(url=service_url, status_code=response.status_code,
-                                                                   message=TeamscaleClient._get_response_message(
-                                                                       response)))
+                                                                   message=response_message))
         return response
 
     @staticmethod
