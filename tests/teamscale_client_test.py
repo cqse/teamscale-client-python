@@ -12,7 +12,8 @@ import responses
 
 from teamscale_client import TeamscaleClient
 from teamscale_client.constants import CoverageFormats, AssessmentMetricColors
-from teamscale_client.data import Finding, FileFindings, MetricDescription, MetricEntry, NonCodeMetricEntry, Baseline
+from teamscale_client.data import Finding, FileFindings, MetricDescription, MetricEntry, NonCodeMetricEntry, Baseline, \
+    FileSystemSourceCodeConnectorConfiguration, ProjectConfiguration
 from teamscale_client.utils import to_json
 
 
@@ -124,3 +125,25 @@ def _get_test_findings():
 def test_finding_json_serialization():
     findings = _get_test_findings()
     assert '[{"content": null, "findings": [{"assessment": "YELLOW", "endLine": null, "endOffset": null, "findingTypeId": "test-id", "identifier": null, "message": "message", "startLine": null, "startOffset": null}], "path": "path/to/file"}]' == to_json(findings)
+
+@responses.activate
+def test_get_projects():
+    responses.add(responses.GET, get_global_service_mock('projects'),
+                      status=200, content_type="application/json", body='[{"description": "", "creationTimestamp": 1487534523817, "alias": "My Test Project", "reanalyzing": false, "deleting": false, "id": "test-project", "name": "Test Project"}]')
+    resp = get_client().get_projects()
+    assert len(resp) == 1
+    assert resp[0].name == "Test Project"
+
+@responses.activate
+def test_add_project():
+    file_system_config = FileSystemSourceCodeConnectorConfiguration(input_directory="/path/to/folder",
+                                                                    repository_identifier="Local",
+                                                                    included_file_names="**.py")
+    project_configuration = ProjectConfiguration(name="Test Project", project_id="test-project",
+                                                 profile="Python (default)", connectors=[file_system_config])
+
+    responses.add(responses.PUT, get_global_service_mock('create-project'),
+                      body='{"message": "success"}', status=200)
+    resp = get_client().create_project(project_configuration)
+    assert resp.status_code == 200 and TeamscaleClient._get_response_message(resp) == 'success'
+
