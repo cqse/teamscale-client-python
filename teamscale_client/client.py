@@ -48,7 +48,7 @@ class TeamscaleClient:
         apiVersion = response.json()['apiVersion']
         if apiVersion < 3:
             raise ServiceError("Server api version " + str(
-                apiVersion) + " too low and not compatible. This client requires Teamscale 3.0 or newer.");
+                apiVersion) + " too low and not compatible. This client requires Teamscale 3.2 or newer.");
 
     def get(self, url, parameters=None):
         """Sends a GET request to the given service url.
