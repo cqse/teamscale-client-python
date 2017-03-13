@@ -46,7 +46,7 @@ class TeamscaleClient:
         url = self.get_global_service_url('service-api-info')
         response = self.get(url)
         apiVersion = response.json()['apiVersion']
-        if apiVersion < 2:
+        if apiVersion < 3:
             raise ServiceError("Server api version " + str(
                 apiVersion) + " too low and not compatible. This client requires Teamscale 3.0 or newer.");
 
