@@ -89,6 +89,13 @@ class CoverageFormats:
     
     ROSLYN = "ROSLYN"
 
+class ReportFormats:
+    """Report formats that Teamscale understands."""
+
+    PCLINT = "PCLINT"
+    
+    CLANG = "CLANG"
+
 class ConnectorType:
     """Connector types."""
 
