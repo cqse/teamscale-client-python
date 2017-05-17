@@ -13,7 +13,7 @@ from teamscale_client.data import Baseline
 TEAMSCALE_URL = "http://localhost:8080"
 
 USERNAME = "admin"
-PASSWORD = "admin"
+ACCESS_TOKEN = "ide-access-token"
 
 PROJECT_NAME = "test"
 
@@ -22,7 +22,7 @@ def show_baselines(client):
     print([str(baseline) for baseline in baselines])
 
 if __name__ == '__main__':
-    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, PASSWORD, PROJECT_NAME)
+    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_NAME)
 
     baseline = Baseline("Test Baseline", "This is a test description", datetime.datetime.now())
 

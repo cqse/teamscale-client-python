@@ -12,11 +12,11 @@ from teamscale_client.constants import CoverageFormats
 TEAMSCALE_URL = "http://localhost:8080"
 
 USERNAME = "admin"
-PASSWORD = "F0VzQ_2Q2wqGmBFBrI6EIVWVK4QxR55o"
+ACCESS_TOKEN = "ide-access-token"
 
 PROJECT_NAME = "test"
 
 if __name__ == '__main__':
-    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, PASSWORD, PROJECT_NAME)
+    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_NAME)
 
     client.upload_architectures({"architectures/system.architecture": "/path/to/system.architecture"}, datetime.datetime.now(), "Upload architecture")

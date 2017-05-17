@@ -20,17 +20,17 @@ class TeamscaleClient:
     Args:
         url (str): The url to Teamscale (including the port)
         username (str): The username to use for authentication
-        password (str): The password/api key to use for authentication
+        access_token (str): The IDE access token to use for authentication
         project (str): The project on which to work
         sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
         timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
         branch: The branch name for which to upload/retrieve data
     """
 
-    def __init__(self, url, username, password, project, sslverify=True, timeout=30.0, branch=None):
+    def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
         self.url = url
         self.username = username
-        self.auth_header = HTTPBasicAuth(username, password)
+        self.auth_header = HTTPBasicAuth(username, access_token)
         self.project = project
         self.sslverify = sslverify
         self.timeout = timeout

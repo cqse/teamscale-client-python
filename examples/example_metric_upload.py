@@ -12,12 +12,12 @@ from teamscale_client.data import MetricEntry
 TEAMSCALE_URL = "http://localhost:8080"
 
 USERNAME = "admin"
-PASSWORD = "admin"
+ACCESS_TOKEN = "ide-access-token"
 
 PROJECT_NAME = "foo"
 
 if __name__ == '__main__':
-    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, PASSWORD, PROJECT_NAME)
+    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_NAME)
 
     entry = MetricEntry("src/Foo.java", {"sample_metric_id" : 10})
     entry2 = MetricEntry("-architectures-/system.architecture/src/empty/", {"sample_metric_id" : 6})

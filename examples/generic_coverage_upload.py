@@ -25,7 +25,7 @@ from teamscale_client.constants import CoverageFormats
 TEAMSCALE_URL = "http://localhost:8080"
 
 USERNAME = "build"
-ACCESS_TOKEN = "access_token"
+ACCESS_TOKEN = "ide-access-token"
     
 def main(coverage_folder):
     print("\n---> checking for new coverage at %s" % datetime.datetime.now())

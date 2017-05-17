@@ -12,12 +12,12 @@ from teamscale_client.constants import ReportFormats
 TEAMSCALE_URL = "http://localhost:8080"
 
 USERNAME = "admin"
-PASSWORD = "admin"
+ACCESS_TOKEN = "ide-access-token"
 
 PROJECT_NAME = "test"
 
 if __name__ == '__main__':
-    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, PASSWORD, PROJECT_NAME)
+    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_NAME)
 
     files = [ file for file in glob.glob("/path/to/report.xml")]
 
