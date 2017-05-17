@@ -21,4 +21,4 @@ if __name__ == '__main__':
 
     files = [ file for file in glob.glob("/path/to/report.xml")]
 
-    client.upload_coverage_data(files, ReportFormats.PCLINT , datetime.datetime.now(), "Upload coverage", "test-partition")
+    client.upload_report(files, ReportFormats.PCLINT , datetime.datetime.now(), "Upload PCLint results", "test-partition")
