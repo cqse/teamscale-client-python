@@ -96,6 +96,8 @@ class ReportFormats:
     
     CLANG = "CLANG"
 
+    PYLINT = "PYLINT"
+
 class ConnectorType:
     """Connector types."""
 
