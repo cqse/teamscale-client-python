@@ -235,7 +235,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-	self.upload_report(self, coverage_files, coverage_format, timestamp, message, partition)
+	self.upload_report(coverage_files, coverage_format, timestamp, message, partition)
 
     def upload_report(self, report_files, report_format, timestamp, message, partition):
         """Upload reports from external tools to Teamscale. It is expected that the given report files can be read from the filesystem.
