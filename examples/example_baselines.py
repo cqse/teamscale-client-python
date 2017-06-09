@@ -15,14 +15,14 @@ TEAMSCALE_URL = "http://localhost:8080"
 USERNAME = "admin"
 ACCESS_TOKEN = "ide-access-token"
 
-PROJECT_NAME = "test"
+PROJECT_ID = "test"
 
 def show_baselines(client):
     baselines = client.get_baselines()
     print([str(baseline) for baseline in baselines])
 
 if __name__ == '__main__':
-    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_NAME)
+    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_ID)
 
     baseline = Baseline("Test Baseline", "This is a test description", datetime.datetime.now())
 

@@ -21,7 +21,7 @@ class TeamscaleClient:
         url (str): The url to Teamscale (including the port)
         username (str): The username to use for authentication
         access_token (str): The IDE access token to use for authentication
-        project (str): The project on which to work
+        project (str): The id of the project on which to work
         sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
         timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
         branch: The branch name for which to upload/retrieve data
