@@ -16,10 +16,10 @@ TEAMSCALE_URL = "http://localhost:8080"
 USERNAME = "admin"
 ACCESS_TOKEN = "ide-access-token"
 
-PROJECT_NAME = "test"
+PROJECT_ID = "test"
 
 if __name__ == '__main__':
-    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_NAME)
+    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_ID)
 
     # Add a new group that will contain findings
     response = client.add_findings_group("Group 1", "externals-.*")

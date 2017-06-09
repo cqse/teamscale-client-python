@@ -15,10 +15,10 @@ TEAMSCALE_URL = "http://localhost:8080"
 USERNAME = "admin"
 ACCESS_TOKEN = "ide-access-token"
 
-PROJECT_NAME = "test"
+PROJECT_ID = "test"
 
 if __name__ == '__main__':
-    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_NAME)
+    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_ID)
 
     entry = NonCodeMetricEntry("/non/code/metric/path", "This is a test content", 3, {AssessmentMetricColors.RED: 2, AssessmentMetricColors.GREEN : 1}, 25.0)
     entry2 = NonCodeMetricEntry("/non/code/metric/path2", "This is a test content 2", 5, {AssessmentMetricColors.RED: 1, AssessmentMetricColors.GREEN : 4}, 40.)

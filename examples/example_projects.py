@@ -13,7 +13,7 @@ TEAMSCALE_URL = "http://localhost:8080"
 USERNAME = "admin"
 ACCESS_TOKEN = "ide-access-token"
 
-PROJECT_NAME = "test"
+PROJECT_ID = "test"
 
 ANALYSIS_PROFILE = "Python (default)"
 INCLUDE_PATTERN = "**.py"
@@ -83,7 +83,7 @@ def create_project_with_svn_connector():
 
 
 if __name__ == '__main__':
-    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_NAME)
+    client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_ID)
     show_projects(client)
 
     create_project_with_file_system_connector()
