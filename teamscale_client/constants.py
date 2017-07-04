@@ -88,6 +88,8 @@ class CoverageFormats:
     MS_COVERAGE = "MS_COVERAGE"
     
     ROSLYN = "ROSLYN"
+    
+    BULLSEYE = "BULLSEYE"
 
 class ReportFormats:
     """Report formats that Teamscale understands."""
