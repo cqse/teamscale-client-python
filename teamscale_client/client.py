@@ -265,7 +265,7 @@ class TeamscaleClient:
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=multiple_files, timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+            raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
 
     def upload_architectures(self, architectures, timestamp, message):
