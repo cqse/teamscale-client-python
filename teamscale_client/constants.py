@@ -91,12 +91,29 @@ class CoverageFormats:
     
     BULLSEYE = "BULLSEYE"
 
+    SIMPLE = "SIMPLE"
+
 class ReportFormats:
     """Report formats that Teamscale understands."""
 
     PCLINT = "PCLINT"
     
     CLANG = "CLANG"
+
+    ASTREE = "ASTREE"
+
+    FXCOP = "FXCOP"
+
+    SPCOP = "SPCOP"
+
+    CS_COMPILER_WARNING = "CS_COMPILER_WARNING"
+
+class UnitTestReportFormats:
+    """Reports for unit test results that Teamscale understands."""
+
+    JUNIT = "JUNIT"
+
+    XUNIT = "XUNIT"
 
 class ConnectorType:
     """Connector types."""
