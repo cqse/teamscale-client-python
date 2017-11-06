@@ -107,6 +107,8 @@ class ReportFormats:
     SPCOP = "SPCOP"
 
     CS_COMPILER_WARNING = "CS_COMPILER_WARNING"
+   
+    PYLINT = "PYLINT"
 
 class UnitTestReportFormats:
     """Reports for unit test results that Teamscale understands."""
