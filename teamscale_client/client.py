@@ -259,7 +259,8 @@ class TeamscaleClient:
             "message": message,
             "partition": partition,
             "format": report_format,
-            "adjusttimestamp": "true"
+            "adjusttimestamp": "true",
+            "movetolastcommit": "true"
         }
         multiple_files = [('report', open(filename, 'rb')) for filename in report_files]
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
