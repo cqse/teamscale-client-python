@@ -286,7 +286,7 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
                                                Empty by default.
         branch_transformation (Optional[str]): Regex transformations that are applied to the branch names
                                                of the repository. Empty by default.
-		path_suffix (Optional[str]): The suffix to append to the base URL of the repository. Empty by default.
+        path_suffix (Optional[str]): The suffix to append to the base URL of the repository. Empty by default.
     """
 
     def __init__(self, connector_type, included_file_names, excluded_file_names="", repository_identifier="repository1",
@@ -317,7 +317,7 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
             "Encoding": encoding,
             "Author transformation": author_transformation,
             "Branch transformation": branch_transformation,
-			"Path suffix": path_suffix,
+            "Path suffix": path_suffix,
         }
 
 
