@@ -54,7 +54,7 @@ class TeamscaleClient:
         """Sends a GET request to the given service url.
 
         Args:
-            url (str):  The URL for which to execute a PUT request
+            url (str):  The URL for which to execute a GET request
             parameters (dict): parameters to attach to the url
 
         Returns:
@@ -217,7 +217,6 @@ class TeamscaleClient:
         """
         service_url = self.get_global_service_url("external-metric")
         return self.put(service_url, data=to_json(metric_descriptions))
-
 
     def upload_coverage_data(self, coverage_files, coverage_format, timestamp, message, partition):
         """Upload coverage reports to Teamscale. It is expected that the given coverage report files can be read from the filesystem.
