@@ -110,7 +110,7 @@ class MigratorBase(ABC):
 class BlacklistMigrator(MigratorBase):
     """ Class for migrating blacklists between two instances.
     If some blacklisted finding cannot be found in the new instance, they will not
-    bet migrated.
+    be migrated.
     """
 
     def migrate(self):
