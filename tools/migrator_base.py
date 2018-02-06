@@ -7,8 +7,6 @@ from teamscale_client import TeamscaleClient
 from teamscale_client.data import ServiceError
 from requests.exceptions import ConnectionError
 
-# TODO: migrating between different versions (messages might change)
-
 
 def get_arguments():
     """ Parses the arguments for the migration tool. """
@@ -28,6 +26,7 @@ class MigratorBase(ABC):
         self.debug = args.debug
         self.logger = self.get_logger()
         self.old, self.new = self.load_config(args.config)
+        self.versions_match = self.check_versions()
         self.migrated = 0
         self.cache = {}
 
@@ -43,7 +42,7 @@ class MigratorBase(ABC):
             try:
                 data = json.load(config_file.open())
                 return self.get_client(data["old_instance"]), self.get_client(data["new_instance"])
-            except (json.JSONDecodeError, KeyError) as e:
+            except (json.JSONDecodeError, KeyError):
                 self.logger.exception("Config file '%s' is malformed" % config_path, exc_info=True)
             except ConnectionError as e:
                 self.logger.exception("Connection to %s could not be established" % e.request.url)
@@ -52,6 +51,18 @@ class MigratorBase(ABC):
         else:
             self.logger.exception("Config file '%s' does not exist" % config_path)
         exit(1)
+
+    def check_versions(self):
+        """ Checks if the versions of both clients match. If not False will be returned
+        and a warning will be logged.
+        """
+        old_version = self.old.get_version()
+        new_version = self.new.get_version()
+        if old_version != new_version:
+            self.logger.warning("Teamscale versions of the old (%s) and new (%s) instance differ!" %
+                                (old_version, new_version))
+            return False
+        return True
 
     @staticmethod
     def get_client(data):
@@ -150,20 +161,12 @@ class MigratorBase(ABC):
             client = self.old
         return "{0.url}/findings.html#details/{0.project}/?id={1}".format(client, findings_id)
 
-    @staticmethod
-    def match_finding(finding1, finding2):
-        """ Checks if the given two findings are the same. """
-        if finding1["message"] != finding2["message"]:
-            return False
-
-        # some findings don't have a start line
-        has_line1 = "rawStartLine" in finding1["location"]
-        has_line2 = "rawStartLine" in finding2["location"]
-        if has_line1 != has_line2:
-            return False
-        if not has_line1:
-            return True
-        return finding1["location"]["rawStartLine"] == finding2["location"]["rawStartLine"]
+    def match_finding(self, finding1, finding2):
+        """ Checks if the given two findings are the same. This is done by comparing their location and message.
+        If the version of the two TS instances don't match, only the location is compared """
+        location_match = finding1["location"] == finding2["location"]
+        message_match = finding1["message"] == finding2["message"]
+        return location_match and (message_match or not self.versions_match)
 
     @abstractmethod
     def migrate(self):
