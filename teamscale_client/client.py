@@ -22,8 +22,10 @@ class TeamscaleClient:
         username (str): The username to use for authentication
         access_token (str): The IDE access token to use for authentication
         project (str): The id of the project on which to work
-        sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
-        timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
+        sslverify: See requests' verify parameter in
+            http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
+        timeout (float): TTFB timeout in seconds,
+            see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
         branch: The branch name for which to upload/retrieve data
     """
 
@@ -45,10 +47,10 @@ class TeamscaleClient:
         """
         url = self.get_global_service_url('service-api-info')
         response = self.get(url)
-        apiVersion = response.json()['apiVersion']
-        if apiVersion < 3:
+        api_version = response.json()['apiVersion']
+        if api_version < 3:
             raise ServiceError("Server api version " + str(
-                apiVersion) + " too low and not compatible. This client requires Teamscale 3.2 or newer.");
+                api_version) + " too low and not compatible. This client requires Teamscale 3.2 or newer.")
 
     def get(self, url, parameters=None):
         """Sends a GET request to the given service url.
@@ -67,7 +69,7 @@ class TeamscaleClient:
         response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers,
                                 timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+            raise ServiceError("GET", url, response)
         return response
 
     def put(self, url, json=None, parameters=None, data=None):
@@ -90,7 +92,7 @@ class TeamscaleClient:
                                 headers=headers, auth=self.auth_header,
                                 verify=self.sslverify, timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+            raise ServiceError("PUT", url, response)
         return response
 
     def delete(self, url, parameters=None):
@@ -109,7 +111,7 @@ class TeamscaleClient:
         response = requests.delete(url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                    timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+            raise ServiceError("PUT", url, response)
         return response
 
     def add_findings_group(self, name, mapping_pattern):
@@ -265,7 +267,7 @@ class TeamscaleClient:
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=multiple_files, timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+            raise ServiceError("POST", service_url, response)
         return response
 
     def upload_architectures(self, architectures, timestamp, message):
@@ -291,7 +293,7 @@ class TeamscaleClient:
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=architecture_files, timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+            raise ServiceError("GET", service_url, response)
         return response
 
     def upload_non_code_metrics(self, metrics, timestamp, message, partition):
@@ -328,7 +330,7 @@ class TeamscaleClient:
         response = requests.get(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                 headers=headers, timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+            raise ServiceError("GET", service_url, response)
         return [Baseline(x['name'], x['description'], timestamp=x['timestamp']) for x in response.json()]
 
     def delete_baseline(self, baseline_name):
@@ -435,9 +437,7 @@ class TeamscaleClient:
 
         response_message = TeamscaleClient._get_response_message(response)
         if response_message != 'success':
-            raise ServiceError(
-                "ERROR: GET {url}: {status_code}:{message}".format(url=service_url, status_code=response.status_code,
-                                                                   message=response_message))
+            raise ServiceError("GET", service_url, response)
         return response
 
     @staticmethod

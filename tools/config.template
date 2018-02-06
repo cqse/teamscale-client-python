@@ -1,0 +1,14 @@
+{
+    "old_instance" : {
+        "url": "http://localhost:8080",
+        "project": "a",
+        "user": "user",
+        "token": "tokentoken"
+    },
+    "new_instance" : {
+        "url": "http://localhost:8080",
+        "project": "b",
+        "user": "user",
+        "token": "tokentoken"
+    }
+}

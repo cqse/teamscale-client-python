@@ -5,8 +5,7 @@ import collections
 import datetime
 import time
 
-from teamscale_client.constants import Assessment, MetricAggregation, MetricValueType, MetricProperties, \
-    AssessmentMetricColors, ConnectorType
+from teamscale_client.constants import Assessment, MetricAggregation, MetricValueType, MetricProperties, ConnectorType
 from teamscale_client.utils import auto_str
 
 
@@ -17,7 +16,7 @@ class Finding(object):
     Args:
         finding_type_id (str): The type id that this finding belongs to.
         message (str): The main finding message
-        assesssment (constants.Assessment): The assessment this finding should have. Default is `YELLOW`.
+        assessment (constants.Assessment): The assessment this finding should have. Default is `YELLOW`.
                                             This value is only important if in Teamscale the finding enablement
                                             is set to auto, otherwise the setting from Teamscale will be used.
         start_offset (int): Offset from the beginning of the file, where the finding area starts
@@ -66,8 +65,10 @@ FindingDescription = collections.namedtuple('FindingDescription', ['typeid', 'de
 
     Args:
         typeid (str): The id used to reference the finding type.
-        description (str): The text to display that explains what this finding type is about (and ideally how to fix it). This text will be the same for each concrete instance of the finding.
-        enablement (constants.Enablement): Describes the default enablement setting for this finding type, used when it is added to the analysis profile.
+            description (str): The text to display that explains what this finding type is about 
+            (and ideally how to fix it) This text will be the same for each concrete instance of the finding.
+        enablement (constants.Enablement): Describes the default enablement setting for this finding type, used when it 
+            is added to the analysis profile.
 """
 
 
@@ -181,7 +182,14 @@ class Baseline(object):
 
 class ServiceError(Exception):
     """Teamscale service returned an error."""
-    pass
+
+    def __init__(self, method, url, response):
+        self.message = "ERROR: {0} {1}: {r.status_code}:{r.text}".format(method, url, r=response)
+        self.response = response
+
+    # This prevents the compressing of a response into a single line, making it unreadable (no repr()!)
+    def __str__(self):
+        return self.message
 
 
 @auto_str
@@ -413,4 +421,3 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
         self.options["Enable Externals"] = enable_externals
         self.options["Externals Includes"] = externals_includes
         self.options["Externals Excludes"] = externals_excludes
-
