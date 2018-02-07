@@ -24,8 +24,13 @@ CONFIG = {
 
 
 class TestTaskMigrator:
+    """ Simple class for bundling the test for the task migration. """
     @staticmethod
     def get_migrator(config):
+        """
+        Returns a task migrator with the given config.
+        For an example config look at CONFIG
+        """
         TestTaskMigrator.create_necessary_client_responses(URL)
         return TaskMigrator(config, False)
 
