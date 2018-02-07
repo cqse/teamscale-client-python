@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-from migrator_base import MigratorBase
+from migration.migrator_base import MigratorBase, get_arguments
 
 
 def main():
     """ Migrates the task from the old instance to the new one.
     It automatically reads the arguments from the command line. """
-    TaskMigrator().migrate()
+    (config, debug) = get_arguments()
+    TaskMigrator(config, debug).migrate()
 
 
 class TaskMigrator(MigratorBase):
@@ -74,12 +75,12 @@ class TaskMigrator(MigratorBase):
                 return True
         return False
 
-    def task_findings_match(self, new, old):
+    def task_findings_match(self, new_task, old_task):
         """ Checks if the findings of the given two tasks are the same.
         Returns True if they are, False otherwise.
         """
-        new_findings = self.get_task_findings(self.new, new)
-        old_findings = self.get_task_findings(self.old, old)
+        new_findings = self.get_task_findings(self.new, new_task)
+        old_findings = self.get_task_findings(self.old, old_task)
 
         for old_finding in old_findings:
             if not self.finding_match_in_list(old_finding, new_findings):

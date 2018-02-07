@@ -15,17 +15,46 @@ def get_arguments():
                                        "see config.template.")
     parser.add_argument("--debug", action="store_true", help="The debug option which enables debug log. Can be use to "
                                                              "dry-run the migration, as it does not change anything.")
-    return parser.parse_args()
+    args = parser.parse_args()
+    return load_config_json(args.config), args.debug
+
+
+def load_config_json(path):
+    """ Loads the config data as a JSON and returns it. """
+    logger = MigratorBase.logger
+    config_file = Path(path)
+    if config_file.exists():
+        try:
+            return json.load(config_file.open())
+        except json.JSONDecodeError:
+            logger.exception("Config file '%s' is malformed" % path, exc_info=True)
+    else:
+        logger.exception("Config file '%s' does not exist" % path)
+    exit(1)
+
+
+def create_logger():
+    """ Creates a logger """
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter("%(levelname)-8s %(message)s (%(filename)-0s:%(lineno)-0s)")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
 
 
 class MigratorBase(ABC):
     """ Base class for migrating data from one instance to another via REST calls. """
+    logger = create_logger()
 
-    def __init__(self):
-        args = get_arguments()
-        self.debug = args.debug
-        self.logger = self.get_logger()
-        self.old, self.new = self.load_config(args.config)
+    def __init__(self, config_data, debug=False):
+        self.debug = debug
+        if self.debug:
+            self.logger.setLevel(logging.DEBUG)
+        else:
+            self.logger.setLevel(logging.INFO)
+        self.old, self.new = self.create_clients(config_data)
         self.versions_match = self.check_versions()
         self.migrated = 0
         self.cache = {}
@@ -33,23 +62,18 @@ class MigratorBase(ABC):
         if self.debug:
             self.logger.debug("Debug Mode ON")
 
-    def load_config(self, config_path):
+    def create_clients(self, config_data):
         """ Reads the given config defined by its path and creates the two teamscale clients from it.
         One old instance (migrating from) and a new onoe (migrating to).
         """
-        config_file = Path(config_path)
-        if config_file.exists():
-            try:
-                data = json.load(config_file.open())
-                return self.get_client(data["old_instance"]), self.get_client(data["new_instance"])
-            except (json.JSONDecodeError, KeyError):
-                self.logger.exception("Config file '%s' is malformed" % config_path, exc_info=True)
-            except ConnectionError as e:
-                self.logger.exception("Connection to %s could not be established" % e.request.url)
-            except ServiceError as e:
-                self.logger.exception("Creating the teamscale clients failed.")
-        else:
-            self.logger.exception("Config file '%s' does not exist" % config_path)
+        try:
+            return self.get_client(config_data["old_instance"]), self.get_client(config_data["new_instance"])
+        except KeyError:
+            self.logger.exception("Config data is malformed")
+        except ConnectionError as e:
+            self.logger.exception("Connection to %s could not be established" % e.request.url)
+        except ServiceError:
+            self.logger.exception("Creating the teamscale clients failed.")
         exit(1)
 
     def check_versions(self):
@@ -68,18 +92,6 @@ class MigratorBase(ABC):
     def get_client(data):
         """ Creates a teamscale client from the given data """
         return TeamscaleClient(data["url"], data["user"], data["token"], data["project"])
-
-    def get_logger(self):
-        """ Creates a logger """
-        logger = logging.getLogger(__name__)
-        logger.setLevel(logging.INFO)
-        if self.debug:
-            logger.setLevel(logging.DEBUG)
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter("%(levelname)-8s %(message)s")
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        return logger
 
     def check_cache(self, request, use_cache):
         """ If use_cache is True it checks if the cache already contains the response

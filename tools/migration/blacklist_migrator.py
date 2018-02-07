@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-from migrator_base import MigratorBase
+from migration.migrator_base import MigratorBase, get_arguments
 
 
 def main():
-    BlacklistMigrator().migrate()
+    config, debug = get_arguments()
+    BlacklistMigrator(config, debug).migrate()
 
 
 class BlacklistMigrator(MigratorBase):
