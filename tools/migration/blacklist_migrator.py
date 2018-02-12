@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from migration.migrator_base import MigratorBase, get_arguments
+from migrator_base import MigratorBase, get_arguments
 
 
 def main():
