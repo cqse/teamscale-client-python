@@ -38,7 +38,7 @@ class TaskMigrator(MigratorBase):
         old_tasks = self.get_from_old("tasks", parameters={"details": True})
         not_migrated = []
         for task in old_tasks:
-            task_url = self.get_tasks_url(task)
+            task_url = self.get_tasks_url(task["id"])
             self.logger.info("Checking for Task %s" % task_url)
             if self.task_exists(task):
                 self.logger.info("Task %s has already been migrated." % task_url)
