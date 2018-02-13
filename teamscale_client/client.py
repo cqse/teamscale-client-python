@@ -37,7 +37,7 @@ class TeamscaleClient:
         self.sslverify = sslverify
         self.timeout = timeout
         self.branch = branch
-        #self.check_api_version()
+        self.check_api_version()
 
     def check_api_version(self):
         """Verifies the server's api version and connectivity.
