@@ -118,7 +118,7 @@ class MigratorBase(ABC):
         Args:
             path_suffix(str): Will be added to the end of the project service URL
         """
-        url = client.get_project_service_url(service) + path_suffix
+        url = client.get_project_service_url(service) + str(path_suffix)
 
         response = self.check_cache((url, parameters), use_cache)
         if response is None:
