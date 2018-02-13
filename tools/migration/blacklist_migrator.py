@@ -28,6 +28,7 @@ class BlacklistMigrator(MigratorBase):
             else:
                 self.logger.info("Migrating blacklisted finding %s" % self.get_findings_url(old_id))
                 self.blacklist_finding(blacklist_info, new_id)
+            self.check_step()
 
         self.logger.info("Migrated %d/%d blacklisted findings" % (self.migrated, len(blacklist_infos)))
 

@@ -26,24 +26,8 @@ class TaskMigrator(MigratorBase):
             self.adjust_task(old_task)
             self.logger.info("Migrating task %s" % self.get_tasks_url(old_task_id))
             self.add_task(old_task)
-
+            self.check_step()
         self.logger.info("Migrated %d/%d tasks" % (self.migrated, len(old_tasks)))
-
-    def get_filtered_tasks(self):
-        """ Returns a list comprising of the tasks of the old instance which are not yet
-         migrated to the new instance.
-         """
-        old_tasks = self.get_from_old("tasks", parameters={"details": True})
-        self.logger.info("Checking %s tasks, if some have already been migrated." % len(old_tasks))
-        not_migrated = []
-        for task in old_tasks:
-            task_url = self.get_tasks_url(task["id"])
-            self.logger.info("Checking for Task %s" % task_url)
-            if self.task_migrated(task):
-                self.logger.info("Task %s has already been migrated." % task_url)
-            else:
-                not_migrated.append(task)
-        return not_migrated
 
     def adjust_task(self, task):
         """ Before adding the task to the new instance the ids of any connected findings need
@@ -67,27 +51,6 @@ class TaskMigrator(MigratorBase):
         """ Adds a task to the new instance """
         self.migrated += 1
         self.put_in_new("tasks", path_suffix=str(task["id"]), data=task)
-
-    def task_migrated(self, old_task):
-        """ Checks if the given task was already migrated to the new instance. """
-        try:
-            new_task = self.get_from_new("tasks", path_suffix=old_task["id"])["task"]
-        except ServiceError:
-            return False
-        return self.superficial_match(new_task, old_task)
-
-    def superficial_match(self, task1, task2):
-        """ A quick check if two tasks are roughly the same. It checks the contents of some fields and
-        the number of findings.
-        """
-        fields_match = self.task_to_list(task1) == self.task_to_list(task2)
-        same_number_of_findings = len(task1["findings"]) == len(task2["findings"])
-        return fields_match and same_number_of_findings
-
-    @staticmethod
-    def task_to_list(task):
-        """ Creates a simple string out of task with some of its field values. """
-        return [task[x] for x in ["subject", "description", "author", "assignee", "tags"]]
 
     def get_task_findings(self, client, task):
         """ Returns the findings objects for a task (if it has any) """

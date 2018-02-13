@@ -16,8 +16,11 @@ def get_arguments():
     parser.add_argument("--debug", action="store_true", help="The debug option which enables debug log.")
     parser.add_argument("--dry-run", action="store_true", help="Dry-run for the migration. See what would happen "
                                                                "without any consequences")
+    parser.add_argument("--step-by-step", action="store_true", help="Pauses between each migration. Can be used to "
+                                                                    "check for potential error without tainting "
+                                                                    "the complete data.")
     args = parser.parse_args()
-    return load_config_json(args.config), args.debug, args.dry_run
+    return load_config_json(args.config), args.debug, args.dry_run, args.step_by_step
 
 
 def load_config_json(path):
@@ -49,7 +52,7 @@ class MigratorBase(ABC):
     """ Base class for migrating data from one instance to another via REST calls. """
     logger = create_logger()
 
-    def __init__(self, config_data, debug=False, dry_run=False):
+    def __init__(self, config_data, debug=False, dry_run=False, step_by_step=False):
         self.debug = debug
         if self.debug:
             self.logger.setLevel(logging.DEBUG)
@@ -57,6 +60,7 @@ class MigratorBase(ABC):
             self.logger.setLevel(logging.INFO)
         print("Logging level: %s" % self.logger.getEffectiveLevel())
         self.dry_run = dry_run
+        self.step_by_step = step_by_step
         self.old, self.new = self.create_clients(config_data)
         self.versions_match = self.check_versions()
         self.migrated = 0
@@ -78,6 +82,11 @@ class MigratorBase(ABC):
         except ServiceError:
             self.logger.exception("Creating the teamscale clients failed.")
         exit(1)
+
+    def check_step(self):
+        """ Checks if there should be a pause. """
+        if self.step_by_step:
+            input("click to continue...")
 
     def check_versions(self):
         """ Checks if the versions of both clients match. If not False will be returned
