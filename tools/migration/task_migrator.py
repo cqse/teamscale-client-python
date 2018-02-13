@@ -5,8 +5,7 @@ from migrator_base import MigratorBase, get_arguments
 def main():
     """ Migrates the task from the old instance to the new one.
     It automatically reads the arguments from the command line. """
-    (config, debug) = get_arguments()
-    TaskMigrator(config, debug).migrate()
+    TaskMigrator(*get_arguments()).migrate()
 
 
 class TaskMigrator(MigratorBase):

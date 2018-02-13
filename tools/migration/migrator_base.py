@@ -13,10 +13,11 @@ def get_arguments():
     parser = argparse.ArgumentParser(description="test", formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("config", help="The path to the config file. Needs to be in a specific format, "
                                        "see config.template.")
-    parser.add_argument("--debug", action="store_true", help="The debug option which enables debug log. Can be use to "
-                                                             "dry-run the migration, as it does not change anything.")
+    parser.add_argument("--debug", action="store_true", help="The debug option which enables debug log.")
+    parser.add_argument("--dry-run", action="store_true", help="Dry-run for the migration. See what would happen "
+                                                               "without any consequences")
     args = parser.parse_args()
-    return load_config_json(args.config), args.debug
+    return load_config_json(args.config), args.debug, args.dry_run
 
 
 def load_config_json(path):
@@ -48,12 +49,13 @@ class MigratorBase(ABC):
     """ Base class for migrating data from one instance to another via REST calls. """
     logger = create_logger()
 
-    def __init__(self, config_data, debug=False):
+    def __init__(self, config_data, debug=False, dry_run=False):
         self.debug = debug
         if self.debug:
             self.logger.setLevel(logging.DEBUG)
         else:
             self.logger.setLevel(logging.INFO)
+        self.dry_run = dry_run
         self.old, self.new = self.create_clients(config_data)
         self.versions_match = self.check_versions()
         self.migrated = 0
@@ -153,7 +155,7 @@ class MigratorBase(ABC):
         Args:
             path_suffix(str): Will be added to the end of the project service URL
         """
-        if not self.debug:
+        if not self.dry_run:
             self.new.put(self.new.get_project_service_url(service) + path_suffix,
                          parameters=parameters,
                          json=data)
@@ -181,7 +183,7 @@ class MigratorBase(ABC):
             return self.get(client, "findings-by-id", path_suffix=finding_id)
         except ServiceError as e:
             if e.response.status_code == 400:
-                self.logger.info("Finding with id %s not found. Skipping." % finding_id)
+                self.logger.debug("Finding with id %s not found. Skipping." % finding_id)
                 return None
 
     def get_findings_url(self, findings_id, client=None):

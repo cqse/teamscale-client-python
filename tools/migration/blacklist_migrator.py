@@ -3,8 +3,7 @@ from migrator_base import MigratorBase, get_arguments
 
 
 def main():
-    config, debug = get_arguments()
-    BlacklistMigrator(config, debug).migrate()
+    BlacklistMigrator(*get_arguments()).migrate()
 
 
 class BlacklistMigrator(MigratorBase):
