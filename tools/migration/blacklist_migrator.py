@@ -14,6 +14,11 @@ class BlacklistMigrator(MigratorBase):
     def migrate(self):
         """ Migrates the blacklist. """
         blacklist_infos = self.get_blacklist_infos()
+        if len(blacklist_infos) == 0:
+            self.logger.info("No new blacklisted findings to migrate")
+            exit(1)
+
+        self.logger.info("Migrating %s blacklisted findings" % len(blacklist_infos))
         for blacklist_info in blacklist_infos:
             old_id = blacklist_info["findingId"]
             new_id = self.get_matching_finding_id(old_id)
@@ -24,10 +29,7 @@ class BlacklistMigrator(MigratorBase):
                 self.logger.info("Migrating blacklisted finding %s" % self.get_findings_url(old_id))
                 self.blacklist_finding(blacklist_info, new_id)
 
-        if len(blacklist_infos) == 0:
-            self.logger.info("No new blacklisted findings to migrate")
-        else:
-            self.logger.info("Migrated %d/%d blacklisted findings" % (self.migrated, len(blacklist_infos)))
+        self.logger.info("Migrated %d/%d blacklisted findings" % (self.migrated, len(blacklist_infos)))
 
     def get_blacklist_infos(self):
         """ Returns all blacklist info objects from the old instance. """

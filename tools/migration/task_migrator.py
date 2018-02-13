@@ -15,16 +15,20 @@ class TaskMigrator(MigratorBase):
     def migrate(self):
         """ Migrates the tasks. """
         old_tasks = self.get_filtered_tasks()
+        if len(old_tasks) == 0:
+            self.logger.info("No new tasks to migrate.")
+            exit(1)
+
+        self.logger.info("Migrating %s tasks" % len(old_tasks))
         for old_task in old_tasks:
             old_task_id = old_task["id"]
             if self.adjust_task(old_task):
                 self.logger.info("Migrating task %s" % self.get_tasks_url(old_task_id))
                 self.add_task(old_task)
+            else:
+                self.logger.warning("Task %s could not be migrated" % self.get_tasks_url(old_task_id))
 
-        if len(old_tasks) == 0:
-            self.logger.info("No new tasks to migrate.")
-        else:
-            self.logger.info("Migrated %d/%d tasks" % (self.migrated, len(old_tasks)))
+        self.logger.info("Migrated %d/%d tasks" % (self.migrated, len(old_tasks)))
 
     def get_filtered_tasks(self):
         """ Returns a list comprising of the tasks of the old instance which are not yet
