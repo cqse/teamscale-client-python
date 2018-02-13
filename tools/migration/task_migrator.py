@@ -80,7 +80,9 @@ class TaskMigrator(MigratorBase):
         """ A quick check if two tasks are roughly the same. It checks the contents of some fields and
         the number of findings.
         """
-        return self.task_to_list(task1) == self.task_to_list(task2) and len(task1["findings"]) == len(task2["findings"])
+        fields_match = self.task_to_list(task1) == self.task_to_list(task2)
+        same_number_of_findings = len(task1["findings"]) == len(task2["findings"])
+        return fields_match and same_number_of_findings
 
     @staticmethod
     def task_to_list(task):
