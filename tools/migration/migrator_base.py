@@ -58,7 +58,6 @@ class MigratorBase(ABC):
             self.logger.setLevel(logging.DEBUG)
         else:
             self.logger.setLevel(logging.INFO)
-        print("Logging level: %s" % self.logger.getEffectiveLevel())
         self.dry_run = dry_run
         self.step_by_step = step_by_step
         self.old, self.new = self.create_clients(config_data)
