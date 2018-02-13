@@ -55,7 +55,7 @@ class TaskMigrator(MigratorBase):
             matching_finding_id = self.get_matching_finding_id(finding["findingId"])
             if matching_finding_id is None:
                 self.logger.warn("The finding %s for the task %s does not exists on the new instance." % (
-                    self.get_findings_url(self.old, finding["findingId"]), task["id"]))
+                    self.get_findings_url(finding["findingId"]), task["id"]))
                 return False
             finding["findingId"] = matching_finding_id
         # If the id is 0, the backend will assign a valid new id

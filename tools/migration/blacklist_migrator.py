@@ -24,7 +24,7 @@ class BlacklistMigrator(MigratorBase):
             new_id = self.get_matching_finding_id(old_id)
             if new_id is None:
                 self.logger.warning("Could not match finding %s to new instance" %
-                                    self.get_findings_url(self.old, old_id))
+                                    self.get_findings_url(old_id))
             else:
                 self.logger.info("Migrating blacklisted finding %s" % self.get_findings_url(old_id))
                 self.blacklist_finding(blacklist_info, new_id)
