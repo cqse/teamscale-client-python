@@ -80,24 +80,13 @@ class MigratorBase(ABC):
         """ Checks if the versions of both clients match. If not False will be returned
         and a warning will be logged.
         """
-        old_version = self.get_teamscale_version(self.old)
-        new_version = self.get_teamscale_version(self.new)
-
+        old_version = self.old.get_version()
+        new_version = self.new.get_version()
         if old_version != new_version:
             self.logger.warning("Teamscale versions of the old (%s) and new (%s) instance differ!" %
                                 (old_version, new_version))
             return False
         return True
-
-    def get_teamscale_version(self, client):
-        """ Retrieves the teamscale version or 'unknown' if the version could not be fetched. """
-        try:
-            response_text = client.get(client.get_global_service_url("health-metrics"), {"metric": "version"}).text
-        except ServiceError as e:
-            self.logger.warning("Unable to fetch teamscale version for %s "
-                                "(Version too old?) (Reason: %s)" % (client.url, e.response.status_code))
-            return "unknown"
-        return response_text.split()[1]
 
     @staticmethod
     def get_client(data):
@@ -135,6 +124,7 @@ class MigratorBase(ABC):
                 response = client.get(url, parameters).json()
             except ServiceError as e:
                 self.logger.exception("Fetching data from %s failed (%s)" % (url, e.response.status_code))
+                exit(1)
         self.cache_request((url, parameters), response, use_cache)
         return response
 
