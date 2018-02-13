@@ -39,7 +39,7 @@ def create_logger():
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
     handler = logging.StreamHandler()
-    formatter = logging.Formatter("%(levelname)-8s %(message)s (%(filename)-0s:%(lineno)-0s)")
+    formatter = logging.Formatter("%(levelname)-8s %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     return logger
