@@ -26,6 +26,7 @@ class TaskMigrator(MigratorBase):
             self.logger.info("Migrating task %s" % self.get_tasks_url(old_task_id))
             self.add_task(old_task)
             self.check_step()
+
         self.logger.info("Migrated %d/%d tasks" % (self.migrated, len(old_tasks)))
 
     def adjust_task(self, task):

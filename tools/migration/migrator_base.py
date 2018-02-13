@@ -62,11 +62,23 @@ class MigratorBase(ABC):
         self.step_by_step = step_by_step
         self.old, self.new = self.create_clients(config_data)
         self.versions_match = self.check_versions()
+        self.check_projects()
         self.migrated = 0
         self.cache = {}
 
         if self.debug:
             self.logger.debug("Debug Mode ON")
+
+    def check_projects(self):
+        """ Check if the two project actually do exist on the given servers. """
+        try:
+            check_url = "{0.url}/create-project/{0.project}"
+            self.old.get(check_url.format(self.old))
+            self.new.get(check_url.format(self.new))
+        except ServiceError as e:
+            project_name = str(e.response.url).split("/")[-1]
+            self.logger.error("Project '%s' does not exist" % project_name)
+            exit(1)
 
     def create_clients(self, config_data):
         """ Reads the given config defined by its path and creates the two teamscale clients from it.

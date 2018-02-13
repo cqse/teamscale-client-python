@@ -24,8 +24,7 @@ class BlacklistMigrator(MigratorBase):
             old_id = blacklist_info["findingId"]
             new_id = self.get_matching_finding_id(old_id)
             if new_id is None:
-                self.logger.warning("Could not match finding %s to new instance" %
-                                    self.get_findings_url(old_id))
+                self.logger.warning("Could not match finding %s to new instance" % self.get_findings_url(old_id))
             else:
                 self.logger.info("Migrating blacklisted finding %s" % self.get_findings_url(old_id))
                 self.blacklist_finding(blacklist_info, new_id)
@@ -36,11 +35,7 @@ class BlacklistMigrator(MigratorBase):
     def get_blacklist_infos(self):
         """ Returns all blacklist info objects from the old instance. """
         # Remove findings which have already been migrated and have the same id
-        blacklisted_ids = set(self.get_from_old("finding-blacklist"))
-        if len(blacklisted_ids) == 0:
-            self.logger.info("Old instance does not have any blacklisted findings")
-            exit(1)
-        blacklisted_ids -= set(self.get_from_new("finding-blacklist"))
+        blacklisted_ids = set(self.get_from_old("finding-blacklist")) - set(self.get_from_new("finding-blacklist"))
 
         infos = []
         for finding_id in blacklisted_ids:
