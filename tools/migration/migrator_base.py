@@ -127,9 +127,9 @@ class MigratorBase(ABC):
                 response = client.get(url, parameters).json()
             except ServiceError as e:
                 status_code = e.response.status_code
-                if status_code in (500, 404):
+                if status_code == 500:
                     self.logger.exception("Fetching data from %s failed (%s)" % (url, e.response.status_code))
-                elif status_code == 400:
+                elif status_code in (400, 404):
                     raise
         self.cache_request((url, parameters), response, use_cache)
         return response

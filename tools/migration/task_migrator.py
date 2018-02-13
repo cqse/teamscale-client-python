@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from migrator_base import MigratorBase, get_arguments
+from teamscale_client.data import ServiceError
 
 
 def main():
@@ -47,7 +48,6 @@ class TaskMigrator(MigratorBase):
     def adjust_task(self, task):
         """ Before adding the task to the new instance the ids of any connected findings need
         to be changed to the corresponding findings on the new instance.
-        If the adjusting could not be done `False` will be returned, `True` otherwise.
         """
         for finding in task["findings"]:
             matching_finding_id = self.get_matching_finding_id(finding["findingId"])
@@ -56,7 +56,6 @@ class TaskMigrator(MigratorBase):
                     self.get_findings_url(finding["findingId"]), task["id"]))
             else:
                 finding["findingId"] = matching_finding_id
-        return True
 
     def get_tasks_url(self, task_id, client=None):
         """ Creates a url of the old instance to the task with the given id. """
@@ -71,7 +70,10 @@ class TaskMigrator(MigratorBase):
 
     def task_migrated(self, old_task):
         """ Checks if the given task was already migrated to the new instance. """
-        new_task = self.get_from_new("tasks", path_suffix=old_task["id"])
+        try:
+            new_task = self.get_from_new("tasks", path_suffix=old_task["id"])["task"]
+        except ServiceError:
+            return False
         return self.superficial_match(new_task, old_task)
 
     def superficial_match(self, task1, task2):
