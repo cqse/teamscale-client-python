@@ -178,7 +178,7 @@ class MigratorBase(ABC):
         If no finding with that ID can be found `None` is returned.
         """
         try:
-            return client.get("findings-by-id", path_suffix=finding_id)
+            return self.get(client, "findings-by-id", path_suffix=finding_id)
         except ServiceError as e:
             if e.response.status_code == 400:
                 self.logger.info("Finding with id %s not found. Skipping." % finding_id)
