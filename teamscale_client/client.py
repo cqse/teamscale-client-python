@@ -384,11 +384,6 @@ class TeamscaleClient:
                         creation_timestamp=x['creationTimestamp'], alias=x.get('alias'),
                         deleting=x['deleting'], reanalyzing=x['reanalyzing']) for x in response.json()]
 
-    def get_version(self):
-        """ Retrieves the teamscale version """
-        response_text = self.get(self.get_global_service_url("health-metrics"), {"metric": "version"}).text
-        return response_text.split()[1]
-
     def create_project(self, project_configuration):
         """Creates a project with the specified configuration in Teamscale.
 
