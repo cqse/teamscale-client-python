@@ -83,7 +83,7 @@ class MigratorBase(ABC):
         exit(1)
 
     def check_step(self):
-        """ Checks if there should be a pause. """
+        """ If the step by step option is enabled the script pauses with this method. """
         if self.step_by_step:
             input("click to continue...")
 
@@ -124,7 +124,12 @@ class MigratorBase(ABC):
         """ Performs a GET call from the client to the service with the given parameters
         and returns the response as a JSON Object.
         Args:
+            client(TeamscaleClient): Teamscale client
+            service(str): Id of the service
             path_suffix(str): Will be added to the end of the project service URL
+            parameters(dict): Dict with parameters which should be appended to the URL
+            use_cache(bool): If true, the call will be cached and subsequently similar calls will get the same
+                            response
         """
         url = client.get_project_service_url(service) + str(path_suffix)
 
@@ -146,7 +151,11 @@ class MigratorBase(ABC):
         """ Performs a GET call with the given information on the instance from
         which the data should be migrated and returns the response as a JSON Object.
         Args:
+            service(str): Id of the service
             path_suffix(str): Will be added to the end of the project service URL
+            parameters(dict): Dict with parameters which should be appended to the URL
+            use_cache(bool): If true, the call will be cached and subsequently similar calls will get the same
+                            response
         """
         return self.get(self.old, service, path_suffix, parameters, use_cache)
 
@@ -154,7 +163,11 @@ class MigratorBase(ABC):
         """ Performs a GET call with the given information on the instance
         to which the data should be migrated and returns the response as a JSON Object.
         Args:
+            service(str): Id of the service
             path_suffix(str): Will be added to the end of the project service URL
+            parameters(dict): Dict with parameters which should be appended to the URL
+            use_cache(bool): If true, the call will be cached and subsequently similar calls will get the same
+                            response
         """
         return self.get(self.new, service, path_suffix, parameters, use_cache)
 
@@ -162,7 +175,10 @@ class MigratorBase(ABC):
         """ Performs a PUT call from the client to the service with the given parameters and data.
         The path parameter are additions to the path, e.g /service/id.
         Args:
+            service(str): Id of the service
+            data(dict): Data which will be converted to JSON and sent to the server
             path_suffix(str): Will be added to the end of the project service URL
+            parameters(dict): Dict with parameters which should be appended to the URL
         """
         if not self.dry_run:
             self.new.put(self.new.get_project_service_url(service) + path_suffix,

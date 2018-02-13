@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from migrator_base import MigratorBase, get_arguments
-from teamscale_client.data import ServiceError
 
 
 def main():
@@ -36,7 +35,7 @@ class TaskMigrator(MigratorBase):
         for finding in task["findings"]:
             matching_finding_id = self.get_matching_finding_id(finding["findingId"])
             if matching_finding_id is None:
-                self.logger.warn("The finding %s for the task %s does not exists on the new instance." % (
+                self.logger.warn("The finding %s for task %s does not exists on the new instance." % (
                     self.get_findings_url(finding["findingId"]), task["id"]))
             else:
                 finding["findingId"] = matching_finding_id
@@ -51,16 +50,6 @@ class TaskMigrator(MigratorBase):
         """ Adds a task to the new instance """
         self.migrated += 1
         self.put_in_new("tasks", path_suffix=str(task["id"]), data=task)
-
-    def get_task_findings(self, client, task):
-        """ Returns the findings objects for a task (if it has any) """
-        findings = []
-        for entry in task["findings"]:
-            finding = self.get_finding_by_id(client, entry["findingId"])
-            if finding is None:
-                continue
-            findings.append(finding)
-        return findings
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ from migrator_base import MigratorBase, get_arguments
 
 
 def main():
+    """ Starts the migration of blacklisted findings """
     BlacklistMigrator(*get_arguments()).migrate()
 
 
