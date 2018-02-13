@@ -34,8 +34,8 @@ class TaskMigrator(MigratorBase):
         """ Returns a list comprising of the tasks of the old instance which are not yet
          migrated to the new instance.
          """
-        self.logger.info("Checking if tasks have already been migrated (Might take a while).")
         old_tasks = self.get_from_old("tasks", parameters={"details": True})
+        self.logger.info("Checking %s tasks, if some have already been migrated (Might take a while)." % len(old_tasks))
         not_migrated = []
         for task in old_tasks:
             task_url = self.get_tasks_url(task["id"])
