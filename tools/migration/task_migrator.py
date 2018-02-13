@@ -22,11 +22,9 @@ class TaskMigrator(MigratorBase):
         self.logger.info("Migrating %s tasks" % len(old_tasks))
         for old_task in old_tasks:
             old_task_id = old_task["id"]
-            if self.adjust_task(old_task):
-                self.logger.info("Migrating task %s" % self.get_tasks_url(old_task_id))
-                self.add_task(old_task)
-            else:
-                self.logger.warning("Task %s could not be migrated" % self.get_tasks_url(old_task_id))
+            self.adjust_task(old_task)
+            self.logger.info("Migrating task %s" % self.get_tasks_url(old_task_id))
+            self.add_task(old_task)
 
         self.logger.info("Migrated %d/%d tasks" % (self.migrated, len(old_tasks)))
 
@@ -35,12 +33,12 @@ class TaskMigrator(MigratorBase):
          migrated to the new instance.
          """
         old_tasks = self.get_from_old("tasks", parameters={"details": True})
-        self.logger.info("Checking %s tasks, if some have already been migrated (Might take a while)." % len(old_tasks))
+        self.logger.info("Checking %s tasks, if some have already been migrated." % len(old_tasks))
         not_migrated = []
         for task in old_tasks:
             task_url = self.get_tasks_url(task["id"])
             self.logger.info("Checking for Task %s" % task_url)
-            if self.task_exists(task):
+            if self.task_migrated(task):
                 self.logger.info("Task %s has already been migrated." % task_url)
             else:
                 not_migrated.append(task)
@@ -49,17 +47,15 @@ class TaskMigrator(MigratorBase):
     def adjust_task(self, task):
         """ Before adding the task to the new instance the ids of any connected findings need
         to be changed to the corresponding findings on the new instance.
-        If any finding cannot be matched on the new instance `False` will be returned, `True` otherwise.
+        If the adjusting could not be done `False` will be returned, `True` otherwise.
         """
         for finding in task["findings"]:
             matching_finding_id = self.get_matching_finding_id(finding["findingId"])
             if matching_finding_id is None:
                 self.logger.warn("The finding %s for the task %s does not exists on the new instance." % (
                     self.get_findings_url(finding["findingId"]), task["id"]))
-                return False
-            finding["findingId"] = matching_finding_id
-        # If the id is 0, the backend will assign a valid new id
-        task["id"] = 0
+            else:
+                finding["findingId"] = matching_finding_id
         return True
 
     def get_tasks_url(self, task_id, client=None):
@@ -73,38 +69,10 @@ class TaskMigrator(MigratorBase):
         self.migrated += 1
         self.put_in_new("tasks", path_suffix=str(task["id"]), data=task)
 
-    def task_exists(self, old_task):
-        """ Checks if the given tasks already exists on the new instance. """
-        new_tasks = self.get_from_new("tasks", parameters={
-            "author": old_task["author"],
-            "assignee": old_task["assignee"],
-            "tags": old_task["tags"],
-            "details": True
-        })
-
-        for new_task in new_tasks:
-            if self.superficial_match(new_task, old_task) and self.task_findings_match(new_task, old_task):
-                return True
-        return False
-
-    def task_findings_match(self, new_task, old_task):
-        """ Checks if the findings of the given two tasks are the same.
-        Returns True if they are, False otherwise.
-        """
-        new_findings = self.get_task_findings(self.new, new_task)
-        old_findings = self.get_task_findings(self.old, old_task)
-
-        for old_finding in old_findings:
-            if not self.finding_match_in_list(old_finding, new_findings):
-                return False
-        return True
-
-    def finding_match_in_list(self, finding, finding_list):
-        """ Checks whether there is a match for a finding in a list of findings. """
-        for new_finding in finding_list:
-            if self.match_finding(finding, new_finding):
-                return True
-        return False
+    def task_migrated(self, old_task):
+        """ Checks if the given task was already migrated to the new instance. """
+        new_task = self.get_from_new("tasks", path_suffix=old_task["id"])
+        return self.superficial_match(new_task, old_task)
 
     def superficial_match(self, task1, task2):
         """ A quick check if two tasks are roughly the same. It checks the contents of some fields and
@@ -115,7 +83,7 @@ class TaskMigrator(MigratorBase):
     @staticmethod
     def task_to_list(task):
         """ Creates a simple string out of task with some of its field values. """
-        return [task[x] for x in ["subject", "description"]]
+        return [task[x] for x in ["subject", "description", "author", "assignee", "tags"]]
 
     def get_task_findings(self, client, task):
         """ Returns the findings objects for a task (if it has any) """
