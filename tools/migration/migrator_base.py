@@ -123,8 +123,11 @@ class MigratorBase(ABC):
                 self.logger.debug("Service Call: {}".format((url, parameters)))
                 response = client.get(url, parameters).json()
             except ServiceError as e:
-                self.logger.exception("Fetching data from %s failed (%s)" % (url, e.response.status_code))
-                exit(1)
+                status_code = e.response.status_code
+                if status_code in (500, 404):
+                    self.logger.exception("Fetching data from %s failed (%s)" % (url, e.response.status_code))
+                elif status_code == 400:
+                    raise
         self.cache_request((url, parameters), response, use_cache)
         return response
 
@@ -160,12 +163,26 @@ class MigratorBase(ABC):
         the given findings id of the old instance.
         If no match could be found `None` is returned.
         """
-        finding = self.get_from_old("findings-by-id", path_suffix=finding_id)
+        finding = self.get_finding_by_id(self.old, finding_id)
+        if finding is None:
+            return None
+
         new_findings = self.get_from_new("findings", path_suffix=finding["location"]["uniformPath"])
         for new_finding in new_findings:
             if self.match_finding(new_finding, finding):
                 return new_finding["id"]
         return None
+
+    def get_finding_by_id(self, client, finding_id):
+        """ Returns the finding with the specified id from the given client.
+        If no finding with that ID can be found `None` is returned.
+        """
+        try:
+            return client.get("findings-by-id", path_suffix=finding_id)
+        except ServiceError as e:
+            if e.response.status_code == 400:
+                self.logger.info("Finding with id %s not found. Skipping." % finding_id)
+                return None
 
     def get_findings_url(self, findings_id, client=None):
         """ Creates a url link to the finding with the given id on the given Teamscale """

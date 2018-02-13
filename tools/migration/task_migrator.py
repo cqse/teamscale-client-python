@@ -109,7 +109,10 @@ class TaskMigrator(MigratorBase):
         """ Returns the findings objects for a task (if it has any) """
         findings = []
         for entry in task["findings"]:
-            findings.append(self.get(client, "findings-by-id", path_suffix=entry["findingId"]))
+            finding = self.get_finding_by_id(client, entry["findingId"])
+            if finding is None:
+                continue
+            findings.append(finding)
         return findings
 
 
