@@ -35,7 +35,7 @@ class BlacklistMigrator(MigratorBase):
     def get_blacklist_infos(self):
         """ Returns all blacklist info objects from the old instance. """
         # Remove findings which have already been migrated and have the same id
-        blacklisted_ids = set(self.get_from_old("finding-blacklist")) - set(self.get_from_new("finding-blacklist"))
+        blacklisted_ids = set(self.get_from_old("finding-blacklist"))
 
         infos = []
         for finding_id in blacklisted_ids:

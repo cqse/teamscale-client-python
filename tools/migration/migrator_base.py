@@ -77,7 +77,7 @@ class MigratorBase(ABC):
             self.new.get(check_url.format(self.new))
         except ServiceError as e:
             project_name = str(e.response.url).split("/")[-1]
-            self.logger.error("Project '%s' does not exist" % project_name)
+            self.logger.exception("Project '%s' does not exist" % project_name)
             exit(1)
 
     def create_clients(self, config_data):
@@ -206,7 +206,7 @@ class MigratorBase(ABC):
         if finding is None:
             return None
 
-        new_findings = self.get_from_new("findings", path_suffix=finding["location"]["uniformPath"])
+        new_findings = self.get_from_new("findings", path_suffix=finding["location"]["uniformPath"], parameters={"blacklisted" : "all"})
         for new_finding in new_findings:
             if self.match_finding(new_finding, finding):
                 return new_finding["id"]
