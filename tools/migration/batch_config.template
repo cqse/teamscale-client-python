@@ -1,0 +1,16 @@
+{
+    "old_instance" : {
+        "url": "http://localhost:8080",
+        "user": "user",
+        "token": "tokentoken"
+    },
+    "new_instance" : {
+        "url": "http://localhost:8080",
+        "user": "user",
+        "token": "tokentoken"
+    },
+    "project_mappings": [
+        {"from": "a", "to": "b"},
+        {"from": "c", "to": "d"}
+    ]
+}
