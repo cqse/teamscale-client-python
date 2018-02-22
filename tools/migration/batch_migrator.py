@@ -14,7 +14,7 @@ def main():
     parser.add_argument("config", help="The path to the config file. Needs to be in a specific format, "
                                        "see batch_config.template.")
     args = parser.parse_args()
-    logger = create_logger()
+    logger = create_logger(name="batch")
     config_file = Path(args.config)
     if not config_file.exists():
         logger.error("Config file does not exist")

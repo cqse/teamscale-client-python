@@ -37,9 +37,9 @@ def load_config_json(path):
     exit(1)
 
 
-def create_logger():
+def create_logger(name="migrator"):
     """ Creates a logger """
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
     handler = logging.StreamHandler()
     formatter = logging.Formatter("%(levelname)-8s %(message)s")
