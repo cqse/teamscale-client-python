@@ -10,7 +10,7 @@ from requests.exceptions import ConnectionError
 
 def get_arguments():
     """ Parses the arguments for the migration tool. """
-    parser = argparse.ArgumentParser(description="test", formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("config", help="The path to the config file. Needs to be in a specific format, "
                                        "see config.template.")
     parser.add_argument("--debug", action="store_true", help="The debug option which enables debug log.")
