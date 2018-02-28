@@ -402,12 +402,14 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
                                             Empty by default.
         externals_excludes (Optional[str]): Ant patterns describing the directories that are not checked for
                                             svn:externals. Empty by default.
+        path_suffix (Optional[str]): Path suffix that is to be appended to the repository's base path. Empty by default.
     """
 
-    def __init__(self, account, enable_externals=False, externals_includes="", externals_excludes="", *args, **kwargs):
+    def __init__(self, account, enable_externals=False, externals_includes="", externals_excludes="", path_suffix="", *args, **kwargs):
         super(SubversionSourceCodeConnectorConfiguration, self).__init__(connector_type=ConnectorType.SVN, *args,
                                                                          **kwargs)
         self.options["Account"] = account
         self.options["Enable Externals"] = enable_externals
+        self.options["Path suffix"] = path_suffix
         self.options["Externals Includes"] = externals_includes
         self.options["Externals Excludes"] = externals_excludes
