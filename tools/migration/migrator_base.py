@@ -71,13 +71,15 @@ class MigratorBase(ABC):
 
     def check_projects(self):
         """ Check if the two project actually do exist on the given servers. """
-        try:
-            check_url = "{0.url}/create-project/{0.project}"
-            self.old.get(check_url.format(self.old))
-            self.new.get(check_url.format(self.new))
-        except ServiceError as e:
-            project_name = str(e.response.url).split("/")[-1]
-            self.logger.exception("Project '%s' does not exist" % project_name)
+        self.check_project(self.old)
+        self.check_project(self.new)
+
+    def check_project(self, client):
+        """ Checks if the project specified in the client actually exists on that client. """
+        check_url = "{0.url}/projects/{0.project}"
+        result = client.get(check_url.format(client))
+        if result.content == b'null':
+            self.logger.error("Project '%s' does not exist" % client.project)
             exit(1)
 
     def create_clients(self, config_data):
@@ -152,10 +154,10 @@ class MigratorBase(ABC):
                 response = client.get(url, parameters).json()
             except ServiceError as e:
                 status_code = e.response.status_code
-                if status_code == 500:
-                    self.logger.exception("Fetching data from %s failed (%s)" % (url, e.response.status_code))
-                elif status_code in (400, 404):
+                if status_code in (400, 404):
                     raise
+                else:
+                    self.logger.exception("Fetching data from %s failed (%s)" % (url, e.response.status_code))
         self.cache_request((url, parameters), response, use_cache)
         return response
 
