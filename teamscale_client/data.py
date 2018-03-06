@@ -421,3 +421,4 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
         self.options["Enable Externals"] = enable_externals
         self.options["Externals Includes"] = externals_includes
         self.options["Externals Excludes"] = externals_excludes
+

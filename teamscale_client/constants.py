@@ -93,6 +93,7 @@ class CoverageFormats:
 
     SIMPLE = "SIMPLE"
 
+
 class ReportFormats:
     """Report formats that Teamscale understands."""
 
@@ -109,6 +110,9 @@ class ReportFormats:
     CS_COMPILER_WARNING = "CS_COMPILER_WARNING"
    
     PYLINT = "PYLINT"
+
+    FINDBUGS = "FINDBUGS"
+
 
 class UnitTestReportFormats:
     """Reports for unit test results that Teamscale understands."""
