@@ -248,7 +248,12 @@ class MigratorBase(ABC):
     def match_finding(self, finding1, finding2):
         """ Checks if the given two findings are the same. This is done by comparing their location and message.
         If the version of the two TS instances don't match, only the location is compared """
-        location_match = finding1["location"] == finding2["location"]
+        # Uniform path should not be checked as if could be different with a path transformation
+        f1_loc = finding1["location"]
+        f2_loc = finding2["location"]
+        entries = ["rawStartOffset", "rawEndOffset", "rawStartLine", "rawEndLine"]
+        location_match = all([(f1_loc[x] == f2_loc[x]) for x in entries])
+
         message_match = finding1["message"] == finding2["message"]
         return location_match and (message_match or not self.versions_match)
 
