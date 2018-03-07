@@ -3,16 +3,16 @@
         "url": "http://localhost:8080",
         "project": "a",
         "user": "user",
-        "token": "tokentoken",
-        "path_prefix_transformation" : {
-            "from" : "test/",
-            "to" : ""
-        }
+        "token": "tokentoken"
     },
     "new_instance" : {
         "url": "http://localhost:8080",
         "project": "b",
         "user": "user",
-        "token": "tokentoken"
+        "token": "tokentoken",
+        "path_prefix_transformation" : {
+            "from" : "test/",
+            "to" : ""
+        }
     }
 }

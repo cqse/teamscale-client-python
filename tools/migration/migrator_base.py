@@ -62,8 +62,7 @@ class MigratorBase(ABC):
         self.dry_run = dry_run
         self.step_by_step = step_by_step
         self.old, self.new = self.create_clients(config_data)
-        self.set_prefix_transformations(self.old, config_data["old_instance"])
-        self.set_prefix_transformations(self.new, config_data["new_instance"])
+        self.set_prefix_transformations(config_data)
         self.versions_match = self.check_versions()
         self.check_projects()
         self.migrated = 0
@@ -72,15 +71,14 @@ class MigratorBase(ABC):
         if self.debug:
             self.logger.debug("Debug Mode ON")
 
-    @staticmethod
-    def set_prefix_transformations(client, config_data):
+    def set_prefix_transformations(self, config_data):
         """ Sets the path prefix transformations for the instances. """
         key = "path_prefix_transformation"
         if key in config_data and all(x in config_data[key] for x in ["from", "to"]):
-            client.path_transform_regex = re.compile("^" + config_data[key]["from"])
-            client.path_transform = lambda x: client.path_transform_regex.sub(config_data[key]["to"], x)
+            regex = re.compile("^" + config_data[key]["from"])
+            self.path_transform = lambda x: regex.sub(config_data[key]["to"], x)
         else:
-            client.path_transform = lambda x: x
+            self.path_transform = lambda x: x
 
     def check_projects(self):
         """ Check if the two project actually do exist on the given servers. """
@@ -221,7 +219,7 @@ class MigratorBase(ABC):
         if finding is None:
             return None
 
-        location = self.new.path_transform(finding["location"]["uniformPath"])
+        location = self.path_transform(finding["location"]["uniformPath"])
         new_findings = self.get_from_new("findings", path_suffix=location, parameters={"blacklisted": "all"})
         for new_finding in new_findings:
             if self.match_finding(new_finding, finding):
