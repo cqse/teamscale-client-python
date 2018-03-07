@@ -1,0 +1,18 @@
+{
+    "old_instance" : {
+        "url": "http://localhost:8080",
+        "project": "old",
+        "user": "admin",
+        "token": "jN3doIhUUHCb2cklIQGi2pywEYtwV0Fe",
+        "path_prefix_transformation" : {
+            "from" : "test/",
+            "to" : ""
+        }
+    },
+    "new_instance" : {
+        "url": "http://localhost:8080",
+        "project": "new",
+        "user": "admin",
+        "token": "jN3doIhUUHCb2cklIQGi2pywEYtwV0Fe"
+    }
+}
