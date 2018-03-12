@@ -63,7 +63,6 @@ class MigratorBase(ABC):
         self.step_by_step = step_by_step
         self.old, self.new = self.create_clients(config_data)
         self.set_prefix_transformations(config_data)
-        self.versions_match = self.check_versions()
         self.check_projects()
         self.migrated = 0
         self.cache = {}
@@ -111,18 +110,6 @@ class MigratorBase(ABC):
         """ If the step by step option is enabled the script pauses with this method. """
         if self.step_by_step:
             input("click to continue...")
-
-    def check_versions(self):
-        """ Checks if the versions of both clients match. If not False will be returned
-        and a warning will be logged.
-        """
-        old_version = self.old.get_version()
-        new_version = self.new.get_version()
-        if old_version != new_version:
-            self.logger.warning("Teamscale versions of the old (%s) and new (%s) instance differ!" %
-                                (old_version, new_version))
-            return False
-        return True
 
     @staticmethod
     def get_client(data):
@@ -244,8 +231,7 @@ class MigratorBase(ABC):
         return "{0.url}/findings.html#details/{0.project}/?id={1}".format(client, findings_id)
 
     def match_finding(self, finding1, finding2):
-        """ Checks if the given two findings are the same. This is done by comparing their location and message.
-        If the version of the two TS instances don't match, only the location is compared """
+        """ Checks if the given two findings are the same. This is done by comparing their location and message. """
         # Uniform path should not be checked as if could be different with a path transformation
         f1_loc = finding1["location"]
         f2_loc = finding2["location"]
@@ -253,7 +239,7 @@ class MigratorBase(ABC):
         location_match = all([(f1_loc[x] == f2_loc[x]) for x in entries])
 
         message_match = finding1["message"] == finding2["message"]
-        return location_match and (message_match or not self.versions_match)
+        return location_match or message_match
 
     @abstractmethod
     def migrate(self):
