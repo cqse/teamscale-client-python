@@ -235,10 +235,14 @@ class MigratorBase(ABC):
         # Uniform path should not be checked as if could be different with a path transformation
         f1_loc = finding1["location"]
         f2_loc = finding2["location"]
-        entries = ["rawStartOffset", "rawEndOffset", "rawStartLine", "rawEndLine"]
-        location_match = all([(f1_loc[x] == f2_loc[x]) for x in entries])
+        entries = ["rawStartLine", "rawEndLine"]
 
-        message_match = finding1["message"] == finding2["message"]
+        try:
+            location_match = all([(f1_loc[x] == f2_loc[x]) for x in entries])
+            message_match = finding1["message"] == finding2["message"]
+        except KeyError:
+            return False
+
         return location_match or message_match
 
     @abstractmethod
