@@ -28,7 +28,7 @@ if __name__ == '__main__':
     # Make Teamscale aware of a new findings type, which mappes to the previously
     # created group
     descriptions = [
-        FindingDescription("externals-1", "A test finding description", Enablement.RED)
+        FindingDescription("externals-1", "externals-1", "A test finding description", Enablement.RED)
     ]
     response = client.add_finding_descriptions(descriptions)
     print("Request result: %s" % (response.text,))
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     if sys.version_info[0] == 2:
         raw_input("Please create the project or update the analysis profile used by the project to contain the new groups. Then Press ENTER to continue.")
     else:
-        input("Please create the projetc or update the analysis profile used by the project to contain the new groups. Then Press ENTER to continue.")
+        input("Please create the project or update the analysis profile used by the project to contain the new groups. Then Press ENTER to continue.")
 
     # Update existing project to use new findings
     response = client.update_findings_schema()

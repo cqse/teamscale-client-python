@@ -61,11 +61,12 @@ class FileFindings(object):
         self.content = content
 
 
-FindingDescription = collections.namedtuple('FindingDescription', ['typeid', 'description', 'enablement'])
+FindingDescription = collections.namedtuple('FindingDescription', ['typeid', 'name', 'description', 'enablement'])
 """Description of a finding type to be added at configuration time.
 
     Args:
         typeid (str): The id used to reference the finding type.
+        name (str): Some UI friendly name for this description.
         description (str): The text to display that explains what this finding type is about (and ideally how to fix it). This text will be the same for each concrete instance of the finding.
         enablement (constants.Enablement): Describes the default enablement setting for this finding type, used when it is added to the analysis profile.
 """

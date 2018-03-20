@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import requests
 from requests.auth import HTTPBasicAuth
 import time
+import collections
 
 import simplejson as json
 
@@ -28,6 +29,8 @@ class TeamscaleClient:
     """
 
     def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
+        """Constructor
+        """
         self.url = url
         self.username = username
         self.auth_header = HTTPBasicAuth(username, access_token)
@@ -35,6 +38,7 @@ class TeamscaleClient:
         self.sslverify = sslverify
         self.timeout = timeout
         self.branch = branch
+        self.supportsAtLeastApiVersion5 = False
         self.check_api_version()
 
     def check_api_version(self):
@@ -45,7 +49,9 @@ class TeamscaleClient:
         """
         url = self.get_global_service_url('service-api-info')
         response = self.get(url)
-        apiVersion = response.json()['apiVersion']
+        jsonResponse = response.json()
+        self.supportsAtLeastApiVersion5 = int(jsonResponse['minSupportedApiVersion']) >= 5
+        apiVersion = jsonResponse['apiVersion']
         if apiVersion < 3:
             raise ServiceError("Server api version " + str(
                 apiVersion) + " too low and not compatible. This client requires Teamscale 3.2 or newer.");
@@ -122,7 +128,12 @@ class TeamscaleClient:
             requests.Response: request's response
         """
         url = self.get_global_service_url('external-findings-group')
-        payload = [{'groupName': name, 'mapping': mapping_pattern}]
+        finding_group = {'groupName': name, 'mapping': mapping_pattern}
+        payload = [finding_group]
+        if self.supportsAtLeastApiVersion5:
+            url = "%s/%s" % (url, name)
+            payload = finding_group
+
         return self.put(url, payload)
 
     def add_finding_descriptions(self, descriptions):
@@ -133,10 +144,35 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
+        payload = []
+        for finding_description in descriptions:
+            some_description = {}
+            some_description['typeId'] = finding_description.typeid
+            some_description['description'] = finding_description.description
+            some_description['enablement'] = finding_description.enablement
+            if self.supportsAtLeastApiVersion5:
+                some_description['name'] = finding_description.name
+                response = self.add_finding_description(some_description)
+                print "Description (typeId -> %s). Upload result: %s" % (finding_description.typeid, response.text)
+            else:
+                payload.append(some_description)
 
-        url = self.get_global_service_url('add-external-finding-descriptions')
-        payload = [{'typeId': d.typeid, 'description': d.description, 'enablement': d.enablement} for d in descriptions]
-        return self.put(url, payload)
+        if self.supportsAtLeastApiVersion5:
+            Result = collections.namedtuple('Result', 'text')
+            return Result(text='All descriptions successfully uploaded.')
+
+        return self.put(self.get_global_service_url('add-external-finding-descriptions'), payload)
+
+    def add_finding_description(self, description):
+        """Adds a finding description.
+
+        Args:
+            description (object): A :class:`FindingDescription`
+        Returns:
+             requests.Response: The response to this request.
+        """
+        url = "%s/%s" % (self.get_global_service_url('external-findings-description'), description['typeId'])
+        return self.put(url, description)
 
     def update_findings_schema(self):
         """Triggers refresh of finding groups in analysis profiles."""
