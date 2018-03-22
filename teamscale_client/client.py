@@ -146,6 +146,9 @@ class TeamscaleClient:
         """
         @responses.activate
         def success_response():
+            """ Returns a mock success response for clients when using Teamscale server
+                with minimum supported api version 5
+            """
             success_url = 'http://success_url'
             responses.add(responses.GET, success_url, status=200, body='success')
             return requests.get(success_url)
