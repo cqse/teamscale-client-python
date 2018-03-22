@@ -9,19 +9,23 @@ from __future__ import unicode_literals
 import datetime
 import re
 import responses
+import sys
 
+sys.path.append('/home/elijah/git.cqse/teamscale-client-python')
 from teamscale_client import TeamscaleClient
-from teamscale_client.constants import CoverageFormats, AssessmentMetricColors
+from teamscale_client.constants import CoverageFormats, AssessmentMetricColors, Enablement
 from teamscale_client.data import Finding, FileFindings, MetricDescription, MetricEntry, NonCodeMetricEntry, Baseline, \
-    FileSystemSourceCodeConnectorConfiguration, ProjectConfiguration
+    FileSystemSourceCodeConnectorConfiguration, ProjectConfiguration, FindingDescription
 from teamscale_client.utils import to_json
 
 
 URL = "http://localhost:8080"
+SUCCESS = 'success'
 
-def get_client():
+def get_client(minimum_supported_api_version=3):
+    response_body = '{ "apiVersion": 3, "minSupportedApiVersion": %s }' % minimum_supported_api_version
     responses.add(responses.GET, get_global_service_mock('service-api-info'),
-                      status=200, content_type="application/json", body='{ "apiVersion": 3 }')
+                      status=200, content_type="application/json", body=response_body)
     return TeamscaleClient(URL, "admin", "admin", "foo")
 
 def get_project_service_mock(service_id):
@@ -36,6 +40,45 @@ def test_put():
                       body='success', status=200)
     resp = get_client().put("http://localhost:8080", "[]", {})
     assert resp.text == "success"
+
+@responses.activate
+def test_add_findings_group():
+    """ Tests uploading of findings groups into Teamscale server versions before
+        and after minimum supported version 5
+    """
+    # For servers before EServiceApiVersion 5
+    service_id = 'external-findings-group'
+    group_name = 'name'
+    group_mapping = 'map.*'
+    responses.add(responses.PUT, get_global_service_mock(service_id), body=SUCCESS,
+                  status=200)
+    resp = get_client().add_findings_group(group_name, group_mapping)
+    assert resp.text == SUCCESS
+
+    # For servers at least EServiceApiVersion 5
+    responses.add(responses.PUT, get_global_service_mock(service_id), body=SUCCESS, status=200)
+    resp = get_client(minimum_supported_api_version=5).add_findings_group(group_name, group_mapping)
+    assert resp.text == SUCCESS
+
+@responses.activate
+def test_add_findings_descriptions():
+    """ Tests uploading of findings descriptions into Teamscale server versions before
+        and after minimum supported version 5
+    """
+    def call_service_and_assert(service_id):
+        """Call service and assert results"""
+        responses.add(responses.PUT, get_global_service_mock(service_id), body=SUCCESS, status=200)
+        resp = get_client().add_finding_descriptions(findings_descriptions)
+        assert resp.text == SUCCESS
+
+    findings_descriptions = [FindingDescription('type1', 'name1', 'desc1', Enablement.RED),
+                             FindingDescription('type2', 'name2', 'desc2', Enablement.YELLOW)]
+
+    # For servers before EServiceApiVersion 5
+    call_service_and_assert('add-external-finding-descriptions')
+
+    # For servers at least EServiceApiVersion 5
+    call_service_and_assert('external-findings-descriptions')
 
 @responses.activate
 def test_upload_findings():
