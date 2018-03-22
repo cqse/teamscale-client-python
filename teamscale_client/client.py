@@ -163,7 +163,7 @@ class TeamscaleClient:
                 some_description['name'] = finding_description.name
                 response = self._add_finding_description(some_description)
                 result = "Description (typeId -> %s). Upload result: %s" % (finding_description.typeid, response.text)
-                print result
+                print (result)
             else:
                 payload.append(some_description)
 
