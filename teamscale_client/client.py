@@ -5,7 +5,6 @@ import requests
 from requests.auth import HTTPBasicAuth
 import responses
 import time
-import collections
 
 import simplejson as json
 

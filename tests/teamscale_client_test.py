@@ -9,9 +9,7 @@ from __future__ import unicode_literals
 import datetime
 import re
 import responses
-import sys
 
-sys.path.append('/home/elijah/git.cqse/teamscale-client-python')
 from teamscale_client import TeamscaleClient
 from teamscale_client.constants import CoverageFormats, AssessmentMetricColors, Enablement
 from teamscale_client.data import Finding, FileFindings, MetricDescription, MetricEntry, NonCodeMetricEntry, Baseline, \
