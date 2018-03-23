@@ -22,10 +22,8 @@ class TeamscaleClient:
         username (str): The username to use for authentication
         access_token (str): The IDE access token to use for authentication
         project (str): The id of the project on which to work
-        sslverify: See requests' verify parameter in
-            http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
-        timeout (float): TTFB timeout in seconds,
-            see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
+        sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
+        timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
         branch: The branch name for which to upload/retrieve data
     """
 
@@ -47,16 +45,16 @@ class TeamscaleClient:
         """
         url = self.get_global_service_url('service-api-info')
         response = self.get(url)
-        api_version = response.json()['apiVersion']
-        if api_version < 3:
+        apiVersion = response.json()['apiVersion']
+        if apiVersion < 3:
             raise ServiceError("Server api version " + str(
-                api_version) + " too low and not compatible. This client requires Teamscale 3.2 or newer.")
+                apiVersion) + " too low and not compatible. This client requires Teamscale 3.2 or newer.");
 
     def get(self, url, parameters=None):
         """Sends a GET request to the given service url.
 
         Args:
-            url (str):  The URL for which to execute a GET request
+            url (str):  The URL for which to execute a PUT request
             parameters (dict): parameters to attach to the url
 
         Returns:
@@ -69,7 +67,7 @@ class TeamscaleClient:
         response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers,
                                 timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("GET", url, response)
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
     def put(self, url, json=None, parameters=None, data=None):
@@ -87,12 +85,12 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+        headers = {'Accept': 'application/json','Content-Type': 'application/json'}
         response = requests.put(url, params=parameters, json=json, data=data,
                                 headers=headers, auth=self.auth_header,
                                 verify=self.sslverify, timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("PUT", url, response)
+            raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
     def delete(self, url, parameters=None):
@@ -111,7 +109,7 @@ class TeamscaleClient:
         response = requests.delete(url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                    timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("PUT", url, response)
+            raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
     def add_findings_group(self, name, mapping_pattern):
@@ -220,6 +218,7 @@ class TeamscaleClient:
         service_url = self.get_global_service_url("external-metric")
         return self.put(service_url, data=to_json(metric_descriptions))
 
+
     def upload_coverage_data(self, coverage_files, coverage_format, timestamp, message, partition):
         """Upload coverage reports to Teamscale. It is expected that the given coverage report files can be read from the filesystem.
 
@@ -267,14 +266,14 @@ class TeamscaleClient:
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=multiple_files, timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("POST", service_url, response)
+            raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
 
     def upload_architectures(self, architectures, timestamp, message):
         """Upload architectures to Teamscale. It is expected that the given architectures can be be read from the filesystem.
 
         Args:
-            architectures (dict): mapping of teamscale paths to architecture files that should be uploaded. Files must be readable.
+            architectures (dict): mappping of teamscale paths to architecture files that should be uploaded. Files must be readable.
             timestamp (datetime.datetime): timestamp for which to upload the data
             message (str): The message to use for the generated upload commit
 
@@ -293,7 +292,7 @@ class TeamscaleClient:
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=architecture_files, timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("GET", service_url, response)
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
 
     def upload_non_code_metrics(self, metrics, timestamp, message, partition):
@@ -330,7 +329,7 @@ class TeamscaleClient:
         response = requests.get(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                 headers=headers, timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("GET", service_url, response)
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return [Baseline(x['name'], x['description'], timestamp=x['timestamp']) for x in response.json()]
 
     def delete_baseline(self, baseline_name):
@@ -384,11 +383,6 @@ class TeamscaleClient:
                         creation_timestamp=x['creationTimestamp'], alias=x.get('alias'),
                         deleting=x['deleting'], reanalyzing=x['reanalyzing']) for x in response.json()]
 
-    def get_version(self):
-        """ Retrieves the teamscale version """
-        response_text = self.get(self.get_global_service_url("health-metrics"), {"metric": "version"}).text
-        return response_text.split()[1]
-
     def create_project(self, project_configuration):
         """Creates a project with the specified configuration in Teamscale.
 
@@ -400,7 +394,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong.
         """
-        return self._add_project(project_configuration, perform_update_call=False)
+        return self._add_project(project_configuration, perfrom_update_call=False)
 
     def update_project(self, project_configuration):
         """Updates an existing project in Teamscale with the given configuration. The id of the existing project is
@@ -414,20 +408,20 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong.
         """
-        return self._add_project(project_configuration, perform_update_call=True)
+        return self._add_project(project_configuration, perfrom_update_call=True)
 
-    def _add_project(self, project_configuration, perform_update_call):
-        """Adds a project to Teamscale. The parameter `perform_update_call` specifies, whether an update call should be
+    def _add_project(self, project_configuration, perfrom_update_call):
+        """Adds a project to Teamscale. The parameter `perfrom_update_call` specifies, whether an update call should be
         made:
-        - If `perform_update_call` is set to `True`, re-adding a project with an existing id will update the original
+        - If `perfrom_update_call` is set to `True`, re-adding a project with an existing id will update the original
         project.
-        - If `perform_update_call` is set to `False`, re-adding a project with an existing id will result in an error.
-        - Further, if `perform_update_call` is set to `True`, but no project with the specified id exists, an error is
+        - If `perfrom_update_call` is set to `False`, re-adding a project with an existing id will result in an error.
+        - Further, if `perfrom_update_call` is set to `True`, but no project with the specified id exists, an error is
         thrown as well.
 
         Args:
             project_configuration (data.ProjectConfiguration): The project that is to be created (or updated).
-            perform_update_call (bool): Whether to perform an update call.
+            perfrom_update_call (bool): Whether to perform an update call.
         Returns:
             requests.Response: object generated by the upload request.
 
@@ -436,13 +430,15 @@ class TeamscaleClient:
         """
         service_url = self.get_global_service_url("create-project")
         parameters = {
-            "only-config-update": perform_update_call
+            "only-config-update": perfrom_update_call
         }
         response = self.put(service_url, parameters=parameters, data=to_json(project_configuration))
 
         response_message = TeamscaleClient._get_response_message(response)
         if response_message != 'success':
-            raise ServiceError("GET", service_url, response)
+            raise ServiceError(
+                "ERROR: GET {url}: {status_code}:{message}".format(url=service_url, status_code=response.status_code,
+                                                                   message=response_message))
         return response
 
     @staticmethod
