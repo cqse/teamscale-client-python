@@ -245,6 +245,10 @@ class MigratorBase(ABC):
 
         return location_match or message_match
 
+    def match_location(self, finding1, finding2):
+        f1_loc = finding1["location"]
+        f2_loc = finding2["location"]
+
     @abstractmethod
     def migrate(self):
         """ Migrates the date from the old instance to the new one """
