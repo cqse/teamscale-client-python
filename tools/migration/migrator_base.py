@@ -231,23 +231,25 @@ class MigratorBase(ABC):
         return "{0.url}/findings.html#details/{0.project}/?id={1}".format(client, findings_id)
 
     def match_finding(self, finding1, finding2):
-        """ Checks if the given two findings are the same. This is done by comparing their location and message. """
-        # Uniform path should not be checked as if could be different with a path transformation
-        f1_loc = finding1["location"]
-        f2_loc = finding2["location"]
-        entries = ["rawStartLine", "rawEndLine"]
+        """ Checks if the given two findings are the same. """
+        location_match = self.dicts_match(finding1["location"],
+                                          finding2["location"],
+                                          ["location", "uniformPath", "@class"])
+        properties_match = self.dicts_match(finding1, finding2,
+                                            ["location", "id", "birth", "analysisTimestamp"])
 
-        try:
-            location_match = all([(f1_loc[x] == f2_loc[x]) for x in entries])
-            message_match = finding1["message"] == finding2["message"]
-        except KeyError:
+        return location_match and properties_match
+
+    @staticmethod
+    def dicts_match(dict1, dict2, excludes):
+        """ Checks if the given two dicts matches.
+        Excludes is a list containing all keys, which should not be compared
+        """
+        if dict1.keys() != dict2.keys():
             return False
 
-        return location_match or message_match
-
-    def match_location(self, finding1, finding2):
-        f1_loc = finding1["location"]
-        f2_loc = finding2["location"]
+        location_keys = [x for x in dict1.keys() if x not in excludes]
+        return all([dict1[x] == dict2[x]] for x in location_keys)
 
     @abstractmethod
     def migrate(self):
