@@ -17,7 +17,7 @@ class TaskMigrator(MigratorBase):
         old_tasks = self.get_from_old("tasks", parameters={"details": True})
         if len(old_tasks) == 0:
             self.logger.info("No new tasks to migrate.")
-            exit(1)
+            exit(0)
 
         self.logger.info("Migrating %s tasks" % len(old_tasks))
         for old_task in old_tasks:

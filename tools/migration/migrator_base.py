@@ -151,11 +151,7 @@ class MigratorBase(ABC):
                 self.logger.debug("Service Call: {}".format((url, parameters)))
                 response = client.get(url, parameters).json()
             except ServiceError as e:
-                status_code = e.response.status_code
-                if status_code in (400, 404):
-                    raise
-                else:
-                    self.logger.exception("Fetching data from %s failed (%s)" % (url, e.response.status_code))
+                self.logger.exception("Fetching data from %s failed (%s)" % (url, e.response.status_code))
         self.cache_request((url, parameters), response, use_cache)
         return response
 
@@ -235,8 +231,9 @@ class MigratorBase(ABC):
         location_match = self.dicts_match(finding1["location"],
                                           finding2["location"],
                                           ["location", "uniformPath", "@class"])
+        # Exclude category and message, because this might change with an update to a newer TS-version
         properties_match = self.dicts_match(finding1, finding2,
-                                            ["location", "id", "birth", "analysisTimestamp"])
+                                            ["location", "id", "birth", "analysisTimestamp", "message", "categoryName"])
 
         return location_match and properties_match
 
