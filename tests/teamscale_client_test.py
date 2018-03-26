@@ -54,8 +54,8 @@ def test_add_findings_group():
 def test_add_findings_descriptions():
     """ Tests uploading of findings descriptions into Teamscale server
     """
-    findings_descriptions = [FindingDescription('type1', 'name1', 'desc1', Enablement.RED),
-                             FindingDescription('type2', 'name2', 'desc2', Enablement.YELLOW)]
+    findings_descriptions = [FindingDescription('type1', 'desc1', Enablement.RED, 'name1'),
+                             FindingDescription('type2', 'desc2', Enablement.YELLOW, 'name 2')]
     responses.add(responses.PUT, get_global_service_mock('external-findings-description'), body=SUCCESS, status=200)
     resp = get_client().add_finding_descriptions(findings_descriptions)
     assert resp == SUCCESS
