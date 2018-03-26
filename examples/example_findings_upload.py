@@ -32,7 +32,7 @@ if __name__ == '__main__':
         FindingDescription("externals-2", "Another finding description", Enablement.YELLOW, "externals-2")
     ]
     response = client.add_finding_descriptions(descriptions)
-    print("Request result: %s" % (response.text,))
+    print("Request result: %s" % (response,))
 
     # A manual step to add the new groups to existing analysis profiles has to be done.
     if sys.version_info[0] == 2:
