@@ -28,7 +28,8 @@ if __name__ == '__main__':
     # Make Teamscale aware of a new findings type, which mappes to the previously
     # created group
     descriptions = [
-        FindingDescription("externals-1", "externals-1", "A test finding description", Enablement.RED)
+        FindingDescription("externals-1", "A test finding description", Enablement.RED),
+        FindingDescription("externals-2", "Another finding description", Enablement.YELLOW, "externals-2")
     ]
     response = client.add_finding_descriptions(descriptions)
     print("Request result: %s" % (response.text,))
