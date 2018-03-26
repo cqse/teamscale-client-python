@@ -17,8 +17,7 @@ setup(
     install_requires=[
           'simplejson',
           'requests>=2.0',
-          'jsonpickle',
-          'responses'
+          'jsonpickle'
     ],
 
     tests_require=[

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 import requests
 from requests.auth import HTTPBasicAuth
-import responses
 import time
 
 import simplejson as json
@@ -38,7 +37,6 @@ class TeamscaleClient:
         self.sslverify = sslverify
         self.timeout = timeout
         self.branch = branch
-        self.supports_at_least_api_version_5 = False
         self.check_api_version()
 
     def check_api_version(self):
@@ -50,11 +48,10 @@ class TeamscaleClient:
         url = self.get_global_service_url('service-api-info')
         response = self.get(url)
         json_response = response.json()
-        self.supports_at_least_api_version_5 = int(json_response['minSupportedApiVersion']) >= 5
         api_version = json_response['apiVersion']
-        if api_version < 3:
+        if api_version < 5:
             raise ServiceError("Server api version " + str(
-                api_version) + " too low and not compatible. This client requires Teamscale 3.2 or newer.");
+                api_version) + " too low and not compatible. This client requires Teamscale 3.9 or newer.")
 
     def get(self, url, parameters=None):
         """Sends a GET request to the given service url.
@@ -127,14 +124,8 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
-        url = self.get_global_service_url('external-findings-group')
-        finding_group = {'groupName': name, 'mapping': mapping_pattern}
-        payload = [finding_group]
-        if self.supports_at_least_api_version_5:
-            url = "%s/%s" % (url, name)
-            payload = finding_group
-
-        return self.put(url, payload)
+        url = "%s/%s" % (self.get_global_service_url('external-findings-group'), name)
+        return self.put(url, {'groupName': name, 'mapping': mapping_pattern})
 
     def add_finding_descriptions(self, descriptions):
         """Adds descriptions of findings.
@@ -142,46 +133,21 @@ class TeamscaleClient:
         Args:
             descriptions (list): List of :class:`FindingDescription` to add to Teamscale.
         Returns:
-            requests.Response: request's response
+            str: 'success' if all descriptions were added.
         """
-        @responses.activate
-        def success_response():
-            """ Returns a mock success response for clients when using Teamscale server
-                with minimum supported api version 5
-            """
-            success_url = 'http://success_url'
-            responses.add(responses.GET, success_url, status=200, body='success')
-            return requests.get(success_url)
-
-        payload = []
+        base_url = self.get_global_service_url('external-findings-description')
         for finding_description in descriptions:
-            some_description = {}
+            some_description = dict()
             some_description['typeId'] = finding_description.typeid
             some_description['description'] = finding_description.description
             some_description['enablement'] = finding_description.enablement
-            if self.supports_at_least_api_version_5:
-                some_description['name'] = finding_description.name
-                response = self._add_finding_description(some_description)
-                result = "Description (typeId -> %s). Upload result: %s" % (finding_description.typeid, response.text)
-                print (result)
-            else:
-                payload.append(some_description)
+            some_description['name'] = finding_description.name
+            url = "%s/%s" % (base_url, finding_description.typeid)
+            response = self.put(url, some_description)
+            result = "Description (typeId -> %s). Upload result: %s" % (finding_description.typeid, response.text)
+            print (result)
 
-        if self.supports_at_least_api_version_5:
-            return success_response()
-
-        return self.put(self.get_global_service_url('add-external-finding-descriptions'), payload)
-
-    def _add_finding_description(self, description):
-        """Adds a finding description.
-
-        Args:
-            description (object): A :class:`FindingDescription`
-        Returns:
-             requests.Response: The response to this request.
-        """
-        url = "%s/%s" % (self.get_global_service_url('external-findings-description'), description['typeId'])
-        return self.put(url, description)
+        return 'success'
 
     def update_findings_schema(self):
         """Triggers refresh of finding groups in analysis profiles."""
