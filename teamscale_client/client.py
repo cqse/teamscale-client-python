@@ -133,9 +133,10 @@ class TeamscaleClient:
         Args:
             descriptions (list): List of :class:`FindingDescription` to add to Teamscale.
         Returns:
-            str: 'success' if all descriptions were added.
+            requests.Response: request's response
         """
         base_url = self.get_global_service_url('external-findings-description')
+        response = None
         for finding_description in descriptions:
             some_description = dict()
             some_description['typeId'] = finding_description.typeid
@@ -143,9 +144,11 @@ class TeamscaleClient:
             some_description['enablement'] = finding_description.enablement
             some_description['name'] = finding_description.name
             url = "%s/%s" % (base_url, finding_description.typeid)
-            self.put(url, some_description)
+            response = self.put(url, some_description)
+            if response.text != 'success':
+                return response
 
-        return 'success'
+        return response
 
     def update_findings_schema(self):
         """Triggers refresh of finding groups in analysis profiles."""
