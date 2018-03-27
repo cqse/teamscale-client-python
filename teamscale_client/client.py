@@ -49,9 +49,9 @@ class TeamscaleClient:
         response = self.get(url)
         json_response = response.json()
         api_version = json_response['apiVersion']
-        if api_version < 5:
+        if api_version < 6:
             raise ServiceError("Server api version " + str(
-                api_version) + " too low and not compatible. This client requires Teamscale 3.9 or newer.")
+                api_version) + " too low and not compatible. This client requires Teamscale 4.1 or newer.")
 
     def get(self, url, parameters=None):
         """Sends a GET request to the given service url.
@@ -143,9 +143,7 @@ class TeamscaleClient:
             some_description['enablement'] = finding_description.enablement
             some_description['name'] = finding_description.name
             url = "%s/%s" % (base_url, finding_description.typeid)
-            response = self.put(url, some_description)
-            result = "Description (typeId -> %s). Upload result: %s" % (finding_description.typeid, response.text)
-            print (result)
+            self.put(url, some_description)
 
         return 'success'
 

@@ -23,7 +23,7 @@ SUCCESS = 'success'
 def get_client():
     """Returns Teamscale client object for requesting servers"""
     responses.add(responses.GET, get_global_service_mock('service-api-info'), status=200,
-                  content_type="application/json", body='{ "apiVersion": 5}')
+                  content_type="application/json", body='{ "apiVersion": 6}')
     return TeamscaleClient(URL, "admin", "admin", "foo")
 
 def get_project_service_mock(service_id):
