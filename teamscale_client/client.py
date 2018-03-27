@@ -28,6 +28,8 @@ class TeamscaleClient:
     """
 
     def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
+        """Constructor
+        """
         self.url = url
         self.username = username
         self.auth_header = HTTPBasicAuth(username, access_token)
@@ -45,10 +47,11 @@ class TeamscaleClient:
         """
         url = self.get_global_service_url('service-api-info')
         response = self.get(url)
-        apiVersion = response.json()['apiVersion']
-        if apiVersion < 3:
+        json_response = response.json()
+        api_version = json_response['apiVersion']
+        if api_version < 6:
             raise ServiceError("Server api version " + str(
-                apiVersion) + " too low and not compatible. This client requires Teamscale 3.2 or newer.");
+                api_version) + " too low and not compatible. This client requires Teamscale 4.1 or newer.")
 
     def get(self, url, parameters=None):
         """Sends a GET request to the given service url.
@@ -121,9 +124,8 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
-        url = self.get_global_service_url('external-findings-group')
-        payload = [{'groupName': name, 'mapping': mapping_pattern}]
-        return self.put(url, payload)
+        url = "%s/%s" % (self.get_global_service_url('external-findings-group'), name)
+        return self.put(url, {'groupName': name, 'mapping': mapping_pattern})
 
     def add_finding_descriptions(self, descriptions):
         """Adds descriptions of findings.
@@ -133,10 +135,20 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
+        base_url = self.get_global_service_url('external-findings-description')
+        response = None
+        for finding_description in descriptions:
+            some_description = dict()
+            some_description['typeId'] = finding_description.typeid
+            some_description['description'] = finding_description.description
+            some_description['enablement'] = finding_description.enablement
+            some_description['name'] = finding_description.name
+            url = "%s/%s" % (base_url, finding_description.typeid)
+            response = self.put(url, some_description)
+            if response.text != 'success':
+                return response
 
-        url = self.get_global_service_url('add-external-finding-descriptions')
-        payload = [{'typeId': d.typeid, 'description': d.description, 'enablement': d.enablement} for d in descriptions]
-        return self.put(url, payload)
+        return response
 
     def update_findings_schema(self):
         """Triggers refresh of finding groups in analysis profiles."""
