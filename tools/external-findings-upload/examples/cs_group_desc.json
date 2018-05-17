@@ -1,0 +1,4 @@
+{
+    "groupName": "C# Compiler Warnings",
+    "mapping": "^CS[0-9]{4}$"
+}

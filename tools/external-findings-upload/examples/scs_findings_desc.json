@@ -1,0 +1,194 @@
+[
+  {
+    "typeId": "SCS0001",
+    "name": "Command Injection",
+    "description": "The dynamic value passed to the command execution should be validated.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0002",
+    "name": "SQL Injection (LINQ)",
+    "description": "LINQ: How to Query for Information",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0003",
+    "name": "XPath Injection",
+    "description": "The dynamic value passed to the XPath query should be validated.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0004",
+    "name": "Certificate Validation Disabled",
+    "description": "Certificate Validation has been disabled. The communication could be intercepted.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0005",
+    "name": "Weak Random Number Generator",
+    "description": "The random numbers generated could be predicted.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0006",
+    "name": "Weak hashing function",
+    "description": "MD5 or SHA1 have known collision weaknesses and are no longer considered strong hashing algorithms.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0007",
+    "name": "XML eXternal Entity Injection (XXE)",
+    "description": "The XML parser is configured incorrectly. The operation could be vulnerable to XML eXternal Entity (XXE) processing.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0008",
+    "name": "Cookie Without SSL Flag",
+    "description": "It is recommended to specify the Secure flag to new cookie.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0009",
+    "name": "Cookie Without HttpOnly Flag",
+    "description": "It is recommended to specify the HttpOnly flag to new cookie.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0010",
+    "name": "Weak cipher algorithm",
+    "description": "DES and 3DES are not considered a strong cipher for modern applications. Currently, NIST recommends the usage of AES block ciphers instead.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0011",
+    "name": "Weak CBC Mode",
+    "description": "The CBC mode alone is susceptible to padding oracle attack.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0012",
+    "name": "Weak ECB Mode",
+    "description": "ECB mode will produce the same result for identical blocks (ie: 16 bytes for AES). An attacker could be able to guess the encrypted message. The use of AES in CBC mode with a HMAC is recommended guaranteeing integrity and confidentiality.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0013",
+    "name": "Weak Cipher Mode",
+    "description": "The cipher text produced is susceptible to alteration by an adversary.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0014",
+    "name": "SQL Injection (WebControls)",
+    "description": "Unsafe usage of System.Web.UI.WebControls.SqlDataSource, System.Web.UI.WebControls.SqlDataSourceView or Microsoft.Whos.Framework.Data.SqlUtility.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0015",
+    "name": "Hardcoded Password",
+    "description": "The password configuration to this API appears to be hardcoded.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0016",
+    "name": "Cross-Site Request Forgery (CSRF)",
+    "description": "Anti-forgery token is missing.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0017",
+    "name": "Request Validation Disabled (Attribute)",
+    "description": "Request validation is disabled. Request validation allows the filtering of some XSS patterns submitted to the application.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0018",
+    "name": "Path Traversal",
+    "description": "A path traversal attack (also known as directory traversal) aims to access files and directories that are stored outside the expected directory.By manipulating variables that reference files with “dot-dot-slash (../)” sequences and its variations or by using absolute file paths, it may be possible to access arbitrary files and directories stored on file system including application source code or configuration and critical system files.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0019",
+    "name": "OutputCache Conflict",
+    "description": "Caching conflicts with authorization.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0020",
+    "name": "SQL Injection (OLE DB)",
+    "description": "Use parametrized queries to mitigate SQL injection.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0021",
+    "name": "Request Validation Disabled (Configuration File)",
+    "description": "The validateRequest which provides additional protection against XSS is disabled in configuration file.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0022",
+    "name": "Event Validation Disabled",
+    "description": "The enableEventValidation is disabled in configuration file.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0023",
+    "name": "View State Not Encrypted",
+    "description": "The viewStateEncryptionMode is not set to Always in configuration file.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0024",
+    "name": "View State MAC Disabled",
+    "description": "The enableViewStateMac is disabled in configuration file. (This feature cannot be disabled starting .NET 4.5.1)",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0025",
+    "name": "SQL Injection (ODBC)",
+    "description": "Use parametrized queries to mitigate SQL injection.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0026",
+    "name": "SQL Injection (MsSQL Data Provider)",
+    "description": "Use parametrized queries to mitigate SQL injection.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0027",
+    "name": "Open Redirect",
+    "description": "The dynamic value passed to the Redirect should be validated.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0028",
+    "name": "Insecure Deserialization",
+    "description": "Untrusted data passed for deserialization.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0029",
+    "name": "Cross-Site Scripting (XSS)",
+    "description": "A potential XSS was found. The endpoint returns a variable from the client input that has not been encoded. To protect against stored XSS attacks, make sure any dynamic content coming from user or data store cannot be used to inject JavaScript on a page. Most modern frameworks will escape dynamic content by default automatically (Razor for example) or by using special syntax (\u003c%: content %\u003e, \u003c%\u003d HttpUtility.HtmlEncode(content) %\u003e).",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0032",
+    "name": "Password RequiredLength Too Small",
+    "description": "The minimal length of a password is recommended to be set at least to 8.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0033",
+    "name": "Password Complexity",
+    "description": "PasswordValidator should have at least two requirements for better security (RequiredLength, RequireDigit, RequireLowercase, RequireUppercase and/or RequireNonLetterOrDigit).",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "SCS0034",
+    "name": "Password RequiredLength Not Set",
+    "description": "The RequiredLength property must be set with a minimum value of 8.",
+    "enablement": "YELLOW"
+  }
+]
