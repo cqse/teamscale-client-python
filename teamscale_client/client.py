@@ -394,7 +394,7 @@ class TeamscaleClient:
         }
         response = self.get(service_url, parameters)
         return [
-            ProjectInfo(project_id=x['id'], name=x['name'], description=x['description'],
+            ProjectInfo(project_id=x['id'], name=x['name'], description=x.get('description'),
                         creation_timestamp=x['creationTimestamp'], alias=x.get('alias'),
                         deleting=x['deleting'], reanalyzing=x['reanalyzing']) for x in response.json()]
 
