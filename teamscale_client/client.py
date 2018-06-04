@@ -301,6 +301,7 @@ class TeamscaleClient:
         service_url = self.get_project_service_url("architecture-upload")
         parameters = {
             "t": self._get_timestamp_parameter(timestamp),
+            "adjusttimestamp": "true",
             "message": message
         }
         architecture_files = [(path, open(filename, 'rb')) for path, filename in architectures.items()]
