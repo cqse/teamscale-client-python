@@ -382,6 +382,38 @@ class GitSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguration):
 
 
 @auto_str
+class GerritSourceCodeConnectorConfiguration(GitSourceCodeConnectorConfiguration):
+    """Represents a Teamscale Gerrit connector configuration.
+
+    Args:
+        project_name (str): Used to reference the project.
+        enable_voting (str): Enables Teamscale voting on Gerrit reviews.
+        enable_detailed_line_comments (str): When enabled, a Teamscale vote will carry a detailed comment for each
+                                             generated finding that is annotated to the relevant line in the reviewed
+                                             file.
+        ignore_yellow_findings_for_votes (str): When enabled, Teamscale will only consider red findings when voting.
+        ignore_yellow_findings_for_comments (str): When enabled, Teamscale will only consider red findings when
+                                                   commenting.
+        number_of_ref_batches_for_updates (str): Defines the number of seperate parts the refs are fetched from Gerrit.
+                                                 Can be between 1-100, but 100 must be cleanly dividable by the given
+                                                 number. DO NOT CHANGE THIS, unless you know exactly what you are doing.
+        review_label (str): The review label used to upload feedback to Gerrit.
+    """
+
+    def __init__(self, project_name, enable_voting=False, enable_detailed_line_comments=True,
+                 ignore_yellow_findings_for_votes=False, ignore_yellow_findings_for_comments=False,
+                 number_of_ref_batches_for_updates=1, review_label="Code-Review", *args, **kwargs):
+        super(GerritSourceCodeConnectorConfiguration, self).__init__(connector_type=ConnectorType.GERRIT, *args, **kwargs)
+        self.options["Project Name"] = project_name
+        self.options["Enable Voting"] = enable_voting
+        self.options["Enable Detailed Line Comments"] = enable_detailed_line_comments
+        self.options["Ignore Yellow Findings For Votes"] = ignore_yellow_findings_for_votes
+        self.options["Ignore Yellow Findings For Comments"] = ignore_yellow_findings_for_comments
+        self.options["Number of Ref Batches For Updates"] = number_of_ref_batches_for_updates
+        self.options["Review Label"] = review_label
+
+
+@auto_str
 class TFSSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguration):
     """Represents a Teamscale TFS connector configuration.
 

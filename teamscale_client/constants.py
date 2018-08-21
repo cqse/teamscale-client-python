@@ -132,3 +132,5 @@ class ConnectorType:
     GIT = "Git"
 
     SVN = "Subversion"
+
+    GERRIT = "Gerrit"
