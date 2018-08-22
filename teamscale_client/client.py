@@ -7,7 +7,7 @@ import time
 
 import simplejson as json
 
-from teamscale_client.data import ServiceError, Baseline, ProjectInfo
+from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding
 from teamscale_client.utils import to_json
 
 
@@ -518,3 +518,40 @@ class TeamscaleClient:
         with open(file_path) as json_file:
             json_data = json.load(json_file)
             return json_data
+
+
+    def upload_files_for_precommit_analysis(self, timestamp, precommit_data):
+        """Uploads the provided files for precommit analysis."""
+        service_url = self.get_project_service_url("pre-commit") + self._get_timestamp_parameter(timestamp)
+
+        return self.put(service_url, data=to_json(precommit_data))
+
+
+    def get_precommit_analysis_results(self):
+        """Gets precommit analysis results."""
+        service_url = self.get_project_service_url("pre-commit")
+
+        while True:
+            response = self.get(service_url)
+            if response.json() is None:
+                time.sleep(2)
+            else:
+                return self._parse_findings_response(service_url, response)
+
+
+    def _parse_findings_response(self, service_url, response):
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+
+        added_findings = self._findings_from_json(response.json()['addedFindings'])
+        findings_in_changed_code = self._findings_from_json(response.json()['findingsInChangedCode'])
+        removed_findings = self._findings_from_json(response.json()['removedFindings'])
+
+        return added_findings, removed_findings, findings_in_changed_code
+
+
+    def _findings_from_json(self, findings_json):
+        return [Finding(finding_type_id=x['typeId'], message=x['message'], assessment=x['assessment'],
+                start_offset=x['location']['rawStartOffset'], end_offset=x['location']['rawEndOffset'],
+                start_line=x['location']['rawStartLine'], end_line=x['location']['rawEndLine'],
+                        uniform_path=x['location']['uniformPath']) for x in findings_json]

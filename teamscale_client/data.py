@@ -31,10 +31,11 @@ class Finding(object):
                         are given.
         identifier (Optional[str]): Advanced usage! Path to special elements in Teamscale, e.g. Simulink model parts.
                                     If this is given, offsets and lines do not need to be filled.
+        uniform_path (Optional[str]): The path of the file where the finding is located.
     """
 
     def __init__(self, finding_type_id, message, assessment=Assessment.YELLOW, start_offset=None, end_offset=None,
-                 start_line=None, end_line=None, identifier=None):
+                 start_line=None, end_line=None, identifier=None, uniform_path=None):
         self.findingTypeId = finding_type_id
         self.message = message
         self.assessment = assessment
@@ -42,6 +43,7 @@ class Finding(object):
         self.endOffset = end_offset
         self.startLine = start_line
         self.endLine = end_line
+        self.uniformPath = uniform_path
         self.identifier = identifier
 
 
