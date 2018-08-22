@@ -1,15 +1,19 @@
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+
 import datetime
 import time
 import os
 import sys
 import json
 
-from git_utils import get_current_branch, get_current_timestamp
-from git_utils import get_changed_files_and_content, get_deleted_files
-from data import PreCommitUploadData
+from teamscale_client.git_utils import get_current_branch, get_current_timestamp
+from teamscale_client.git_utils import get_changed_files_and_content, get_deleted_files
+from teamscale_client.data import PreCommitUploadData
 from teamscale_client import TeamscaleClient
-from teamscale_config import TeamscaleConfig
-from git_utils import get_repo_root_from_file_in_repo
+from teamscale_client.teamscale_config import TeamscaleConfig
+from teamscale_client.git_utils import get_repo_root_from_file_in_repo
 
 
 class PrecommitClient:
@@ -61,7 +65,9 @@ class PrecommitClient:
 
     def _format_findings(self, findings):
         """Formats the given findings as error strings."""
-        return [os.path.split(finding.uniformPath)[1] + ':' + unicode(finding.startLine) + ':0: error: '
+        # return [os.path.split(finding.uniformPath)[1] + ':' + unicode(finding.startLine) + ':0: error: '
+        #         + finding.message for finding in findings]
+        return [os.path.join(repo_path, finding.uniformPath) + ':' + unicode(finding.startLine) + ':0: error: '
                 + finding.message for finding in findings]
 
 
