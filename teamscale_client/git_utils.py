@@ -43,8 +43,16 @@ def get_current_timestamp(path_to_repository):
     return head.commit_time
 
 
+def filter_changed_files(changed_files):
+    """Filters the provided list of changed files."""
+    # Currently, no filtering is performed.
+    return changed_files
+
+
 def get_changed_files_and_content(path_to_repository):
     """Utility method for getting the currently changed files from a Git repository.
+
+    Filters the changed files using `filter_changed_files`.
 
         Args:
             path_to_repository (str): Path to the Git repository
@@ -52,7 +60,7 @@ def get_changed_files_and_content(path_to_repository):
         Returns:
             dict: Mapping of filename to file content for all changed files in the provided repository.
     """
-    changed_files = get_changed_files(path_to_repository)
+    changed_files = filter_changed_files(get_changed_files(path_to_repository))
     return {filename: open(os.path.join(path_to_repository, filename), 'rb').read() for filename in changed_files}
 
 

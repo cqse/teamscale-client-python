@@ -43,8 +43,18 @@ class Finding(object):
         self.endOffset = end_offset
         self.startLine = start_line
         self.endLine = end_line
-        self.uniformPath = uniform_path
         self.identifier = identifier
+        self.uniformPath = uniform_path
+
+    def __cmp__(self, other):
+        """Compares this finding to another finding."""
+        if self.uniformPath == other.uniformPath:
+            return self.startLine.__cmp__(other.startLine)
+        else:
+            if self.uniformPath < other.uniformPath:
+                return -1
+            else:
+                return 1
 
 
 @auto_str

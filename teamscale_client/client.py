@@ -540,6 +540,7 @@ class TeamscaleClient:
 
 
     def _parse_findings_response(self, service_url, response):
+        """Parses findings retrieved from Teamscale."""
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
 
@@ -551,7 +552,34 @@ class TeamscaleClient:
 
 
     def _findings_from_json(self, findings_json):
-        return [Finding(finding_type_id=x['typeId'], message=x['message'], assessment=x['assessment'],
-                start_offset=x['location']['rawStartOffset'], end_offset=x['location']['rawEndOffset'],
-                start_line=x['location']['rawStartLine'], end_line=x['location']['rawEndLine'],
-                        uniform_path=x['location']['uniformPath']) for x in findings_json]
+        """Parses JSON encoded findings."""
+        return [Finding(finding_type_id=x['typeId'], message=x['message'],
+                        assessment=x['assessment'], start_offset=x['location']['rawStartOffset'],
+                        end_offset=x['location']['rawEndOffset'], start_line=x['location']['rawStartLine'],
+                        end_line=x['location']['rawEndLine'], uniform_path=x['location']['uniformPath'])
+                for x in findings_json]
+
+
+    def get_findings(self, uniform_path, timestamp):
+        """Retrieves the list of findings in the currently active project for the given uniform path
+        at the provided timestamp on the given branch.
+
+        Returns:
+            List[:class:`data.Finding`]): The list of findings.
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        service_url = self.get_project_service_url("findings") + uniform_path
+        parameters = {
+            "t": self._get_timestamp_parameter(timestamp=timestamp),
+            "recursive": True,
+            "all": True
+        }
+        headers = {'Accept': 'application/json'}
+        response = requests.get(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
+                                headers=headers, timeout=self.timeout)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return self._findings_from_json(response.json())
+
