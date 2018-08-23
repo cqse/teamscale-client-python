@@ -4,7 +4,7 @@ In order to be able to perform precommit analysis, you need to put the config fi
 into the root of the repository you want to analyze.
 Then, change the configuration in that file (e.g. url to Teamscale, project id etc.) to match your setting.
 
-# Configuration as build step in editors like Sublime VS Code
+# Configuration as build step in editors like Sublime or VS Code
 
 The precommit client will print the fetched findings to `stdout` in a format similar to gcc findings.
 This allows you to use the highlighting capabilities of your editors to mark the findings inline.
