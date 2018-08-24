@@ -80,7 +80,7 @@ class PrecommitClient:
         if len(findings) == 0:
             return ['> No findings.']
         sorted_findings = sorted(findings)
-        return [os.path.join(self.repository_path, finding.uniformPath) + ':' + unicode(finding.startLine) + ':0: ' +
+        return [os.path.join(self.repository_path, finding.uniformPath) + ':' + str(finding.startLine) + ':0: ' +
                 self._severity_string(finding=finding) + ': ' + finding.message for finding in sorted_findings]
 
     def _severity_string(self, finding):

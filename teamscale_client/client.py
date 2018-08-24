@@ -88,7 +88,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        headers = {'Accept': 'application/json','Content-Type': 'application/json'}
+        headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         response = requests.put(url, params=parameters, json=json, data=data,
                                 headers=headers, auth=self.auth_header,
                                 verify=self.sslverify, timeout=self.timeout)
@@ -229,7 +229,6 @@ class TeamscaleClient:
         """
         service_url = self.get_global_service_url("external-metric")
         return self.put(service_url, data=to_json(metric_descriptions))
-
 
     def upload_coverage_data(self, coverage_files, coverage_format, timestamp, message, partition):
         """Upload coverage reports to Teamscale. It is expected that the given coverage report files can be read from the filesystem.

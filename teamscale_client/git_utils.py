@@ -6,6 +6,7 @@ import os
 from pygit2 import Repository, GIT_STATUS_WT_DELETED, GIT_STATUS_WT_MODIFIED, GIT_STATUS_WT_RENAMED, \
     GIT_STATUS_WT_TYPECHANGE, GIT_STATUS_INDEX_NEW, GIT_STATUS_INDEX_MODIFIED, GIT_STATUS_INDEX_DELETED, \
     discover_repository
+from io import open
 
 _STATI_CONSIDERED_FOR_PRECOMMIT = GIT_STATUS_INDEX_NEW | GIT_STATUS_INDEX_MODIFIED | GIT_STATUS_WT_MODIFIED | \
                                   GIT_STATUS_WT_RENAMED | GIT_STATUS_WT_TYPECHANGE
@@ -69,7 +70,7 @@ def get_changed_files_and_content(path_to_repository):
             dict: Mapping of filename to file content for all changed files in the provided repository.
     """
     changed_files = filter_changed_files(get_changed_files(path_to_repository), path_to_repository)
-    return {filename: open(os.path.join(path_to_repository, filename), 'rb').read() for filename in changed_files}
+    return {filename: open(os.path.join(path_to_repository, filename), encoding='utf-8').read() for filename in changed_files}
 
 def get_changed_files(path_to_repository):
     """Utility method for getting the currently changed files from a Git repository.
