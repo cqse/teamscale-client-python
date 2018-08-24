@@ -82,7 +82,7 @@ def get_changed_files(path_to_repository):
     """
     repo = Repository(path_to_repository)
     status_entries = repo.status()
-    return [path for path, st in status_entries.iteritems() if st & _STATI_CONSIDERED_FOR_PRECOMMIT]
+    return [path for path, st in status_entries.items() if st & _STATI_CONSIDERED_FOR_PRECOMMIT]
 
 def get_deleted_files(path_to_repository):
     """Utility method for getting the deleted files from a Git repository.
@@ -95,4 +95,4 @@ def get_deleted_files(path_to_repository):
     """
     repo = Repository(path_to_repository)
     status_entries = repo.status()
-    return [path for path, st in status_entries.iteritems() if st & _STATI_DELETED]
+    return [path for path, st in status_entries.items() if st & _STATI_DELETED]
