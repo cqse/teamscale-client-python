@@ -514,21 +514,29 @@ class TeamscaleClient:
             file_path (str): File from which to read the JSON content.
 
         Returns:
-            The parsed JSON data."""
+            The parsed JSON data.
+        """
         with open(file_path) as json_file:
             json_data = json.load(json_file)
             return json_data
 
-
     def upload_files_for_precommit_analysis(self, timestamp, precommit_data):
-        """Uploads the provided files for precommit analysis."""
+        """Uploads the provided files for precommit analysis.
+
+        Args:
+            timestamp (datetime.datetime): The timestamp of the parent commit.
+            precommit_data (data.PreCommitUploadData): The precommit data to upload.
+        """
         service_url = self.get_project_service_url("pre-commit") + self._get_timestamp_parameter(timestamp)
 
         return self.put(service_url, data=to_json(precommit_data))
 
-
     def get_precommit_analysis_results(self):
-        """Gets precommit analysis results."""
+        """Gets precommit analysis results.
+
+        Returns:
+            A tuple consisting of three lists: added findings, findings in changed code, and removed findings.
+        """
         service_url = self.get_project_service_url("pre-commit")
 
         while True:
@@ -538,9 +546,19 @@ class TeamscaleClient:
             else:
                 return self._parse_findings_response(service_url, response)
 
-
     def _parse_findings_response(self, service_url, response):
-        """Parses findings retrieved from Teamscale."""
+        """Parses findings retrieved from Teamscale.
+
+        Args:
+            service_url (str): The service url. Used for logging.
+            response (requests.Response): The response to parse for findings.
+
+        Returns:
+            A tuple consisting of three lists: added findings, findings in changed code, and removed findings.
+
+        Raises:
+            ServiceError: If anything goes wrong.
+        """
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
 
@@ -550,19 +568,30 @@ class TeamscaleClient:
 
         return added_findings, removed_findings, findings_in_changed_code
 
-
     def _findings_from_json(self, findings_json):
-        """Parses JSON encoded findings."""
+        """Parses JSON encoded findings.
+
+        Args:
+            findings_json (List[object]): The json object encoding the list of findings.
+
+        Returns:
+            data.Finding: The finding that was parsed from the JSON object
+        """
         return [Finding(finding_type_id=x['typeId'], message=x['message'],
                         assessment=x['assessment'], start_offset=x['location']['rawStartOffset'],
                         end_offset=x['location']['rawEndOffset'], start_line=x['location']['rawStartLine'],
                         end_line=x['location']['rawEndLine'], uniform_path=x['location']['uniformPath'])
                 for x in findings_json]
 
-
-    def get_findings(self, uniform_path, timestamp):
+    def get_findings(self, uniform_path, timestamp, recursive=True):
         """Retrieves the list of findings in the currently active project for the given uniform path
         at the provided timestamp on the given branch.
+
+        Args:
+            uniform_path (str): The uniform path to get findings for.
+            timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
+            recursive (bool): Whether to query findings recursively, i.e. also get findings for files under the given
+                path.
 
         Returns:
             List[:class:`data.Finding`]): The list of findings.
@@ -573,13 +602,10 @@ class TeamscaleClient:
         service_url = self.get_project_service_url("findings") + uniform_path
         parameters = {
             "t": self._get_timestamp_parameter(timestamp=timestamp),
-            "recursive": True,
+            "recursive": recursive,
             "all": True
         }
-        headers = {'Accept': 'application/json'}
-        response = requests.get(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
-                                headers=headers, timeout=self.timeout)
+        response = self.get(service_url, parameters=parameters)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return self._findings_from_json(response.json())
-

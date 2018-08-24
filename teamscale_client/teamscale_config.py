@@ -2,12 +2,17 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import print_function
 
+from ConfigParser import ConfigParser
+
 class TeamscaleConfig:
     """Configuration parameters for connections to Teamscale"""
-    def __init__(self, url, username, access_token, project_id):
+    def __init__(self, config_file):
         """Constructor
         """
-        self.url = url
-        self.username = username
-        self.access_token = access_token
-        self.project_id = project_id
+        parser = ConfigParser()
+        parser.read(config_file)
+
+        self.url = parser.get('teamscale', 'url')
+        self.username = parser.get('teamscale', 'username')
+        self.access_token = parser.get('teamscale', 'access_token')
+        self.project_id = parser.get('project', 'id')
