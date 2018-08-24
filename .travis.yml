@@ -12,6 +12,8 @@ cache:
       - $HOME/.cache/pip
 
 install:
+    - sudo apt-get install libgit2-dev libgit2-0
+    - pip install -Iv pygit2==0.19.0
     - pip install travis-sphinx sphinx
     - pip install -e . 
 

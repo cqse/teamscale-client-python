@@ -31,10 +31,11 @@ class Finding(object):
                         are given.
         identifier (Optional[str]): Advanced usage! Path to special elements in Teamscale, e.g. Simulink model parts.
                                     If this is given, offsets and lines do not need to be filled.
+        uniform_path (Optional[str]): The path of the file where the finding is located.
     """
 
     def __init__(self, finding_type_id, message, assessment=Assessment.YELLOW, start_offset=None, end_offset=None,
-                 start_line=None, end_line=None, identifier=None):
+                 start_line=None, end_line=None, identifier=None, uniform_path=None):
         self.findingTypeId = finding_type_id
         self.message = message
         self.assessment = assessment
@@ -43,6 +44,17 @@ class Finding(object):
         self.startLine = start_line
         self.endLine = end_line
         self.identifier = identifier
+        self.uniformPath = uniform_path
+
+    def __cmp__(self, other):
+        """Compares this finding to another finding."""
+        if self.uniformPath == other.uniformPath:
+            return self.startLine.__cmp__(other.startLine)
+        else:
+            if self.uniformPath < other.uniformPath:
+                return -1
+            else:
+                return 1
 
 
 @auto_str
@@ -422,3 +434,16 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
         self.options["Externals Includes"] = externals_includes
         self.options["Externals Excludes"] = externals_excludes
 
+
+@auto_str
+class PreCommitUploadData(object):
+    """Represents precommit upload data for Teamscale.
+
+    Args:
+        uniformPathToContentMap (dict[unicode, unicode]): A map from uniform paths to the content of changed files
+        deletedUniformPaths (List[str]): List of names of deleted files
+    """
+
+    def __init__(self, uniformPathToContentMap, deletedUniformPaths):
+        self.uniformPathToContentMap = uniformPathToContentMap
+        self.deletedUniformPaths = deletedUniformPaths

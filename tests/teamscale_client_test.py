@@ -158,7 +158,7 @@ def _get_test_findings():
 def test_finding_json_serialization():
     """Tests that findings json is correctly serialized"""
     findings = _get_test_findings()
-    assert '[{"content": null, "findings": [{"assessment": "YELLOW", "endLine": null, "endOffset": null, "findingTypeId": "test-id", "identifier": null, "message": "message", "startLine": null, "startOffset": null}], "path": "path/to/file"}]' == to_json(findings)
+    assert '[{"content": null, "findings": [{"assessment": "YELLOW", "endLine": null, "endOffset": null, "findingTypeId": "test-id", "identifier": null, "message": "message", "startLine": null, "startOffset": null, "uniformPath": null}], "path": "path/to/file"}]' == to_json(findings)
 
 @responses.activate
 def test_get_projects():
