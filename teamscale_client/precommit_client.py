@@ -29,13 +29,16 @@ class PrecommitClient:
         """Uploads the currently changed files for precommit analysis."""
         current_branch = get_current_branch(self.repository_path)
         self.teamscale_client.branch = current_branch
-        print("Uploading changes on branch '%s' in '%s'..." % (current_branch, self.repository_path))
-
         parent_commit_timestamp = get_current_timestamp(self.repository_path)
 
         changed_files = get_changed_files_and_content(self.repository_path)
         deleted_files = get_deleted_files(self.repository_path)
 
+        if not changed_files and not deleted_files:
+            print("No changed files found. Forgot to `git add` new files?")
+            exit(0)
+
+        print("Uploading changes on branch '%s' in '%s'..." % (current_branch, self.repository_path))
         precommit_data = PreCommitUploadData(uniformPathToContentMap=changed_files, deletedUniformPaths=deleted_files)
         self.teamscale_client.upload_files_for_precommit_analysis(
             datetime.datetime.fromtimestamp(int(parent_commit_timestamp)), precommit_data)
