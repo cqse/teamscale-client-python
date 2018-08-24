@@ -18,7 +18,7 @@ setup(
           'simplejson',
           'requests>=2.0',
           'jsonpickle',
-          'pygit2'
+          'configparser'
     ],
 
     tests_require=[

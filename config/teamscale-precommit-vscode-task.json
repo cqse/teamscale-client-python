@@ -4,7 +4,7 @@
         {
             "label": "Teamscale Precommit Analysis",
             "type": "shell",
-            "command": "python -c 'teamscale_client.precommit_client import run;run()' ${file}",
+            "command": "python -c 'from teamscale_client.precommit_client import run;run()' ${file}",
             "group": {
                 "kind": "build",
                 "isDefault": true
