@@ -528,7 +528,9 @@ class TeamscaleClient:
         """
         service_url = self.get_project_service_url("pre-commit") + self._get_timestamp_parameter(timestamp)
 
-        return self.put(service_url, data=to_json(precommit_data))
+        response = self.put(service_url, data=to_json(precommit_data))
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
 
     def get_precommit_analysis_results(self):
         """Gets precommit analysis results.
