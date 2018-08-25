@@ -183,3 +183,18 @@ def test_add_project():
     resp = get_client().create_project(project_configuration)
     assert resp.status_code == 200 and TeamscaleClient._get_response_message(resp) == SUCCESS
 
+def test_compare_findings():
+    """Tests comparing between findings."""
+    first_finding = Finding("1a", "first message a", uniform_path='path/to/a', start_line=10, end_line=30)
+    second_finding = Finding("2", "second message", uniform_path='path/to/a', start_line=20, end_line=25)
+    third_finding = Finding("3", "third message", uniform_path='path/to/b', start_line=20, end_line=25)
+
+    assert first_finding < second_finding
+    assert second_finding < third_finding
+    assert first_finding == first_finding
+    assert third_finding > second_finding
+    assert second_finding >= first_finding
+    assert second_finding >= first_finding
+    assert second_finding != first_finding
+
+

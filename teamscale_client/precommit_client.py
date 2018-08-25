@@ -49,7 +49,11 @@ class PrecommitClient:
 
     def print_precommit_results_as_error_string(self, include_findings_in_changed_code=True,
                                                 include_existing_findings=False, include_all_findings=False):
-        """Print the current precommit results formatting them in a way, most text editors understand."""
+        """Print the current precommit results formatting them in a way, most text editors understand.
+
+        Returns:
+            `True`, if RED findings were among the new findings. `False`, otherwise.
+        """
         added_findings, removed_findings, findings_in_changed_code = self.wait_and_get_precommit_result()
 
         print('New findings:')
@@ -74,6 +78,9 @@ class PrecommitClient:
             print('Existing findings:')
             for formatted_finding in self._format_findings(existing_findings):
                 print(formatted_finding)
+
+        red_added_findings = list(filter(lambda finding: finding.assessment == "RED", added_findings))
+        return len(red_added_findings) > 0
 
     def _format_findings(self, findings):
         """Formats the given findings as error or warning strings."""
@@ -103,6 +110,10 @@ def _parse_args():
                         const=True, default=False,
                         help='When this option is set, all existing findings in the repo are fetched in addition '
                              'to precommit findings. (default: False)')
+    parser.add_argument('--fail-on-red-findings', dest='fail_on_red_findings', action='store_const',
+                        const=True, default=False,
+                        help='When this option is set, the precommit client will exit with a non-zero return value '
+                             'whenever RED findings were among the precommit findings. (default: False)')
     return parser.parse_args()
 
 def configure_precommit_client(config_file, repo_path, parsed_args):
@@ -130,10 +141,13 @@ def run():
 
     print('Waiting for precommit analysis results...')
     print('')
-    precommit_client.print_precommit_results_as_error_string(
+    red_findings_found = precommit_client.print_precommit_results_as_error_string(
         include_findings_in_changed_code=not parsed_args.exclude_findings_in_changed_code,
         include_existing_findings=parsed_args.fetch_existing_findings,
         include_all_findings=parsed_args.fetch_all_findings)
+
+    if parsed_args.fail_on_red_findings and red_findings_found:
+        exit(1)
 
 if __name__ == '__main__':
     run()

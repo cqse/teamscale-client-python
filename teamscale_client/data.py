@@ -56,6 +56,34 @@ class Finding(object):
             else:
                 return 1
 
+    def __eq__(self, other):
+        """Checks if this finding is equal to the given finding."""
+        return ((self.uniformPath, self.startLine, self.assessment, self.message, self.endLine, self.endOffset,
+                 self.findingTypeId, self.identifier, self.startOffset) ==
+                (other.uniformPath, other.startLine, other.assessment, other.message, other.endLine, other.endOffset,
+                 other.findingTypeId, other.identifier, other.startOffset))
+
+    def __ne__(self, other):
+        """Checks if this finding is not equal to the given finding."""
+        return not (self == other)
+
+    def __lt__(self, other):
+        """Checks if this finding is less than the given finding."""
+        return (self.uniformPath, self.startLine, self.endLine) < (other.uniformPath, other.startLine, other.endLine)
+
+    def __gt__(self, other):
+        """Checks if this finding is greater than the given finding."""
+        return (self.uniformPath, self.startLine, self.endLine) > (other.uniformPath, other.startLine, other.endLine)
+
+    def __le__(self, other):
+        """Checks if this finding is less than or equal the given finding."""
+        return (self == other) or ((self.uniformPath, self.startLine, self.endLine) <
+                                   (other.uniformPath, other.startLine, other.endLine))
+
+    def __ge__(self, other):
+        """Checks if this finding is greater than or equal the given finding."""
+        return (self == other) or ((self.uniformPath, self.startLine, self.endLine) >
+                                   (other.uniformPath, other.startLine, other.endLine))
 
 @auto_str
 class FileFindings(object):
