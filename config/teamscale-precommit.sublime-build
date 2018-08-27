@@ -1,4 +1,0 @@
-{
-	"cmd": ["python", "-c", "from teamscale_client.precommit_client import run;run()", "$file"],
-	"file_regex": "^([^:]*):([0-9]+):([0-9]+): (?:error|warning): (.*)$"
-}
