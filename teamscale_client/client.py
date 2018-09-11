@@ -7,7 +7,7 @@ import time
 
 import simplejson as json
 
-from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding
+from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task
 from teamscale_client.utils import to_json
 
 
@@ -610,3 +610,44 @@ class TeamscaleClient:
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return self._findings_from_json(response.json())
+
+    def get_tasks(self, status="OPEN", details=True, start=0, max=300):
+        """Retrieves the tasks for the client's project from the server.
+
+        Args:
+            status (constants.TaskStatus): The status to retrieve tickets for
+            details (bool): Whether to retrieve details together with the tasks
+            start (number): From which task number to start listing tasks
+            max (number): Maximum number of tasks to return
+
+        Returns:
+            List[:class:`data.Task`]): The list of tasks.
+
+        Raises:
+            ServiceError: If anything goes wrong
+            """
+        service_url = self.get_project_service_url("tasks")
+        parameters = {
+            "status": status,
+            "details": details,
+            "start": start,
+            "max": max,
+            "with-count": False
+        }
+        response = self.get(service_url, parameters=parameters)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return TeamscaleClient._tasks_from_json(response.json())
+
+    @staticmethod
+    def _tasks_from_json(task_json):
+        """Parses JSON encoded findings.
+
+        Args:
+            task_json (List[object]): The json object encoding the list of findings.
+
+        Returns:
+            list[data.Task]: The tasks that was parsed from the JSON object
+        """
+        print(task_json)
+        return [Task.from_json(x) for x in task_json]

@@ -1,12 +1,11 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import collections
 import datetime
 import time
 
 from teamscale_client.constants import Assessment, MetricAggregation, MetricValueType, MetricProperties, \
-    AssessmentMetricColors, ConnectorType
+    ConnectorType
 from teamscale_client.utils import auto_str
 
 
@@ -461,3 +460,38 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
         self.options["Enable Externals"] = enable_externals
         self.options["Externals Includes"] = externals_includes
         self.options["Externals Excludes"] = externals_excludes
+
+
+@auto_str
+class Task(object):
+    """Represents a task in Teamscale
+
+    Args:
+        id (int): The task's id
+        subject (str): The task's subject
+        author (str): The task author's name
+        description (str): The task's description
+        assignee (str): The assigned user's name
+        status (constants.TaskStatus): The task's status
+        resolution (Optional[constants.TaskResolution]): The task's resolution
+        findings (Optional[List[str]]): The findings attached to this task
+        comments (Optional[List[str]]): Comments attached to this task
+        tags (List[str]): Tags that have been added to this task
+    """
+
+    def __init__(self, id, subject, author, description, assignee, status, resolution, findings, comments, tags):
+        self.id = id
+        self.subject = subject
+        self.author = author
+        self.description = description
+        self.assignee = assignee
+        self.status = status
+        self.resolution = resolution
+        self.findings = findings
+        self.comments = comments
+        self.tags = tags
+
+    @classmethod
+    def from_json(cls, json):
+        return Task(json['id'], json['subject'], json['author'], json['description'], json['assignee'], json['status'],
+                    json['resolution'], json['findings'], json['comments'], json['tags'])
