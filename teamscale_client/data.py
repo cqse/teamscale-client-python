@@ -493,5 +493,5 @@ class Task(object):
 
     @classmethod
     def from_json(cls, json):
-        return Task(json['id'], json['subject'], json['author'], json['description'], json['assignee'], json['status'],
+        return Task(json['id'], json['subject'], json['author'], json.get('description', ""), json.get('assignee', ''), json['status'],
                     json['resolution'], json['findings'], json['comments'], json['tags'])
