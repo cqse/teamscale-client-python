@@ -84,6 +84,7 @@ class Finding(object):
         return (self == other) or ((self.uniformPath, self.startLine, self.endLine) >
                                    (other.uniformPath, other.startLine, other.endLine))
 
+
 @auto_str
 class FileFindings(object):
     """Representation of a file and its findings.
@@ -113,7 +114,7 @@ class FindingDescription(object):
 
     def __init__(self, typeid, description, enablement, name=None):
         self.typeid = typeid
-        self.description= description
+        self.description = description
         self.enablement = enablement
         self.name = name
 
@@ -475,11 +476,13 @@ class Task(object):
         status (constants.TaskStatus): The task's status
         resolution (Optional[constants.TaskResolution]): The task's resolution
         findings (Optional[List[str]]): The findings attached to this task
-        comments (Optional[List[str]]): Comments attached to this task
+        comments (Optional[List[Comment]]): Comments attached to this task
         tags (List[str]): Tags that have been added to this task
     """
 
-    def __init__(self, id, subject, author, description, assignee, status, resolution, findings, comments, tags):
+    # noinspection PyPep8Naming
+    def __init__(self, id, subject, author, description, assignee, status, resolution, findings, comments, tags,
+                 created, updated, updatedBy):
         self.id = id
         self.subject = subject
         self.author = author
@@ -490,8 +493,39 @@ class Task(object):
         self.findings = findings
         self.comments = comments
         self.tags = tags
+        self.created = created
+        self.updated = updated
+        self.updatedBy = updatedBy
 
     @classmethod
     def from_json(cls, json):
-        return Task(json['id'], json['subject'], json['author'], json.get('description', ""), json.get('assignee', ''), json['status'],
-                    json['resolution'], json['findings'], json['comments'], json['tags'])
+        print(json)
+        comments = []
+        if json['comments']:
+            for comment_json in json['comments']:
+                comments.append(Comment.from_json(comment_json))
+        return Task(json['id'], json['subject'], json['author'], json.get('description', ""), json.get('assignee', ''),
+                    json['status'], json['resolution'], json['findings'], comments, json['tags'],
+                    json['created'], json['updated'], json['updatedBy'])
+
+@auto_str
+class Comment(object):
+    """Represents a comment on a Task in Teamscale
+
+    Args:
+        author (str): The author of this comment
+        date (long): Creation date in ms
+        text (str): The comment's text
+        changeComment (bool): Whether this is a system generated change comment
+    """
+
+    # noinspection PyPep8Naming
+    def __init__(self, author, date, text, changeComment=False):
+        self.author = author
+        self.date = date
+        self.text = text
+        self.changeComment = changeComment
+
+    @classmethod
+    def from_json(cls, json):
+        return Comment(json['author'], json['date'], json['text'], json['changeComment'])
