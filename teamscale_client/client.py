@@ -668,5 +668,4 @@ class TeamscaleClient:
         Returns:
             list[data.Task]: The tasks that was parsed from the JSON object
         """
-        print(task_json)
         return [Task.from_json(x) for x in task_json]

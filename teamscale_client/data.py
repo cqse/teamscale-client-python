@@ -499,7 +499,6 @@ class Task(object):
 
     @classmethod
     def from_json(cls, json):
-        print(json)
         comments = []
         if json['comments']:
             for comment_json in json['comments']:
