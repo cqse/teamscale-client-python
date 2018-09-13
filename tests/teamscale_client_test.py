@@ -207,3 +207,11 @@ def test_get_tasks():
     assert len(resp) == 1
     assert resp[0].id == 1
     assert resp[0].author == 'admin'
+
+@responses.activate
+def test_add_issue_metric():
+    """Tests the addition of a issue metric"""
+    responses.add(responses.PUT, get_project_service_mock('issue-metrics'),
+                      body='{"message": "success"}', status=200)
+    get_client().add_issue_metric("example/foo", "instate(status=YELLOW) > 2d")
+    assert "YELLOW" in responses.calls[1].request.body.decode()

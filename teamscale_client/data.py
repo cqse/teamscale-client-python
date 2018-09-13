@@ -342,7 +342,7 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
                  content_exclude="", polling_interval=60, prepend_repository_identifier=False, end_revision="",
                  text_filter="", source_library_connector=False, run_to_exhaustion=False, delta_size=500,
                  path_prefix_transformation="", path_transformation="", encoding="", author_transformation="",
-                 branch_transformation="", path_suffix=""):
+                 branch_transformation="", path_suffix="", preserve_empty_commits=False):
         super(SourceCodeConnectorConfiguration, self).__init__(connector_type)
         self.options = {
             "Included file names": included_file_names,
@@ -366,6 +366,7 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
             "Author transformation": author_transformation,
             "Branch transformation": branch_transformation,
             "Path suffix": path_suffix,
+            "Preserve empty commits": preserve_empty_commits
         }
 
 
@@ -412,13 +413,46 @@ class GitSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguration):
     """
 
     def __init__(self, branch_name, account, path_suffix="", include_submodules=False,
-                 submodule_recursion_depth=10, *args, **kwargs):
-        super(GitSourceCodeConnectorConfiguration, self).__init__(connector_type=ConnectorType.GIT, *args, **kwargs)
+                 submodule_recursion_depth=10, connector_type=ConnectorType.GIT, *args, **kwargs):
+        super(GitSourceCodeConnectorConfiguration, self).__init__(connector_type=connector_type, *args, **kwargs)
         self.options["Branch Name"] = branch_name
         self.options["Account"] = account
         self.options["Path suffix"] = path_suffix
         self.options["Include Submodules"] = include_submodules
         self.options["Submodule recursion depth"] = submodule_recursion_depth
+
+
+@auto_str
+class GerritSourceCodeConnectorConfiguration(GitSourceCodeConnectorConfiguration):
+    """Represents a Teamscale Gerrit connector configuration.
+
+    Args:
+        project_name (str): Used to reference the project.
+        enable_voting (str): Enables Teamscale voting on Gerrit reviews.
+        enable_detailed_line_comments (str): When enabled, a Teamscale vote will carry a detailed comment for each
+                                             generated finding that is annotated to the relevant line in the reviewed
+                                             file.
+        ignore_yellow_findings_for_votes (str): When enabled, Teamscale will only consider red findings when voting.
+        ignore_yellow_findings_for_comments (str): When enabled, Teamscale will only consider red findings when
+                                                   commenting.
+        number_of_ref_batches_for_updates (str): Defines the number of seperate parts the refs are fetched from Gerrit.
+                                                 Can be between 1-100, but 100 must be cleanly dividable by the given
+                                                 number. DO NOT CHANGE THIS, unless you know exactly what you are doing.
+        review_label (str): The review label used to upload feedback to Gerrit.
+    """
+
+    def __init__(self, project_name, enable_voting=False, enable_detailed_line_comments=True,
+                 ignore_yellow_findings_for_votes=False, ignore_yellow_findings_for_comments=False,
+                 number_of_ref_batches_for_updates=1, review_label="Code-Review", *args, **kwargs):
+        super(GerritSourceCodeConnectorConfiguration, self).__init__(connector_type=ConnectorType.GERRIT, *args,
+                                                                     **kwargs)
+        self.options["Project Name"] = project_name
+        self.options["Enable Voting"] = enable_voting
+        self.options["Enable Detailed Line Comments"] = enable_detailed_line_comments
+        self.options["Ignore Yellow Findings For Votes"] = ignore_yellow_findings_for_votes
+        self.options["Ignore Yellow Findings For Comments"] = ignore_yellow_findings_for_comments
+        # self.options["Number of Ref Batches For Updates"] = number_of_ref_batches_for_updates
+        self.options["Review Label"] = review_label
 
 
 @auto_str
@@ -506,6 +540,7 @@ class Task(object):
         return Task(json['id'], json['subject'], json['author'], json.get('description', ""), json.get('assignee', ''),
                     json['status'], json['resolution'], json['findings'], comments, json['tags'],
                     json['created'], json['updated'], json['updatedBy'])
+
 
 @auto_str
 class Comment(object):

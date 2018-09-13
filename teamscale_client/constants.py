@@ -133,6 +133,8 @@ class ConnectorType:
 
     SVN = "Subversion"
 
+    GERRIT = "Gerrit"
+
 class TaskStatus:
     """Different statuses a task in Teamscale can have"""
 

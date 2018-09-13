@@ -669,3 +669,39 @@ class TeamscaleClient:
             list[data.Task]: The tasks that was parsed from the JSON object
         """
         return [Task.from_json(x) for x in task_json]
+
+    def add_issue_metric(self, name, issue_query):
+        """Adds group of findings.
+
+        Args:
+            name (str): Name of issue metric
+            issue_query (str): The issue query to add
+        Returns:
+            requests.Response: request's response
+        """
+        url = "%s/%s" % (self.get_project_service_url('issue-metrics'), name)
+        return self.put(url, {'name': name, 'query': issue_query})
+
+    def create_dashboard(self, dashboard_descriptor):
+        """Adds a new dashboard from the given template.
+
+        Args:
+            dashboard_descriptor (str): The dashboard descriptor that should be uploaded
+        Returns:
+            requests.Response: request's response
+        """
+        service_url = self.get_global_service_url("dashboard-export")
+        multiple_files = [('dashboardDescriptor', dashboard_descriptor)]
+        return requests.post(service_url, auth=self.auth_header, verify=self.sslverify,
+                             files=multiple_files, timeout=self.timeout)
+
+    def get_project_configuration(self, project_id):
+        """Adds a new dashboard from the given template.
+
+                Args:
+                    project_id (str): The id for which the project configuration should be retrieved
+                Returns:
+                    str: The project configuration as json
+                """
+        url = "%s%s" % (self.get_global_service_url("create-project"), project_id)
+        return self.get(url).json()
