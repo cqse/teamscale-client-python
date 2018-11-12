@@ -307,7 +307,7 @@ class TeamscaleClient:
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=architecture_files, timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+            raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
 
     def upload_non_code_metrics(self, metrics, timestamp, message, partition):
@@ -705,3 +705,19 @@ class TeamscaleClient:
                 """
         url = "%s%s" % (self.get_global_service_url("create-project"), project_id)
         return self.get(url).json()
+
+    def get_architectures(self):
+        """Returns the paths of all architecture in the project.
+
+            Returns:
+                List[str] The architecture names.
+        """
+        service_url = self.get_project_service_url("arch-assessment")
+        parameters = {
+            "list": True,
+
+        }
+        response = self.get(service_url, parameters=parameters)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return [architecture_overview['uniformPath'] for architecture_overview in response.json()]
