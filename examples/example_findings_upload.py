@@ -47,7 +47,7 @@ if __name__ == '__main__':
     # Upload findings to Teamscale
     findings = [
         FileFindings([
-                      Finding("externals-1", "test2", start_line=3)
+                      Finding("externals-1", "test2", start_line=3, findingProperties=dict(someStringProperty="severe", someNumericProperty=42.0))
                       ],
                       "src/Foo.java")
     ]

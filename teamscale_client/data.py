@@ -31,6 +31,7 @@ class Finding(object):
         identifier (Optional[str]): Advanced usage! Path to special elements in Teamscale, e.g. Simulink model parts.
                                     If this is given, offsets and lines do not need to be filled.
         uniform_path (Optional[str]): The path of the file where the finding is located.
+        properties (Optional[dict]): A map of String->Object properties associated with this finding.
     """
 
     def __init__(self, finding_type_id, message, assessment=Assessment.YELLOW, start_offset=None, end_offset=None,
@@ -43,7 +44,9 @@ class Finding(object):
         self.startLine = start_line
         self.endLine = end_line
         self.identifier = identifier
+
         self.uniformPath = uniform_path
+        self.findingProperties = findingProperties
 
     def __cmp__(self, other):
         """Compares this finding to another finding."""
@@ -486,13 +489,15 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
                                             Empty by default.
         externals_excludes (Optional[str]): Ant patterns describing the directories that are not checked for
                                             svn:externals. Empty by default.
+        path_suffix (Optional[str]): Path suffix that is to be appended to the repository's base path. Empty by default.
     """
 
-    def __init__(self, account, enable_externals=False, externals_includes="", externals_excludes="", *args, **kwargs):
+    def __init__(self, account, enable_externals=False, externals_includes="", externals_excludes="", path_suffix="", *args, **kwargs):
         super(SubversionSourceCodeConnectorConfiguration, self).__init__(connector_type=ConnectorType.SVN, *args,
                                                                          **kwargs)
         self.options["Account"] = account
         self.options["Enable Externals"] = enable_externals
+        self.options["Path suffix"] = path_suffix
         self.options["Externals Includes"] = externals_includes
         self.options["Externals Excludes"] = externals_excludes
 
