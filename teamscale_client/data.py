@@ -31,6 +31,7 @@ class Finding(object):
                         are given.
         identifier (Optional[str]): Advanced usage! Path to special elements in Teamscale, e.g. Simulink model parts.
                                     If this is given, offsets and lines do not need to be filled.
+        properties (Optional[dict]): A map of String->Object properties associated with this finding.
     """
 
     def __init__(self, finding_type_id, message, assessment=Assessment.YELLOW, start_offset=None, end_offset=None,
@@ -43,6 +44,7 @@ class Finding(object):
         self.startLine = start_line
         self.endLine = end_line
         self.identifier = identifier
+        self.findingProperties = findingProperties
 
 
 @auto_str
