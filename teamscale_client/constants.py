@@ -93,6 +93,7 @@ class CoverageFormats:
 
     SIMPLE = "SIMPLE"
 
+
 class ReportFormats:
     """Report formats that Teamscale understands."""
 
@@ -109,6 +110,8 @@ class ReportFormats:
     CS_COMPILER_WARNING = "CS_COMPILER_WARNING"
    
     PYLINT = "PYLINT"
+
+    FINDBUGS = "FINDBUGS"
 
 class UnitTestReportFormats:
     """Reports for unit test results that Teamscale understands."""
@@ -129,3 +132,26 @@ class ConnectorType:
     GIT = "Git"
 
     SVN = "Subversion"
+
+    GERRIT = "Gerrit"
+
+class TaskStatus:
+    """Different statuses a task in Teamscale can have"""
+
+    OPEN = "OPEN"
+
+    RESOLVED = "RESOLVED"
+
+    VERIFIED = "VERIFIED"
+
+    DISCARDED = "DISCARDED"
+
+class TaskResolution:
+    """Different resolutions used in tasks"""
+    NONE = "NONE"
+
+    FIXED = "FIXED"
+
+    INFEASIBLE = "INFEASIBLE"
+
+    TOO_MUCH_EFFORT = "TOO_MUCH_EFFORT"

@@ -7,7 +7,7 @@ import time
 
 import simplejson as json
 
-from teamscale_client.data import ServiceError, Baseline, ProjectInfo
+from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task
 from teamscale_client.utils import to_json
 
 
@@ -28,6 +28,8 @@ class TeamscaleClient:
     """
 
     def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
+        """Constructor
+        """
         self.url = url
         self.username = username
         self.auth_header = HTTPBasicAuth(username, access_token)
@@ -45,10 +47,11 @@ class TeamscaleClient:
         """
         url = self.get_global_service_url('service-api-info')
         response = self.get(url)
-        apiVersion = response.json()['apiVersion']
-        if apiVersion < 3:
+        json_response = response.json()
+        api_version = json_response['apiVersion']
+        if api_version < 6:
             raise ServiceError("Server api version " + str(
-                apiVersion) + " too low and not compatible. This client requires Teamscale 3.2 or newer.");
+                api_version) + " too low and not compatible. This client requires Teamscale 4.1 or newer.")
 
     def get(self, url, parameters=None):
         """Sends a GET request to the given service url.
@@ -85,7 +88,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        headers = {'Accept': 'application/json','Content-Type': 'application/json'}
+        headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         response = requests.put(url, params=parameters, json=json, data=data,
                                 headers=headers, auth=self.auth_header,
                                 verify=self.sslverify, timeout=self.timeout)
@@ -121,9 +124,8 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
-        url = self.get_global_service_url('external-findings-group')
-        payload = [{'groupName': name, 'mapping': mapping_pattern}]
-        return self.put(url, payload)
+        url = "%s/%s" % (self.get_global_service_url('external-findings-group'), name)
+        return self.put(url, {'groupName': name, 'mapping': mapping_pattern})
 
     def add_finding_descriptions(self, descriptions):
         """Adds descriptions of findings.
@@ -133,10 +135,20 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
+        base_url = self.get_global_service_url('external-findings-description')
+        response = None
+        for finding_description in descriptions:
+            some_description = dict()
+            some_description['typeId'] = finding_description.typeid
+            some_description['description'] = finding_description.description
+            some_description['enablement'] = finding_description.enablement
+            some_description['name'] = finding_description.name
+            url = "%s/%s" % (base_url, finding_description.typeid)
+            response = self.put(url, some_description)
+            if response.text != 'success':
+                return response
 
-        url = self.get_global_service_url('add-external-finding-descriptions')
-        payload = [{'typeId': d.typeid, 'description': d.description, 'enablement': d.enablement} for d in descriptions]
-        return self.put(url, payload)
+        return response
 
     def update_findings_schema(self):
         """Triggers refresh of finding groups in analysis profiles."""
@@ -218,7 +230,6 @@ class TeamscaleClient:
         service_url = self.get_global_service_url("external-metric")
         return self.put(service_url, data=to_json(metric_descriptions))
 
-
     def upload_coverage_data(self, coverage_files, coverage_format, timestamp, message, partition):
         """Upload coverage reports to Teamscale. It is expected that the given coverage report files can be read from the filesystem.
 
@@ -237,16 +248,19 @@ class TeamscaleClient:
         """
         return self.upload_report(coverage_files, coverage_format, timestamp, message, partition)
 
-    def upload_report(self, report_files, report_format, timestamp, message, partition):
-        """Upload reports from external tools to Teamscale. It is expected that the given report files can be read from the filesystem.
+    def upload_report(self, report_files, report_format, timestamp, message, partition, move_to_last_commit=True):
+        """Upload reports from external tools to Teamscale. It is expected that the given report files can be read from
+           the filesystem.
 
         Args:
             report_files (list): list of filenames (strings!) that should be uploaded. Files must be readable.
             report_format  (constants.ReportFormats): the format to use
             timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
             message (str): The message to use for the generated upload commit
-            partition (str): The partition's id into which the data should be added (See also: :ref:`FAQ - Partitions<faq-partition>`).
-
+            partition (str): The partition's id into which the data should be added
+                            (See also: :ref:`FAQ - Partitions<faq-partition>`).
+            move_to_last_commit (bool): True to automatically adjust this commit to be the latest otherwise False.
+                                        Default is True
         Returns:
             requests.Response: object generated by the request
 
@@ -260,7 +274,7 @@ class TeamscaleClient:
             "partition": partition,
             "format": report_format,
             "adjusttimestamp": "true",
-            "movetolastcommit": "true"
+            "movetolastcommit": str(move_to_last_commit).lower()
         }
         multiple_files = [('report', open(filename, 'rb')) for filename in report_files]
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
@@ -286,13 +300,14 @@ class TeamscaleClient:
         service_url = self.get_project_service_url("architecture-upload")
         parameters = {
             "t": self._get_timestamp_parameter(timestamp),
+            "adjusttimestamp": "true",
             "message": message
         }
         architecture_files = [(path, open(filename, 'rb')) for path, filename in architectures.items()]
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=architecture_files, timeout=self.timeout)
         if response.status_code != 200:
-            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+            raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
 
     def upload_non_code_metrics(self, metrics, timestamp, message, partition):
@@ -379,7 +394,7 @@ class TeamscaleClient:
         }
         response = self.get(service_url, parameters)
         return [
-            ProjectInfo(project_id=x['id'], name=x['name'], description=x['description'],
+            ProjectInfo(project_id=x['id'], name=x['name'], description=x.get('description'),
                         creation_timestamp=x['creationTimestamp'], alias=x.get('alias'),
                         deleting=x['deleting'], reanalyzing=x['reanalyzing']) for x in response.json()]
 
@@ -498,7 +513,211 @@ class TeamscaleClient:
             file_path (str): File from which to read the JSON content.
 
         Returns:
-            The parsed JSON data."""
+            The parsed JSON data.
+        """
         with open(file_path) as json_file:
             json_data = json.load(json_file)
             return json_data
+
+    def upload_files_for_precommit_analysis(self, timestamp, precommit_data):
+        """Uploads the provided files for precommit analysis.
+
+        Args:
+            timestamp (datetime.datetime): The timestamp of the parent commit.
+            precommit_data (data.PreCommitUploadData): The precommit data to upload.
+        """
+        service_url = self.get_project_service_url("pre-commit") + self._get_timestamp_parameter(timestamp)
+
+        response = self.put(service_url, data=to_json(precommit_data))
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+
+    def get_precommit_analysis_results(self):
+        """Gets precommit analysis results.
+
+        Returns:
+            A tuple consisting of three lists: added findings, findings in changed code, and removed findings.
+        """
+        service_url = self.get_project_service_url("pre-commit")
+
+        while True:
+            response = self.get(service_url)
+            if response.json() is None:
+                time.sleep(2)
+            else:
+                return self._parse_findings_response(service_url, response)
+
+    def _parse_findings_response(self, service_url, response):
+        """Parses findings retrieved from Teamscale.
+
+        Args:
+            service_url (str): The service url. Used for logging.
+            response (requests.Response): The response to parse for findings.
+
+        Returns:
+            A tuple consisting of three lists: added findings, findings in changed code, and removed findings.
+
+        Raises:
+            ServiceError: If anything goes wrong.
+        """
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+
+        added_findings = self._findings_from_json(response.json()['addedFindings'])
+        findings_in_changed_code = self._findings_from_json(response.json()['findingsInChangedCode'])
+        removed_findings = self._findings_from_json(response.json()['removedFindings'])
+
+        return added_findings, removed_findings, findings_in_changed_code
+
+    def _findings_from_json(self, findings_json):
+        """Parses JSON encoded findings.
+
+        Args:
+            findings_json (List[object]): The json object encoding the list of findings.
+
+        Returns:
+            data.Finding: The finding that was parsed from the JSON object
+        """
+        return [Finding(finding_type_id=x['typeId'], message=x['message'],
+                        assessment=x['assessment'], start_offset=x['location']['rawStartOffset'],
+                        end_offset=x['location']['rawEndOffset'], start_line=x['location']['rawStartLine'],
+                        end_line=x['location']['rawEndLine'], uniform_path=x['location']['uniformPath'])
+                for x in findings_json]
+
+    def get_findings(self, uniform_path, timestamp, recursive=True):
+        """Retrieves the list of findings in the currently active project for the given uniform path
+        at the provided timestamp on the given branch.
+
+        Args:
+            uniform_path (str): The uniform path to get findings for.
+            timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
+            recursive (bool): Whether to query findings recursively, i.e. also get findings for files under the given
+                path.
+
+        Returns:
+            List[:class:`data.Finding`]): The list of findings.
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        service_url = self.get_project_service_url("findings") + uniform_path
+        parameters = {
+            "t": self._get_timestamp_parameter(timestamp=timestamp),
+            "recursive": recursive,
+            "all": True
+        }
+        response = self.get(service_url, parameters=parameters)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return self._findings_from_json(response.json())
+
+    def get_tasks(self, status="OPEN", details=True, start=0, max=300):
+        """Retrieves the tasks for the client's project from the server.
+
+        Args:
+            status (constants.TaskStatus): The status to retrieve tickets for
+            details (bool): Whether to retrieve details together with the tasks
+            start (number): From which task number to start listing tasks
+            max (number): Maximum number of tasks to return
+
+        Returns:
+            List[:class:`data.Task`]): The list of tasks.
+
+        Raises:
+            ServiceError: If anything goes wrong
+            """
+        service_url = self.get_project_service_url("tasks")
+        parameters = {
+            "status": status,
+            "details": details,
+            "start": start,
+            "max": max,
+            "with-count": False
+        }
+        response = self.get(service_url, parameters=parameters)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return TeamscaleClient._tasks_from_json(response.json())
+
+    def add_task_comment(self, task_id, comment):
+        """Adds a comment to a task.
+
+        Args:
+            task_id (number): the task id to which to add the comment
+            comment (str): the comment to add
+
+        Returns:
+            requests.Response: object generated by the request
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        service_url = self.get_project_service_url("comment-task") + str(task_id)
+        response = self.put(service_url, data=to_json(comment))
+        if response.status_code != 200:
+            raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return response
+
+    @staticmethod
+    def _tasks_from_json(task_json):
+        """Parses JSON encoded findings.
+
+        Args:
+            task_json (List[object]): The json object encoding the list of findings.
+
+        Returns:
+            list[data.Task]: The tasks that was parsed from the JSON object
+        """
+        return [Task.from_json(x) for x in task_json]
+
+    def add_issue_metric(self, name, issue_query):
+        """Adds group of findings.
+
+        Args:
+            name (str): Name of issue metric
+            issue_query (str): The issue query to add
+        Returns:
+            requests.Response: request's response
+        """
+        url = "%s/%s" % (self.get_project_service_url('issue-metrics'), name)
+        return self.put(url, {'name': name, 'query': issue_query})
+
+    def create_dashboard(self, dashboard_descriptor):
+        """Adds a new dashboard from the given template.
+
+        Args:
+            dashboard_descriptor (str): The dashboard descriptor that should be uploaded
+        Returns:
+            requests.Response: request's response
+        """
+        service_url = self.get_global_service_url("dashboard-export")
+        multiple_files = [('dashboardDescriptor', dashboard_descriptor)]
+        return requests.post(service_url, auth=self.auth_header, verify=self.sslverify,
+                             files=multiple_files, timeout=self.timeout)
+
+    def get_project_configuration(self, project_id):
+        """Adds a new dashboard from the given template.
+
+                Args:
+                    project_id (str): The id for which the project configuration should be retrieved
+                Returns:
+                    str: The project configuration as json
+                """
+        url = "%s%s" % (self.get_global_service_url("create-project"), project_id)
+        return self.get(url).json()
+
+    def get_architectures(self):
+        """Returns the paths of all architecture in the project.
+
+            Returns:
+                List[str] The architecture names.
+        """
+        service_url = self.get_project_service_url("arch-assessment")
+        parameters = {
+            "list": True,
+
+        }
+        response = self.get(service_url, parameters=parameters)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return [architecture_overview['uniformPath'] for architecture_overview in response.json()]

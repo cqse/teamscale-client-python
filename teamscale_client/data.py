@@ -1,12 +1,11 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import collections
 import datetime
 import time
 
 from teamscale_client.constants import Assessment, MetricAggregation, MetricValueType, MetricProperties, \
-    AssessmentMetricColors, ConnectorType
+    ConnectorType
 from teamscale_client.utils import auto_str
 
 
@@ -31,11 +30,12 @@ class Finding(object):
                         are given.
         identifier (Optional[str]): Advanced usage! Path to special elements in Teamscale, e.g. Simulink model parts.
                                     If this is given, offsets and lines do not need to be filled.
+        uniform_path (Optional[str]): The path of the file where the finding is located.
         properties (Optional[dict]): A map of String->Object properties associated with this finding.
     """
 
     def __init__(self, finding_type_id, message, assessment=Assessment.YELLOW, start_offset=None, end_offset=None,
-                 start_line=None, end_line=None, identifier=None):
+                 start_line=None, end_line=None, identifier=None, uniform_path=None):
         self.findingTypeId = finding_type_id
         self.message = message
         self.assessment = assessment
@@ -44,7 +44,48 @@ class Finding(object):
         self.startLine = start_line
         self.endLine = end_line
         self.identifier = identifier
+
+        self.uniformPath = uniform_path
         self.findingProperties = findingProperties
+
+    def __cmp__(self, other):
+        """Compares this finding to another finding."""
+        if self.uniformPath == other.uniformPath:
+            return self.startLine.__cmp__(other.startLine)
+        else:
+            if self.uniformPath < other.uniformPath:
+                return -1
+            else:
+                return 1
+
+    def __eq__(self, other):
+        """Checks if this finding is equal to the given finding."""
+        return ((self.uniformPath, self.startLine, self.assessment, self.message, self.endLine, self.endOffset,
+                 self.findingTypeId, self.identifier, self.startOffset) ==
+                (other.uniformPath, other.startLine, other.assessment, other.message, other.endLine, other.endOffset,
+                 other.findingTypeId, other.identifier, other.startOffset))
+
+    def __ne__(self, other):
+        """Checks if this finding is not equal to the given finding."""
+        return not (self == other)
+
+    def __lt__(self, other):
+        """Checks if this finding is less than the given finding."""
+        return (self.uniformPath, self.startLine, self.endLine) < (other.uniformPath, other.startLine, other.endLine)
+
+    def __gt__(self, other):
+        """Checks if this finding is greater than the given finding."""
+        return (self.uniformPath, self.startLine, self.endLine) > (other.uniformPath, other.startLine, other.endLine)
+
+    def __le__(self, other):
+        """Checks if this finding is less than or equal the given finding."""
+        return (self == other) or ((self.uniformPath, self.startLine, self.endLine) <
+                                   (other.uniformPath, other.startLine, other.endLine))
+
+    def __ge__(self, other):
+        """Checks if this finding is greater than or equal the given finding."""
+        return (self == other) or ((self.uniformPath, self.startLine, self.endLine) >
+                                   (other.uniformPath, other.startLine, other.endLine))
 
 
 @auto_str
@@ -63,14 +104,22 @@ class FileFindings(object):
         self.content = content
 
 
-FindingDescription = collections.namedtuple('FindingDescription', ['typeid', 'description', 'enablement'])
-"""Description of a finding type to be added at configuration time.
+@auto_str
+class FindingDescription(object):
+    """Description of a finding type to be added at configuration time.
 
-    Args:
-        typeid (str): The id used to reference the finding type.
-        description (str): The text to display that explains what this finding type is about (and ideally how to fix it). This text will be the same for each concrete instance of the finding.
-        enablement (constants.Enablement): Describes the default enablement setting for this finding type, used when it is added to the analysis profile.
-"""
+        Args:
+            typeid (str): The id used to reference the finding type.
+            name (str): Some UI friendly name for this description.
+            description (str): The text to display that explains what this finding type is about (and ideally how to fix it). This text will be the same for each concrete instance of the finding.
+            enablement (constants.Enablement): Describes the default enablement setting for this finding type, used when it is added to the analysis profile.
+    """
+
+    def __init__(self, typeid, description, enablement, name=None):
+        self.typeid = typeid
+        self.description = description
+        self.enablement = enablement
+        self.name = name
 
 
 @auto_str
@@ -288,6 +337,7 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
                                                Empty by default.
         branch_transformation (Optional[str]): Regex transformations that are applied to the branch names
                                                of the repository. Empty by default.
+        path_suffix (Optional[str]): The suffix to append to the base URL of the repository. Empty by default.
     """
 
     def __init__(self, connector_type, included_file_names, excluded_file_names="", repository_identifier="repository1",
@@ -295,7 +345,7 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
                  content_exclude="", polling_interval=60, prepend_repository_identifier=False, end_revision="",
                  text_filter="", source_library_connector=False, run_to_exhaustion=False, delta_size=500,
                  path_prefix_transformation="", path_transformation="", encoding="", author_transformation="",
-                 branch_transformation=""):
+                 branch_transformation="", path_suffix="", preserve_empty_commits=False):
         super(SourceCodeConnectorConfiguration, self).__init__(connector_type)
         self.options = {
             "Included file names": included_file_names,
@@ -318,6 +368,8 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
             "Encoding": encoding,
             "Author transformation": author_transformation,
             "Branch transformation": branch_transformation,
+            "Path suffix": path_suffix,
+            "Preserve empty commits": preserve_empty_commits
         }
 
 
@@ -364,13 +416,46 @@ class GitSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguration):
     """
 
     def __init__(self, branch_name, account, path_suffix="", include_submodules=False,
-                 submodule_recursion_depth=10, *args, **kwargs):
-        super(GitSourceCodeConnectorConfiguration, self).__init__(connector_type=ConnectorType.GIT, *args, **kwargs)
+                 submodule_recursion_depth=10, connector_type=ConnectorType.GIT, *args, **kwargs):
+        super(GitSourceCodeConnectorConfiguration, self).__init__(connector_type=connector_type, *args, **kwargs)
         self.options["Branch Name"] = branch_name
         self.options["Account"] = account
         self.options["Path suffix"] = path_suffix
         self.options["Include Submodules"] = include_submodules
         self.options["Submodule recursion depth"] = submodule_recursion_depth
+
+
+@auto_str
+class GerritSourceCodeConnectorConfiguration(GitSourceCodeConnectorConfiguration):
+    """Represents a Teamscale Gerrit connector configuration.
+
+    Args:
+        project_name (str): Used to reference the project.
+        enable_voting (str): Enables Teamscale voting on Gerrit reviews.
+        enable_detailed_line_comments (str): When enabled, a Teamscale vote will carry a detailed comment for each
+                                             generated finding that is annotated to the relevant line in the reviewed
+                                             file.
+        ignore_yellow_findings_for_votes (str): When enabled, Teamscale will only consider red findings when voting.
+        ignore_yellow_findings_for_comments (str): When enabled, Teamscale will only consider red findings when
+                                                   commenting.
+        number_of_ref_batches_for_updates (str): Defines the number of seperate parts the refs are fetched from Gerrit.
+                                                 Can be between 1-100, but 100 must be cleanly dividable by the given
+                                                 number. DO NOT CHANGE THIS, unless you know exactly what you are doing.
+        review_label (str): The review label used to upload feedback to Gerrit.
+    """
+
+    def __init__(self, project_name, enable_voting=False, enable_detailed_line_comments=True,
+                 ignore_yellow_findings_for_votes=False, ignore_yellow_findings_for_comments=False,
+                 number_of_ref_batches_for_updates=1, review_label="Code-Review", *args, **kwargs):
+        super(GerritSourceCodeConnectorConfiguration, self).__init__(connector_type=ConnectorType.GERRIT, *args,
+                                                                     **kwargs)
+        self.options["Project Name"] = project_name
+        self.options["Enable Voting"] = enable_voting
+        self.options["Enable Detailed Line Comments"] = enable_detailed_line_comments
+        self.options["Ignore Yellow Findings For Votes"] = ignore_yellow_findings_for_votes
+        self.options["Ignore Yellow Findings For Comments"] = ignore_yellow_findings_for_comments
+        # self.options["Number of Ref Batches For Updates"] = number_of_ref_batches_for_updates
+        self.options["Review Label"] = review_label
 
 
 @auto_str
@@ -415,3 +500,71 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
         self.options["Path suffix"] = path_suffix
         self.options["Externals Includes"] = externals_includes
         self.options["Externals Excludes"] = externals_excludes
+
+
+@auto_str
+class Task(object):
+    """Represents a task in Teamscale
+
+    Args:
+        id (int): The task's id
+        subject (str): The task's subject
+        author (str): The task author's name
+        description (str): The task's description
+        assignee (str): The assigned user's name
+        status (constants.TaskStatus): The task's status
+        resolution (Optional[constants.TaskResolution]): The task's resolution
+        findings (Optional[List[str]]): The findings attached to this task
+        comments (Optional[List[Comment]]): Comments attached to this task
+        tags (List[str]): Tags that have been added to this task
+    """
+
+    # noinspection PyPep8Naming
+    def __init__(self, id, subject, author, description, assignee, status, resolution, findings, comments, tags,
+                 created, updated, updatedBy):
+        self.id = id
+        self.subject = subject
+        self.author = author
+        self.description = description
+        self.assignee = assignee
+        self.status = status
+        self.resolution = resolution
+        self.findings = findings
+        self.comments = comments
+        self.tags = tags
+        self.created = created
+        self.updated = updated
+        self.updatedBy = updatedBy
+
+    @classmethod
+    def from_json(cls, json):
+        comments = []
+        if json['comments']:
+            for comment_json in json['comments']:
+                comments.append(Comment.from_json(comment_json))
+        return Task(json['id'], json['subject'], json['author'], json.get('description', ""), json.get('assignee', ''),
+                    json['status'], json['resolution'], json['findings'], comments, json['tags'],
+                    json['created'], json['updated'], json['updatedBy'])
+
+
+@auto_str
+class Comment(object):
+    """Represents a comment on a Task in Teamscale
+
+    Args:
+        author (str): The author of this comment
+        date (long): Creation date in ms
+        text (str): The comment's text
+        changeComment (bool): Whether this is a system generated change comment
+    """
+
+    # noinspection PyPep8Naming
+    def __init__(self, author, date, text, changeComment=False):
+        self.author = author
+        self.date = date
+        self.text = text
+        self.changeComment = changeComment
+
+    @classmethod
+    def from_json(cls, json):
+        return Comment(json['author'], json['date'], json['text'], json['changeComment'])
