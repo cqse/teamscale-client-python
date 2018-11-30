@@ -721,3 +721,26 @@ class TeamscaleClient:
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return [architecture_overview['uniformPath'] for architecture_overview in response.json()]
+
+    def get_all_dashboard_details(self):
+        """Returns all dashboards with detail info.
+
+            Returns:
+                list of dashboard objects
+        """
+        service_url = self.get_global_service_url("dashboards")
+
+        response = self.get(service_url, parameters={'detail':True})
+
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return json.loads(response.content)
+
+    def delete_dashboard(self, dashboard_name):
+        """Deletes the dashboard with the given name
+
+            Returns:
+                response
+        """
+        service_url = self.get_global_service_url("dashboards")
+        return self.delete(service_url+ dashboard_name)
