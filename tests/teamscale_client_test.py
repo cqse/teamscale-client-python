@@ -229,5 +229,5 @@ def test_delete_dashboard():
     """Test deletion of dashboards"""
     responses.add(responses.DELETE, get_project_service_mock('dashboards'),
                       body=SUCCESS, status=200)
-    resp = get_client().delete_baseline("some dashboard name")
+    resp = get_client().delete_dashboard("some dashboard name")
     assert resp.text == SUCCESS
