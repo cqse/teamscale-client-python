@@ -220,7 +220,7 @@ def test_add_issue_metric():
 def test_get_all_dashboard_details():
     """Tests query of all dashboard details"""
     responses.add(responses.GET, get_global_service_mock('dashboards'),
-                      body='[{"name":"new dashboard","owner":"gib","descriptorJSON":"{\"widgets\":[{\"widget-id\":\"commit-chart\",\"position\":{\"x\":0,\"y\":0,\"width\":12,\"height\":6},\"Title\":\"Commit Chart\",\"Path\":{\"project\":\"myProject\",\"path\":\"\",\"hiddenInWidgetTitle\":false},\"Trend\":{\"type\":\"timespan\",\"value\":0},\"Zooming\":true,\"Hide Y-Axes\":false,\"Baselines\":true,\"Action menu\":false,\"Min. commits per developer\":0,\"Order\":\"by time\"}]}","author":"gib","comment":"","canRead":false,"canWrite":false}]', status=200)
+                      body='[{"name":"new dashboard","owner":"gib","descriptorJSON":"{\\"widgets\":[{\\"widget-id\\":\\"commit-chart\\",\\"position\\":{\\"x\\":0,\\"y\\":0,\\"width\\":12,\\"height\\":6},\\"Title\\":\\"Commit Chart\\",\\"Path\\":{\\"project\\":\\"myProject\\",\\"path\\":\\"\\",\\"hiddenInWidgetTitle\\":false},\\"Trend\\":{\\"type\\":\\"timespan\\",\\"value\\":0},\\"Zooming\\":true,\\"Hide Y-Axes\\":false,\\"Baselines\\":true,\\"Action menu\\":false,\\"Min. commits per developer\\":0,\\"Order\\":\\"by time\\"}]}","author":"gib","comment":"","canRead":false,"canWrite":false}]', status=200)
     dashboards = get_client().get_all_dashboard_details()
     assert dashboards[0]['name'] == 'new dashboard'
 
