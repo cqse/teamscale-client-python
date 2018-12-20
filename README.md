@@ -10,7 +10,7 @@ Install via:
     pip install teamscale-client
 
 # Development
-We suggest the [PyCcharm](https://www.jetbrains.com/pycharm/) IDE for development in this project.
+We suggest the [PyCharm](https://www.jetbrains.com/pycharm/) IDE for development in this project.
 We are happy to add additional service calls to the client. Please make sure you include a test, if you add a service call. To run them use:
 
     python setup.py test
