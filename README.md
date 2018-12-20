@@ -8,3 +8,10 @@ http://cqse.github.io/teamscale-client-python
 Install via:
     
     pip install teamscale-client
+
+# Development
+We are happy to add additional service calls to the client. Please make sure you include a test, if you add a service call. To run them use:
+
+    python setup.py test
+
+Tests are written using the [responses library](https://pypi.org/project/responses/), to mock the requests passed to the server using the [requests api](http://docs.python-requests.org/en/master/).
