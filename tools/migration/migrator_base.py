@@ -73,9 +73,9 @@ class MigratorBase(ABC):
     def set_prefix_transformations(self, config_data):
         """ Sets the path prefix transformations for the instances. """
         key = "path_prefix_transformation"
-        if key in config_data and all(x in config_data[key] for x in ["from", "to"]):
-            regex = re.compile("^" + config_data[key]["from"])
-            self.path_transform = lambda x: regex.sub(config_data[key]["to"], x)
+        if key in config_data['new_instance'] and all(x in config_data['new_instance'][key] for x in ["from", "to"]):
+            regex = re.compile("^" + config_data['new_instance'][key]["from"])
+            self.path_transform = lambda x: regex.sub(config_data['new_instance'][key]["to"], x)
         else:
             self.path_transform = lambda x: x
 
@@ -94,7 +94,7 @@ class MigratorBase(ABC):
 
     def create_clients(self, config_data):
         """ Reads the given config defined by its path and creates the two teamscale clients from it.
-        One old instance (migrating from) and a new onoe (migrating to).
+        One old instance (migrating from) and a new one (migrating to).
         """
         try:
             return self.get_client(config_data["old_instance"]), self.get_client(config_data["new_instance"])
@@ -151,7 +151,7 @@ class MigratorBase(ABC):
                 self.logger.debug("Service Call: {}".format((url, parameters)))
                 response = client.get(url, parameters).json()
             except ServiceError as e:
-                self.logger.exception("Fetching data from %s failed (%s)" % (url, e.response.status_code))
+                self.logger.exception("Fetching data from %s failed (%s)" % (url, e))
         self.cache_request((url, parameters), response, use_cache)
         return response
 
@@ -216,9 +216,8 @@ class MigratorBase(ABC):
         try:
             return self.get(client, "findings-by-id", path_suffix=finding_id)
         except ServiceError as e:
-            if e.response.status_code == 400:
-                self.logger.debug("Finding with id %s not found. Skipping." % finding_id)
-                return None
+            self.logger.debug("Finding with id %s not found. Skipping." % finding_id)
+            return None
 
     def get_findings_url(self, findings_id, client=None):
         """ Creates a url link to the finding with the given id on the given Teamscale """
