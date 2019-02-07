@@ -133,3 +133,26 @@ class ConnectorType:
     GIT = "Git"
 
     SVN = "Subversion"
+
+    GERRIT = "Gerrit"
+
+class TaskStatus:
+    """Different statuses a task in Teamscale can have"""
+
+    OPEN = "OPEN"
+
+    RESOLVED = "RESOLVED"
+
+    VERIFIED = "VERIFIED"
+
+    DISCARDED = "DISCARDED"
+
+class TaskResolution:
+    """Different resolutions used in tasks"""
+    NONE = "NONE"
+
+    FIXED = "FIXED"
+
+    INFEASIBLE = "INFEASIBLE"
+
+    TOO_MUCH_EFFORT = "TOO_MUCH_EFFORT"
