@@ -8,9 +8,9 @@ Up to now there are three scripts you can use:
 The first two scripts are pretty self-explanatory.
 Use `config.template` to create your own configuration and give the path to the config file as a parameter
 when calling either migrator (task or blacklist).
-1If there is any kind of `path (suffix) transformation` on either project adjust the optional parameter
-`path_prefix_transformation`. This feature is not very in depth, so if you are coming up to extreme example where
-both projects have multiple transformation you might need to extend it.
+If there is any kind of `path (suffix) transformation` on necessary adjust the optional parameter
+`path_prefix_transformation` for the new instance. This feature is not very in depth, so if you are coming up to 
+an extreme example where both projects have multiple transformation you might need to extend it.
 
 ## Batch Migration
 Both scripts only work for one project at a time. If you want to migrate the blacklist and the tasks of
