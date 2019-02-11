@@ -578,11 +578,34 @@ class TeamscaleClient:
         Returns:
             data.Finding: The finding that was parsed from the JSON object
         """
-        return [Finding(finding_type_id=x['typeId'], message=x['message'],
-                        assessment=x['assessment'], start_offset=x['location']['rawStartOffset'],
-                        end_offset=x['location']['rawEndOffset'], start_line=x['location']['rawStartLine'],
-                        end_line=x['location']['rawEndLine'], uniform_path=x['location']['uniformPath'])
-                for x in findings_json]
+        return [Finding(finding_type_id=finding['typeId'],
+                        message=finding['message'],
+                        assessment=finding['assessment'],
+                        start_offset=self._get_finding_location_entry(finding, 'rawStartOffset', 0),
+                        end_offset=self._get_finding_location_entry(finding, 'rawEndOffset', 0),
+                        start_line=self._get_finding_location_entry(finding, 'rawStartLine', 1),
+                        end_line=self._get_finding_location_entry(finding, 'rawEndLine', 1),
+                        uniform_path=finding['location']['uniformPath'])
+                for finding in findings_json]
+
+    def _get_finding_location_entry(self, finding_json, key, defaultValue):
+        """Safely extracts a value from the location data of a JSON encoded finding.
+        Some findings don't have all the location data, in which case the given default value
+	is returned.
+
+        Args:
+            finding_json (object): The json object encoding the finding.
+            key (string): The key in the location data to look up.
+            defaultValue (object): The default value to return in case the key cannot be found.
+
+        Returns:
+            object: The value or the default value.
+        """
+        value = finding_json['location'].get(key)
+        if value is None:
+            return defaultValue
+
+        return value
 
     def get_findings(self, uniform_path, timestamp, recursive=True):
         """Retrieves the list of findings in the currently active project for the given uniform path
