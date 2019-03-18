@@ -151,7 +151,7 @@ class MigratorBase(ABC):
                 self.logger.debug("Service Call: {}".format((url, parameters)))
                 response = client.get(url, parameters).json()
             except ServiceError as e:
-                self.logger.exception("Fetching data from %s failed (%s)" % (url, e))
+                self.logger.exception("Fetching data from %s failed" % url)
         self.cache_request((url, parameters), response, use_cache)
         return response
 
