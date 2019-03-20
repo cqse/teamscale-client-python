@@ -576,17 +576,28 @@ class TeamscaleClient:
             findings_json (List[object]): The json object encoding the list of findings.
 
         Returns:
+            List[data.Finding]: The findings that were parsed from the JSON object
+        """
+        return [self._finding_from_json(finding)
+                for finding in findings_json]
+
+    def _finding_from_json(self, finding_json):
+        """Parses Ja single SON encoded finding.
+
+        Args:
+            finding_json (object): The json object encoding the finding.
+
+        Returns:
             data.Finding: The finding that was parsed from the JSON object
         """
-        return [Finding(finding_type_id=finding['typeId'],
-                        message=finding['message'],
-                        assessment=finding['assessment'],
-                        start_offset=self._get_finding_location_entry(finding, 'rawStartOffset', 0),
-                        end_offset=self._get_finding_location_entry(finding, 'rawEndOffset', 0),
-                        start_line=self._get_finding_location_entry(finding, 'rawStartLine', 1),
-                        end_line=self._get_finding_location_entry(finding, 'rawEndLine', 1),
-                        uniform_path=finding['location']['uniformPath'])
-                for finding in findings_json]
+        return Finding(finding_type_id=finding_json['typeId'],
+                       message=finding_json['message'],
+                       assessment=finding_json['assessment'],
+                       start_offset=self._get_finding_location_entry(finding_json, 'rawStartOffset', 0),
+                       end_offset=self._get_finding_location_entry(finding_json, 'rawEndOffset', 0),
+                       start_line=self._get_finding_location_entry(finding_json, 'rawStartLine', 1),
+                       end_line=self._get_finding_location_entry(finding_json, 'rawEndLine', 1),
+                       uniform_path=finding_json['location']['uniformPath'])
 
     def _get_finding_location_entry(self, finding_json, key, defaultValue):
         """Safely extracts a value from the location data of a JSON encoded finding.
@@ -633,6 +644,36 @@ class TeamscaleClient:
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return self._findings_from_json(response.json())
+
+    def get_finding_by_id(self, finding_id, branch=None, timestamp=None):
+        """Retrieves the finding with the given id.
+
+        Args:
+            finding_id (str): The id of the finding to retrieve.
+            branch (str): The branch from which the finding should be retrieved.
+            timestamp (datetime.datetime): The timestamp (unix format) for which to receive the finding.
+
+        Returns:
+             data.Finding: The retrieved finding.
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        service_url = self.get_project_service_url("findings-by-id") + finding_id
+
+        branch_stash = self.branch
+        self.branch = branch
+
+        parameters = {
+            "t": self._get_timestamp_parameter(timestamp=timestamp) if timestamp else 'HEAD',
+        }
+        response = self.get(service_url, parameters=parameters)
+        self.branch = branch_stash
+
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return self._finding_from_json(response.json())
+
 
     def get_tasks(self, status="OPEN", details=True, start=0, max=300):
         """Retrieves the tasks for the client's project from the server.
