@@ -468,20 +468,27 @@ class TeamscaleClient:
         """
         return response.json().get('message')
 
-    def _get_timestamp_parameter(self, timestamp):
+    def _get_timestamp_parameter(self, timestamp, branch=None):
         """Returns the timestamp parameter. Will use the branch parameter if it is set.
+        Returned timestamp is 'HEAD' if given timestamp is `None`.
 
         Args:
             timestamp (datetime.datetime): The timestamp to convert
+            branch (str): The branch to use. If this parameter is not set, the branch that was used to initialize the
+                          client is used, if any.
 
         Returns:
-            str: timestamp in ms
+            str: timestamp in ms, optionally prepended by the branch name.
+            Returned timestamp is 'HEAD' if given timestamp is `None`.
         """
-        timestamp_seconds = time.mktime(timestamp.timetuple())
-        timestamp_ms = str(int(timestamp_seconds * 1000))
-        if self.branch is not None:
-            return self.branch + ":" + timestamp_ms
-        return timestamp_ms
+        timestamp_or_head = 'HEAD'
+        if timestamp:
+            timestamp_seconds = time.mktime(timestamp.timetuple())
+            timestamp_or_head = str(int(timestamp_seconds * 1000))
+        branch_name = branch if branch else self.branch
+        if branch_name:
+            return branch_name + ":" + timestamp_or_head
+        return timestamp_or_head
 
     def get_global_service_url(self, service_name):
         """Returns the full url pointing to a global service.
@@ -661,15 +668,10 @@ class TeamscaleClient:
         """
         service_url = self.get_project_service_url("findings-by-id") + finding_id
 
-        branch_stash = self.branch
-        self.branch = branch
-
         parameters = {
-            "t": self._get_timestamp_parameter(timestamp=timestamp) if timestamp else 'HEAD',
+            "t": self._get_timestamp_parameter(timestamp=timestamp, branch=branch),
         }
         response = self.get(service_url, parameters=parameters)
-        self.branch = branch_stash
-
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return self._finding_from_json(response.json())

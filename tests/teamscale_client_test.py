@@ -20,11 +20,11 @@ from teamscale_client.utils import to_json
 URL = "http://localhost:8080"
 SUCCESS = 'success'
 
-def get_client():
+def get_client(branch=None):
     """Returns Teamscale client object for requesting servers"""
     responses.add(responses.GET, get_global_service_mock('service-api-info'), status=200,
                   content_type="application/json", body='{ "apiVersion": 6}')
-    return TeamscaleClient(URL, "admin", "admin", "foo")
+    return TeamscaleClient(URL, "admin", "admin", "foo", branch=branch)
 
 def get_project_service_mock(service_id):
     """Returns mock project service url"""
@@ -215,3 +215,24 @@ def test_add_issue_metric():
                       body='{"message": "success"}', status=200)
     get_client().add_issue_metric("example/foo", "instate(status=YELLOW) > 2d")
     assert "YELLOW" in responses.calls[1].request.body.decode()
+
+@responses.activate
+def test_get_timestamp_parameter():
+    """Tests that timestamp and branch are correctly handled when creating the timestamp parameter."""
+    master_client = get_client('master')
+    _assert_timestamp_parameter(master_client, None, 1, 'master:1000')
+    _assert_timestamp_parameter(master_client, None, None, 'master:HEAD')
+    _assert_timestamp_parameter(master_client, 'develop', 1, 'develop:1000')
+    _assert_timestamp_parameter(master_client, 'develop', None, 'develop:HEAD')
+
+    branchless_client = get_client()
+    _assert_timestamp_parameter(branchless_client, None, 1, '1000')
+    _assert_timestamp_parameter(branchless_client, None, None, 'HEAD')
+    _assert_timestamp_parameter(branchless_client, 'develop', 1, 'develop:1000')
+    _assert_timestamp_parameter(branchless_client, 'develop', None, 'develop:HEAD')
+
+
+def _assert_timestamp_parameter(client, branch, timestamp, expected_parameter):
+    given_timestamp = datetime.datetime.fromtimestamp(timestamp) if timestamp else None
+    timestamp_parameter = client._get_timestamp_parameter(given_timestamp, branch)
+    assert timestamp_parameter == expected_parameter
