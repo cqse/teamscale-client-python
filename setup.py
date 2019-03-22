@@ -17,7 +17,8 @@ setup(
     install_requires=[
           'simplejson',
           'requests>=2.0',
-          'jsonpickle'
+          'jsonpickle',
+          'configparser'
     ],
 
     tests_require=[

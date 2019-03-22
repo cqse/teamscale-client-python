@@ -5,10 +5,16 @@ import requests
 from requests.auth import HTTPBasicAuth
 import time
 
+import os
 import simplejson as json
 
 from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task
 from teamscale_client.utils import to_json
+from teamscale_client.teamscale_client_config import TeamscaleClientConfig
+
+
+# Name of the default Teamscale client configuration file.
+TEAMSCALE_CLIENT_CONFIG_FILENAME = '.teamscale-client.config'
 
 
 class TeamscaleClient:
@@ -24,7 +30,7 @@ class TeamscaleClient:
         project (str): The id of the project on which to work
         sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
         timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
-        branch: The branch name for which to upload/retrieve data
+        branch (str): The branch name for which to upload/retrieve data
     """
 
     def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
@@ -38,6 +44,38 @@ class TeamscaleClient:
         self.timeout = timeout
         self.branch = branch
         self.check_api_version()
+
+    @staticmethod
+    def from_client_config(config, sslverify=True, timeout=30.0, branch=None):
+        """Creates a new Teamscale client from a `TeamscaleConfig` object.
+
+        Args:
+            config (teamscale_config.TeamscaleConfig): The client configuration to use.
+            sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
+            timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
+            branch (str): The branch name for which to upload/retrieve data
+        """
+        return TeamscaleClient(config.url, config.username, config.access_token, config.project_id,
+                               sslverify, timeout, branch)
+
+    @staticmethod
+    def from_client_config_in_home_dir(sslverify=True, timeout=30.0, branch=None):
+        """Creates a new Teamscale client using the configuration options found in the default Teamscale configuration
+        file in the user's home directory.
+
+        Args:
+            sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
+            timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
+            branch (str): The branch name for which to upload/retrieve data
+        """
+        home = os.path.expanduser("~")
+        config_file = os.sep.join([home, TEAMSCALE_CLIENT_CONFIG_FILENAME])
+        config = TeamscaleClientConfig(config_file)
+        return TeamscaleClient.from_client_config(config, sslverify, timeout, branch)
+
+    def set_project(self, project):
+        """Sets the project id for subsequent calls made using the client."""
+        self.project = project
 
     def check_api_version(self):
         """Verifies the server's api version and connectivity.
