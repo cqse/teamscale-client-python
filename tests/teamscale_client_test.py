@@ -236,3 +236,32 @@ def _assert_timestamp_parameter(client, branch, timestamp, expected_parameter):
     given_timestamp = datetime.datetime.fromtimestamp(timestamp) if timestamp else None
     timestamp_parameter = client._get_timestamp_parameter(given_timestamp, branch)
     assert timestamp_parameter == expected_parameter
+
+@responses.activate
+def test_get_finding_by_id():
+    """Tests retrieving findings by id."""
+    finding_id = '1A1837926D5406B9B33DDB84A1383525'
+    uniformPath = 'teamscale_client/client.py'
+    startLine = 450
+    endLine = 450
+    startOffset = 19808
+    endOffset = 19828
+    findingTypeId = 'Code Anomalies/Assignment of a variable to itself'
+    message = '`parameters` is assigned to itself'
+    assessment = AssessmentMetricColors.YELLOW
+
+    responses.add(responses.GET, get_project_service_mock('findings-by-id'),
+                  status=200, content_type="application/json",
+                  body='{"typeId": "%s", "categoryName": "Code Anomalies", "analysisTimestamp": -1, "groupName": "Bad practice", "location": {"rawStartOffset": %i, "@class": "org.conqat.engine.commons.findings.location.TextRegionLocation", "rawEndLine": %i, "rawEndOffset": %i, "location": "%s", "rawStartLine": %i, "uniformPath": "%s"}, "birth": {"timestamp": 1487577242000, "branchName": "master"}, "id": "%s", "message": "%s", "assessment": "%s", "properties": {"Check": "Assignment of a variable to itself"}}'
+                       % (findingTypeId, startOffset, endLine, endOffset, uniformPath, startLine, uniformPath, finding_id, message, assessment))
+    finding = get_client().get_finding_by_id(finding_id)
+    assert finding.uniformPath == uniformPath
+    assert finding.startLine == startLine
+    assert finding.endLine == endLine
+    assert finding.startOffset == startOffset
+    assert finding.endOffset == endOffset
+    assert finding.findingTypeId == findingTypeId
+    assert finding.message == message
+    assert finding.assessment == AssessmentMetricColors.YELLOW
+    assert finding.identifier is None
+    assert finding.findingProperties is None
