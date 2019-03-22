@@ -9,7 +9,6 @@ import simplejson as json
 
 from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task
 from teamscale_client.utils import to_json
-from teamscale_client.teamscale_client_config import TeamscaleClientConfig
 
 
 class TeamscaleClient:
