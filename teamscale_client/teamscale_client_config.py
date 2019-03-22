@@ -3,11 +3,26 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 from configparser import ConfigParser
+import os
+
+
+# Name of the default Teamscale client configuration file.
+TEAMSCALE_CLIENT_CONFIG_FILENAME = '.teamscale-client.config'
+
 
 class TeamscaleClientConfig:
     """Configuration parameters for connections to Teamscale"""
 
-    def __init__(self, config_file):
+    def __init__(self, url, username, access_token, project=''):
+        """Constructor."""
+        self.url = url
+        self.username = username
+        self.access_token = access_token
+        self.project_id = project
+        self.config_file = None
+
+    @staticmethod
+    def from_config_file(config_file, teamscale_section_required=True, project_id_required=False):
         """Reads a Teamscale configuration from the specified file.
 
         The config file must at least provide the following entries:
@@ -15,13 +30,56 @@ class TeamscaleClientConfig:
         * `username`: The username to use to perform API calls
         * `access_token`: The access token to use.
 
-        The config file can also specify a project `id`. If no project `id` is specified, '' is used.
+        The config file can also specify a project `id`.
+        If no project `id` is specified, '' is used in case `project_required` is `False`.
         A `TeamscaleClient` created using a configuration without project `id` will only perform global calls.
+
+        Args:
+            config_file (str): Path of the client configuration to use.
+            project_id_required (bool): Whether a project id is required for configuration.
         """
+        if not os.path.exists(config_file) or not os.path.isfile(config_file):
+            raise RuntimeError('Config file could not be found: %s' % config_file)
+
         parser = ConfigParser()
         parser.read(config_file)
 
-        self.url = parser.get('teamscale', 'url')
-        self.username = parser.get('teamscale', 'username')
-        self.access_token = parser.get('teamscale', 'access_token')
-        self.project_id = parser.get('project', 'id', fallback='')
+        url = parser.get('teamscale', 'url') if teamscale_section_required \
+            else parser.get('teamscale', 'url', fallback=None)
+        username = parser.get('teamscale', 'username') if teamscale_section_required \
+            else parser.get('teamscale', 'username', fallback=None)
+        access_token = parser.get('teamscale', 'access_token') if teamscale_section_required \
+            else parser.get('teamscale', 'access_token', fallback=None)
+        project_id = parser.get('project', 'id') if project_id_required \
+            else parser.get('project', 'id', fallback='')
+
+        config = TeamscaleClientConfig(url, username, access_token, project_id)
+        config.config_file = config_file
+        return config
+
+    @staticmethod
+    def from_config_file_in_home_dir(project_id_required=False):
+        home = os.path.expanduser("~")
+        config_file = os.sep.join([home, TEAMSCALE_CLIENT_CONFIG_FILENAME])
+        return TeamscaleClientConfig.from_config_file(config_file, project_id_required)
+
+    def overwrite_with(self, other):
+        """Overwrites values in this configuration with values from the other configuration.
+        This is useful to combine multiple configurations from different files, e.g. the home dir and the
+        repository root.
+        """
+        if other.url:
+            self.url = other.url
+        if other.username:
+            self.username = other.username
+        if other.access_token:
+            self.access_token = other.access_token
+        if other.project_id:
+            self.project_id = other.project_id
+        if other.config_file:
+            self.config_file = other.config_file
+
+
+if __name__ == '__main__':
+    config = TeamscaleClientConfig.from_config_file_in_home_dir(project_id_required=True)
+    pass
