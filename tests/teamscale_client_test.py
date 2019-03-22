@@ -20,11 +20,11 @@ from teamscale_client.utils import to_json
 URL = "http://localhost:8080"
 SUCCESS = 'success'
 
-def get_client():
+def get_client(branch=None):
     """Returns Teamscale client object for requesting servers"""
     responses.add(responses.GET, get_global_service_mock('service-api-info'), status=200,
                   content_type="application/json", body='{ "apiVersion": 6}')
-    return TeamscaleClient(URL, "admin", "admin", "foo")
+    return TeamscaleClient(URL, "admin", "admin", "foo", branch=branch)
 
 def get_project_service_mock(service_id):
     """Returns mock project service url"""
@@ -215,3 +215,53 @@ def test_add_issue_metric():
                       body='{"message": "success"}', status=200)
     get_client().add_issue_metric("example/foo", "instate(status=YELLOW) > 2d")
     assert "YELLOW" in responses.calls[1].request.body.decode()
+
+@responses.activate
+def test_get_timestamp_parameter():
+    """Tests that timestamp and branch are correctly handled when creating the timestamp parameter."""
+    master_client = get_client('master')
+    _assert_timestamp_parameter(master_client, None, 1, 'master:1000')
+    _assert_timestamp_parameter(master_client, None, None, 'master:HEAD')
+    _assert_timestamp_parameter(master_client, 'develop', 1, 'develop:1000')
+    _assert_timestamp_parameter(master_client, 'develop', None, 'develop:HEAD')
+
+    branchless_client = get_client()
+    _assert_timestamp_parameter(branchless_client, None, 1, '1000')
+    _assert_timestamp_parameter(branchless_client, None, None, 'HEAD')
+    _assert_timestamp_parameter(branchless_client, 'develop', 1, 'develop:1000')
+    _assert_timestamp_parameter(branchless_client, 'develop', None, 'develop:HEAD')
+
+
+def _assert_timestamp_parameter(client, branch, timestamp, expected_parameter):
+    given_timestamp = datetime.datetime.fromtimestamp(timestamp) if timestamp else None
+    timestamp_parameter = client._get_timestamp_parameter(given_timestamp, branch)
+    assert timestamp_parameter == expected_parameter
+
+@responses.activate
+def test_get_finding_by_id():
+    """Tests retrieving findings by id."""
+    finding_id = '1A1837926D5406B9B33DDB84A1383525'
+    uniformPath = 'teamscale_client/client.py'
+    startLine = 450
+    endLine = 450
+    startOffset = 19808
+    endOffset = 19828
+    findingTypeId = 'Code Anomalies/Assignment of a variable to itself'
+    message = '`parameters` is assigned to itself'
+    assessment = AssessmentMetricColors.YELLOW
+
+    responses.add(responses.GET, get_project_service_mock('findings-by-id'),
+                  status=200, content_type="application/json",
+                  body='{"typeId": "%s", "categoryName": "Code Anomalies", "analysisTimestamp": -1, "groupName": "Bad practice", "location": {"rawStartOffset": %i, "@class": "org.conqat.engine.commons.findings.location.TextRegionLocation", "rawEndLine": %i, "rawEndOffset": %i, "location": "%s", "rawStartLine": %i, "uniformPath": "%s"}, "birth": {"timestamp": 1487577242000, "branchName": "master"}, "id": "%s", "message": "%s", "assessment": "%s", "properties": {"Check": "Assignment of a variable to itself"}}'
+                       % (findingTypeId, startOffset, endLine, endOffset, uniformPath, startLine, uniformPath, finding_id, message, assessment))
+    finding = get_client().get_finding_by_id(finding_id)
+    assert finding.uniformPath == uniformPath
+    assert finding.startLine == startLine
+    assert finding.endLine == endLine
+    assert finding.startOffset == startOffset
+    assert finding.endOffset == endOffset
+    assert finding.findingTypeId == findingTypeId
+    assert finding.message == message
+    assert finding.assessment == AssessmentMetricColors.YELLOW
+    assert finding.identifier is None
+    assert finding.findingProperties is None
