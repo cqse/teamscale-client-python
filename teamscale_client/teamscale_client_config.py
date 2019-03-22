@@ -84,4 +84,4 @@ class TeamscaleClientConfig:
             return False
         if not require_project_id:
             return True
-        return self.project_id or False
+        return True if self.project_id else False
