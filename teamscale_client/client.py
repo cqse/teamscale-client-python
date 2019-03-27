@@ -24,7 +24,7 @@ class TeamscaleClient:
         project (str): The id of the project on which to work
         sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
         timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
-        branch: The branch name for which to upload/retrieve data
+        branch (str): The branch name for which to upload/retrieve data
     """
 
     def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
@@ -38,6 +38,23 @@ class TeamscaleClient:
         self.timeout = timeout
         self.branch = branch
         self.check_api_version()
+
+    @staticmethod
+    def from_client_config(config, sslverify=True, timeout=30.0, branch=None):
+        """Creates a new Teamscale client from a `TeamscaleClientConfig` object.
+
+        Args:
+            config (teamscale_client_config.TeamscaleClientConfig): The client configuration to use.
+            sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
+            timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
+            branch (str): The branch name for which to upload/retrieve data
+        """
+        return TeamscaleClient(config.url, config.username, config.access_token, config.project_id,
+                               sslverify, timeout, branch)
+
+    def set_project(self, project):
+        """Sets the project id for subsequent calls made using the client."""
+        self.project = project
 
     def check_api_version(self):
         """Verifies the server's api version and connectivity.
