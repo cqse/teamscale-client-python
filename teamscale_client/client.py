@@ -24,7 +24,7 @@ class TeamscaleClient:
         project (str): The id of the project on which to work
         sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
         timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
-        branch: The branch name for which to upload/retrieve data
+        branch (str): The branch name for which to upload/retrieve data
     """
 
     def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
@@ -38,6 +38,23 @@ class TeamscaleClient:
         self.timeout = timeout
         self.branch = branch
         self.check_api_version()
+
+    @staticmethod
+    def from_client_config(config, sslverify=True, timeout=30.0, branch=None):
+        """Creates a new Teamscale client from a `TeamscaleClientConfig` object.
+
+        Args:
+            config (teamscale_client_config.TeamscaleClientConfig): The client configuration to use.
+            sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
+            timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
+            branch (str): The branch name for which to upload/retrieve data
+        """
+        return TeamscaleClient(config.url, config.username, config.access_token, config.project_id,
+                               sslverify, timeout, branch)
+
+    def set_project(self, project):
+        """Sets the project id for subsequent calls made using the client."""
+        self.project = project
 
     def check_api_version(self):
         """Verifies the server's api version and connectivity.
@@ -468,20 +485,27 @@ class TeamscaleClient:
         """
         return response.json().get('message')
 
-    def _get_timestamp_parameter(self, timestamp):
+    def _get_timestamp_parameter(self, timestamp, branch=None):
         """Returns the timestamp parameter. Will use the branch parameter if it is set.
+        Returned timestamp is 'HEAD' if given timestamp is `None`.
 
         Args:
             timestamp (datetime.datetime): The timestamp to convert
+            branch (str): The branch to use. If this parameter is not set, the branch that was used to initialize the
+                          client is used, if any.
 
         Returns:
-            str: timestamp in ms
+            str: timestamp in ms, optionally prepended by the branch name.
+            Returned timestamp is 'HEAD' if given timestamp is `None`.
         """
-        timestamp_seconds = time.mktime(timestamp.timetuple())
-        timestamp_ms = str(int(timestamp_seconds * 1000))
-        if self.branch is not None:
-            return self.branch + ":" + timestamp_ms
-        return timestamp_ms
+        timestamp_or_head = 'HEAD'
+        if timestamp:
+            timestamp_seconds = time.mktime(timestamp.timetuple())
+            timestamp_or_head = str(int(timestamp_seconds * 1000))
+        branch_name = branch if branch else self.branch
+        if branch_name:
+            return branch_name + ":" + timestamp_or_head
+        return timestamp_or_head
 
     def get_global_service_url(self, service_name):
         """Returns the full url pointing to a global service.
@@ -576,13 +600,47 @@ class TeamscaleClient:
             findings_json (List[object]): The json object encoding the list of findings.
 
         Returns:
+            List[data.Finding]: The findings that were parsed from the JSON object
+        """
+        return [self._finding_from_json(finding)
+                for finding in findings_json]
+
+    def _finding_from_json(self, finding_json):
+        """Parses Ja single SON encoded finding.
+
+        Args:
+            finding_json (object): The json object encoding the finding.
+
+        Returns:
             data.Finding: The finding that was parsed from the JSON object
         """
-        return [Finding(finding_type_id=x['typeId'], message=x['message'],
-                        assessment=x['assessment'], start_offset=x['location']['rawStartOffset'],
-                        end_offset=x['location']['rawEndOffset'], start_line=x['location']['rawStartLine'],
-                        end_line=x['location']['rawEndLine'], uniform_path=x['location']['uniformPath'])
-                for x in findings_json]
+        return Finding(finding_type_id=finding_json['typeId'],
+                       message=finding_json['message'],
+                       assessment=finding_json['assessment'],
+                       start_offset=self._get_finding_location_entry(finding_json, 'rawStartOffset', 0),
+                       end_offset=self._get_finding_location_entry(finding_json, 'rawEndOffset', 0),
+                       start_line=self._get_finding_location_entry(finding_json, 'rawStartLine', 1),
+                       end_line=self._get_finding_location_entry(finding_json, 'rawEndLine', 1),
+                       uniform_path=finding_json['location']['uniformPath'])
+
+    def _get_finding_location_entry(self, finding_json, key, defaultValue):
+        """Safely extracts a value from the location data of a JSON encoded finding.
+        Some findings don't have all the location data, in which case the given default value
+	is returned.
+
+        Args:
+            finding_json (object): The json object encoding the finding.
+            key (string): The key in the location data to look up.
+            defaultValue (object): The default value to return in case the key cannot be found.
+
+        Returns:
+            object: The value or the default value.
+        """
+        value = finding_json['location'].get(key)
+        if value is None:
+            return defaultValue
+
+        return value
 
     def get_findings(self, uniform_path, timestamp, recursive=True):
         """Retrieves the list of findings in the currently active project for the given uniform path
@@ -610,6 +668,31 @@ class TeamscaleClient:
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return self._findings_from_json(response.json())
+
+    def get_finding_by_id(self, finding_id, branch=None, timestamp=None):
+        """Retrieves the finding with the given id.
+
+        Args:
+            finding_id (str): The id of the finding to retrieve.
+            branch (str): The branch from which the finding should be retrieved.
+            timestamp (datetime.datetime): The timestamp (unix format) for which to receive the finding.
+
+        Returns:
+             data.Finding: The retrieved finding.
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        service_url = self.get_project_service_url("findings-by-id") + finding_id
+
+        parameters = {
+            "t": self._get_timestamp_parameter(timestamp=timestamp, branch=branch),
+        }
+        response = self.get(service_url, parameters=parameters)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return self._finding_from_json(response.json())
+
 
     def get_tasks(self, status="OPEN", details=True, start=0, max=300):
         """Retrieves the tasks for the client's project from the server.
