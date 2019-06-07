@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-from migrator_base import MigratorBase, get_arguments
+from teamscale_client.constants import TaskStatus
+
+from tools.migration.migrator_base import MigratorBase, get_arguments
 
 
 def main():
@@ -12,6 +14,12 @@ class TaskMigrator(MigratorBase):
     """ Class for migrating tasks between two instances.
     Tasks will only be migrated if all connected findings are on the new instance as well.
     """
+    def __init__(self, config_data, debug=False, dry_run=False, step_by_step=False, overwrite_tasks=True, findings_timestamp=None, overwrite_tasks_offset=0):
+        super().__init__(config_data, debug=debug, dry_run=dry_run, step_by_step=step_by_step)
+        self.overwrite_tasks = overwrite_tasks
+        self.findings_timestamp = findings_timestamp
+        self.overwrite_tasks_offset = overwrite_tasks_offset
+
     def migrate(self):
         """ Migrates the tasks. """
         old_tasks = self.get_from_old("tasks", parameters={"details": True})
@@ -22,9 +30,12 @@ class TaskMigrator(MigratorBase):
         self.logger.info("Migrating %s tasks" % len(old_tasks))
         for old_task in old_tasks:
             old_task_id = old_task["id"]
+            self.logger.debug('Working on task %i (%s)' % (old_task_id, old_task["status"]))
             self.adjust_task(old_task)
+            self.pre_process_task(old_task)
             self.logger.info("Migrating task %s" % self.get_tasks_url(old_task_id))
-            self.add_task(old_task)
+            new_task_id = self.add_task(old_task)
+            self.post_process_task(old_task, old_task_id, new_task_id)
             self.check_step()
 
         self.logger.info("Migrated %d/%d tasks" % (self.migrated, len(old_tasks)))
@@ -33,13 +44,27 @@ class TaskMigrator(MigratorBase):
         """ Before adding the task to the new instance the ids of any connected findings need
         to be changed to the corresponding findings on the new instance.
         """
+        self.logger.debug('Adjusting %i findings' % len(task["findings"]))
         for finding in task["findings"]:
-            matching_finding_id = self.get_matching_finding_id(finding["findingId"])
+            self.logger.debug('Searching for finding %s' % finding["findingId"])
+
+            matching_finding_id = self.get_matching_finding_id(finding["findingId"], self.findings_timestamp)
             if matching_finding_id is None:
                 self.logger.warn("The finding %s for task %s does not exists on the new instance." % (
                     self.get_findings_url(finding["findingId"]), task["id"]))
             else:
+                self.logger.debug("Found finding %s for task %s on new instance: %s." % (
+                    self.get_findings_url(finding["findingId"]), task["id"],
+                    self.get_findings_url(matching_finding_id, client=self.new)))
                 finding["findingId"] = matching_finding_id
+
+    def pre_process_task(self, task):
+        """Additional task preprocessing. Default implementation does nothing."""
+        pass
+
+    def post_process_task(self, task, old_task_id, new_task_id):
+        """Additional task postprocessing. Default implementation does nothing."""
+        pass
 
     def get_tasks_url(self, task_id, client=None):
         """ Creates a url of the old instance to the task with the given id. """
@@ -50,7 +75,13 @@ class TaskMigrator(MigratorBase):
     def add_task(self, task):
         """ Adds a task to the new instance """
         self.migrated += 1
-        self.put_in_new("tasks", path_suffix=str(task["id"]), data=task)
+        path_suffix = str(task["id"] + self.overwrite_tasks_offset) if self.overwrite_tasks else '0'
+        new_task_response = self.put_in_new("tasks", path_suffix=path_suffix, data=task)
+        new_task_id = new_task_response.json() if new_task_response else 100000
+        if task["status"] != TaskStatus.OPEN:
+            # Need to put it a second time to get the status right
+            self.put_in_new("tasks", path_suffix=str(new_task_id), data=task)
+        return new_task_id
 
 
 if __name__ == "__main__":

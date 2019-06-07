@@ -25,9 +25,10 @@ class TeamscaleClient:
         sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
         timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
         branch (str): The branch name for which to upload/retrieve data
+        proxies (dict): Dictionary of proxies if any. Note: This needs pysocks installed.
     """
 
-    def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
+    def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None, proxies=None):
         """Constructor
         """
         self.url = url
@@ -37,6 +38,7 @@ class TeamscaleClient:
         self.sslverify = sslverify
         self.timeout = timeout
         self.branch = branch
+        self.proxies = proxies
         self.check_api_version()
 
     @staticmethod
@@ -85,7 +87,7 @@ class TeamscaleClient:
         """
         headers = {'Accept': 'application/json'}
         response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers,
-                                timeout=self.timeout)
+                                timeout=self.timeout, proxies=self.proxies)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
@@ -108,7 +110,7 @@ class TeamscaleClient:
         headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         response = requests.put(url, params=parameters, json=json, data=data,
                                 headers=headers, auth=self.auth_header,
-                                verify=self.sslverify, timeout=self.timeout)
+                                verify=self.sslverify, timeout=self.timeout, proxies=self.proxies)
         if response.status_code != 200:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response

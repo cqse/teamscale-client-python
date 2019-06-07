@@ -64,6 +64,8 @@ class MigratorBase(ABC):
         self.old, self.new = self.create_clients(config_data)
         self.set_prefix_transformations(config_data)
         self.check_projects()
+        self.old_project = self.get_project(self.old).json()
+        self.new_project = self.get_project(self.new).json()
         self.migrated = 0
         self.cache = {}
 
@@ -86,11 +88,16 @@ class MigratorBase(ABC):
 
     def check_project(self, client):
         """ Checks if the project specified in the client actually exists on that client. """
-        check_url = "{0.url}/projects/{0.project}"
-        result = client.get(check_url.format(client))
+        result = self.get_project(client)
         if result.content == b'null':
             self.logger.error("Project '%s' does not exist" % client.project)
             exit(1)
+
+    @staticmethod
+    def get_project(client):
+        check_url = "{0.url}/projects/{0.project}"
+        result = client.get(check_url.format(client))
+        return result
 
     def create_clients(self, config_data):
         """ Reads the given config defined by its path and creates the two teamscale clients from it.
@@ -114,7 +121,7 @@ class MigratorBase(ABC):
     @staticmethod
     def get_client(data):
         """ Creates a teamscale client from the given data """
-        return TeamscaleClient(data["url"], data["user"], data["token"], data["project"])
+        return TeamscaleClient(data["url"], data["user"], data["token"], data["project"], proxies=data["proxies"])
 
     def check_cache(self, request, use_cache):
         """ If use_cache is True it checks if the cache already contains the response
@@ -188,12 +195,12 @@ class MigratorBase(ABC):
             path_suffix(str): Will be added to the end of the project service URL
             parameters(dict): Dict with parameters which should be appended to the URL
         """
+        url = self.new.get_project_service_url(service) + path_suffix
+        self.logger.debug("Service Call: {}".format((url, parameters)))
         if not self.dry_run:
-            self.new.put(self.new.get_project_service_url(service) + path_suffix,
-                         parameters=parameters,
-                         json=data)
+            return self.new.put(url, parameters=parameters, json=data)
 
-    def get_matching_finding_id(self, finding_id):
+    def get_matching_finding_id(self, finding_id, timestamp=None):
         """ Tries to find a matching finding in the new instance for
         the given findings id of the old instance.
         If no match could be found `None` is returned.
@@ -203,7 +210,7 @@ class MigratorBase(ABC):
             return None
 
         location = self.path_transform(finding["location"]["uniformPath"])
-        new_findings = self.get_from_new("findings", path_suffix=location, parameters={"blacklisted": "all"})
+        new_findings = self.get_from_new("findings", path_suffix=location, parameters={"blacklisted": "all", "t": timestamp})
         for new_finding in new_findings:
             if self.match_finding(new_finding, finding):
                 return new_finding["id"]
@@ -229,10 +236,10 @@ class MigratorBase(ABC):
         """ Checks if the given two findings are the same. """
         location_match = self.dicts_match(finding1["location"],
                                           finding2["location"],
-                                          ["location", "uniformPath", "@class"])
+                                          ["location", "uniformPath", "@class", "rawEndOffset"])
         # Exclude category and message, because this might change with an update to a newer TS-version
         properties_match = self.dicts_match(finding1, finding2,
-                                            ["location", "id", "birth", "analysisTimestamp", "message", "categoryName"])
+                                            ["location", "id", "birth", "death", "analysisTimestamp", "message", "categoryName", "siblingLocations"])
 
         return location_match and properties_match
 
@@ -241,11 +248,10 @@ class MigratorBase(ABC):
         """ Checks if the given two dicts matches.
         Excludes is a list containing all keys, which should not be compared
         """
-        if dict1.keys() != dict2.keys():
-            return False
+        common_keys_without_excludes = (dict1.keys() & dict2.keys()) - set(excludes)
 
-        location_keys = [x for x in dict1.keys() if x not in excludes]
-        return all([dict1[x] == dict2[x]] for x in location_keys)
+        matchings = [dict1[x] == dict2[x] for x in common_keys_without_excludes]
+        return all(matchings)
 
     @abstractmethod
     def migrate(self):
