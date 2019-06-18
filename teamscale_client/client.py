@@ -42,7 +42,7 @@ class TeamscaleClient:
         self.check_api_version()
 
     @staticmethod
-    def from_client_config(config, sslverify=True, timeout=30.0, branch=None):
+    def from_client_config(config, sslverify=True, timeout=30.0, branch=None, proxies=None):
         """Creates a new Teamscale client from a `TeamscaleClientConfig` object.
 
         Args:
@@ -52,7 +52,7 @@ class TeamscaleClient:
             branch (str): The branch name for which to upload/retrieve data
         """
         return TeamscaleClient(config.url, config.username, config.access_token, config.project_id,
-                               sslverify, timeout, branch)
+                               sslverify, timeout, branch, proxies=proxies)
 
     def set_project(self, project):
         """Sets the project id for subsequent calls made using the client."""
