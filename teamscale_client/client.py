@@ -623,7 +623,8 @@ class TeamscaleClient:
                        end_offset=self._get_finding_location_entry(finding_json, 'rawEndOffset', 0),
                        start_line=self._get_finding_location_entry(finding_json, 'rawStartLine', 1),
                        end_line=self._get_finding_location_entry(finding_json, 'rawEndLine', 1),
-                       uniform_path=finding_json['location']['uniformPath'])
+                       uniform_path=finding_json['location']['uniformPath'],
+                       resolved='death' in finding_json)
 
     def _get_finding_location_entry(self, finding_json, key, defaultValue):
         """Safely extracts a value from the location data of a JSON encoded finding.

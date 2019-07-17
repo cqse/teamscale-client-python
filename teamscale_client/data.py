@@ -35,7 +35,8 @@ class Finding(object):
     """
 
     def __init__(self, finding_type_id, message, assessment=Assessment.YELLOW, start_offset=None, end_offset=None,
-                 start_line=None, end_line=None, identifier=None, uniform_path=None, finding_properties=None):
+                 start_line=None, end_line=None, identifier=None, uniform_path=None, finding_properties=None,
+                 resolved=False):
         self.findingTypeId = finding_type_id
         self.message = message
         self.assessment = assessment
@@ -47,6 +48,7 @@ class Finding(object):
 
         self.uniformPath = uniform_path
         self.findingProperties = finding_properties
+        self.resolved = resolved
 
     def __cmp__(self, other):
         """Compares this finding to another finding."""

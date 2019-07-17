@@ -14,10 +14,12 @@ class TaskMigrator(MigratorBase):
     """ Class for migrating tasks between two instances.
     Tasks will only be migrated if all connected findings are on the new instance as well.
     """
-    def __init__(self, config_data, debug=False, dry_run=False, step_by_step=False, overwrite_tasks=True, findings_timestamp=None, overwrite_tasks_offset=0):
+    def __init__(self, config_data, debug=False, dry_run=False, step_by_step=False, overwrite_tasks=True,
+                 findings_timestamp=None, get_findings_timestamp_from_task_creation=False, overwrite_tasks_offset=0):
         super().__init__(config_data, debug=debug, dry_run=dry_run, step_by_step=step_by_step)
         self.overwrite_tasks = overwrite_tasks
         self.findings_timestamp = findings_timestamp
+        self.get_findings_timestamp_from_task_creation = get_findings_timestamp_from_task_creation
         self.overwrite_tasks_offset = overwrite_tasks_offset
 
     def migrate(self):
@@ -31,6 +33,9 @@ class TaskMigrator(MigratorBase):
         for old_task in old_tasks:
             old_task_id = old_task["id"]
             self.logger.debug('Working on task %i (%s)' % (old_task_id, old_task["status"]))
+            if not self.filter_task(old_task):
+                self.logger.debug('Skipping task %i (%s)' % (old_task_id, old_task["status"]))
+                continue
             self.adjust_task(old_task)
             self.pre_process_task(old_task)
             self.logger.info("Migrating task %s" % self.get_tasks_url(old_task_id))
@@ -45,10 +50,15 @@ class TaskMigrator(MigratorBase):
         to be changed to the corresponding findings on the new instance.
         """
         self.logger.debug('Adjusting %i findings' % len(task["findings"]))
+
+        timestamp_for_finding_on_new_instance = self.findings_timestamp
+        if self.get_findings_timestamp_from_task_creation:
+            timestamp_for_finding_on_new_instance = task["created"]
+
         for finding in task["findings"]:
             self.logger.debug('Searching for finding %s' % finding["findingId"])
 
-            matching_finding_id = self.get_matching_finding_id(finding["findingId"], self.findings_timestamp)
+            matching_finding_id = self.get_matching_finding_id(finding["findingId"], timestamp_for_finding_on_new_instance)
             if matching_finding_id is None:
                 self.logger.warn("The finding %s for task %s does not exists on the new instance." % (
                     self.get_findings_url(finding["findingId"]), task["id"]))
@@ -57,6 +67,10 @@ class TaskMigrator(MigratorBase):
                     self.get_findings_url(finding["findingId"]), task["id"],
                     self.get_findings_url(matching_finding_id, client=self.new)))
                 finding["findingId"] = matching_finding_id
+
+    def filter_task(self, task):
+        """Additional task filter. Default implementation does nothing."""
+        return True
 
     def pre_process_task(self, task):
         """Additional task preprocessing. Default implementation does nothing."""
