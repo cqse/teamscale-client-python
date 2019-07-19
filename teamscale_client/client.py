@@ -621,7 +621,8 @@ class TeamscaleClient:
                        end_offset=self._get_finding_location_entry(finding_json, 'rawEndOffset', 0),
                        start_line=self._get_finding_location_entry(finding_json, 'rawStartLine', 1),
                        end_line=self._get_finding_location_entry(finding_json, 'rawEndLine', 1),
-                       uniform_path=finding_json['location']['uniformPath'])
+                       uniform_path=finding_json['location']['uniformPath'],
+                       finding_id=finding_json['id'])
 
     def _get_finding_location_entry(self, finding_json, key, defaultValue):
         """Safely extracts a value from the location data of a JSON encoded finding.
@@ -693,6 +694,20 @@ class TeamscaleClient:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return self._finding_from_json(response.json())
 
+    def get_finding_url(self, finding):
+        """Returns the full url pointing to the specified finding in Teamscale,
+        or `None` if the finding does not have an id.
+
+        Args:
+           finding(data.Finding): the finding for which the url should be generated
+
+        Returns:
+            str: The full url
+        """
+        if not finding.finding_id:
+            return None
+        return "{client.url}/findings.html#details/{client.project}/?id={finding_id}"\
+            .format(client=self, finding_id=finding.finding_id)
 
     def get_tasks(self, status="OPEN", details=True, start=0, max=300):
         """Retrieves the tasks for the client's project from the server.

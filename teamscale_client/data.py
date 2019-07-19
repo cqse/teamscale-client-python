@@ -32,10 +32,13 @@ class Finding(object):
                                     If this is given, offsets and lines do not need to be filled.
         uniform_path (Optional[str]): The path of the file where the finding is located.
         properties (Optional[dict]): A map of String->Object properties associated with this finding.
+        finding_id (str): The Teamscale internal id of this finding. Can be left empty for findings that do not yet have
+                          an id.
     """
 
-    def __init__(self, finding_type_id, message, assessment=Assessment.YELLOW, start_offset=None, end_offset=None,
-                 start_line=None, end_line=None, identifier=None, uniform_path=None, finding_properties=None):
+    def __init__(self, finding_type_id, message, assessment=Assessment.YELLOW, start_offset=None,
+                 end_offset=None, start_line=None, end_line=None, identifier=None, uniform_path=None,
+                 finding_properties=None, finding_id=None):
         self.findingTypeId = finding_type_id
         self.message = message
         self.assessment = assessment
@@ -47,6 +50,7 @@ class Finding(object):
 
         self.uniformPath = uniform_path
         self.findingProperties = finding_properties
+        self.finding_id = finding_id
 
     def __cmp__(self, other):
         """Compares this finding to another finding."""
@@ -60,6 +64,8 @@ class Finding(object):
 
     def __eq__(self, other):
         """Checks if this finding is equal to the given finding."""
+        if self.finding_id and other.finding_id:
+            return self.finding_id == other.finding_id
         return ((self.uniformPath, self.startLine, self.assessment, self.message, self.endLine, self.endOffset,
                  self.findingTypeId, self.identifier, self.startOffset) ==
                 (other.uniformPath, other.startLine, other.assessment, other.message, other.endLine, other.endOffset,
