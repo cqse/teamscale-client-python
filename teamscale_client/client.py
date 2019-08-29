@@ -502,9 +502,9 @@ class TeamscaleClient:
         if timestamp:
             timestamp_seconds = time.mktime(timestamp.timetuple())
             timestamp_or_head = str(int(timestamp_seconds * 1000))
-        branch_name = branch if branch else self.branch
-        if branch_name:
-            return branch_name + ":" + timestamp_or_head
+        default_branch_name = branch if branch else self.branch
+        if default_branch_name:
+            return default_branch_name + ":" + timestamp_or_head
         return timestamp_or_head
 
     def get_global_service_url(self, service_name):

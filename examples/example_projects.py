@@ -50,7 +50,7 @@ def update_project_with_file_system_connector():
 
 
 def create_project_with_git_connector():
-    git_config = GitSourceCodeConnectorConfiguration(branch_name="master", account=ACCOUNT_NAME_GIT,
+    git_config = GitSourceCodeConnectorConfiguration(default_branch_name="master", account=ACCOUNT_NAME_GIT,
                                                      repository_identifier="Git", included_file_names=INCLUDE_PATTERN)
     project_configuration = ProjectConfiguration(name="Test Project 2", project_id="test-project-002",
                                                  profile=ANALYSIS_PROFILE, connectors=[git_config])
