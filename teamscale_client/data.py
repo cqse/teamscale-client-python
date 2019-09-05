@@ -343,7 +343,6 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
                                                Empty by default.
         branch_transformation (Optional[str]): Regex transformations that are applied to the branch names
                                                of the repository. Empty by default.
-        path_suffix (Optional[str]): The suffix to append to the base URL of the repository. Empty by default.
     """
 
     def __init__(self, connector_type, included_file_names, excluded_file_names="", repository_identifier="repository1",
@@ -351,7 +350,7 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
                  content_exclude="", polling_interval=60, prepend_repository_identifier=False, end_revision="",
                  text_filter="", source_library_connector=False, run_to_exhaustion=False, delta_size=500,
                  path_prefix_transformation="", path_transformation="", encoding="", author_transformation="",
-                 branch_transformation="", path_suffix="", preserve_empty_commits=False):
+                 branch_transformation="", preserve_empty_commits=False):
         super(SourceCodeConnectorConfiguration, self).__init__(connector_type)
         self.options = {
             "Included file names": included_file_names,
@@ -374,7 +373,6 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
             "Encoding": encoding,
             "Author transformation": author_transformation,
             "Branch transformation": branch_transformation,
-            "Path suffix": path_suffix,
             "Preserve empty commits": preserve_empty_commits
         }
 
@@ -412,7 +410,7 @@ class GitSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguration):
     """Represents a Teamscale Git connector configuration.
 
     Args:
-        branch_name (str): Name of the branch that should be analyzed. If not provided, the master branch will be used.
+        default_branch_name (str): Name of the branch that should be analyzed. If not provided, the master branch will be used.
                            If `enable_branch_analysis` is set to `True`, this becomes the default branch.
         account (str): Name of the Teamscale account to use to connect to the repository.
         path_suffix (Optional[str]): The suffix to append to the base URL of the repository. Empty by default.
@@ -421,10 +419,10 @@ class GitSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguration):
                                                    Defaults to `10`.
     """
 
-    def __init__(self, branch_name, account, path_suffix="", include_submodules=False,
+    def __init__(self, default_branch_name, account, path_suffix="", include_submodules=False,
                  submodule_recursion_depth=10, connector_type=ConnectorType.GIT, *args, **kwargs):
         super(GitSourceCodeConnectorConfiguration, self).__init__(connector_type=connector_type, *args, **kwargs)
-        self.options["Branch Name"] = branch_name
+        self.options["Default branch name"] = default_branch_name
         self.options["Account"] = account
         self.options["Path suffix"] = path_suffix
         self.options["Include Submodules"] = include_submodules
