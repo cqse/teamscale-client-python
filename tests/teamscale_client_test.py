@@ -183,6 +183,20 @@ def test_add_project():
     resp = get_client().create_project(project_configuration)
     assert resp.status_code == 200 and TeamscaleClient._get_response_message(resp) == SUCCESS
 
+@responses.activate
+def test_add_project_without_validation():
+    """Test adding projects"""
+    file_system_config = FileSystemSourceCodeConnectorConfiguration(input_directory="/path/to/folder",
+                                                                    repository_identifier="Local",
+                                                                    included_file_names="**.py")
+    project_configuration = ProjectConfiguration(name="Test Project", project_id="test-project",
+                                                 profile="Python (default)", connectors=[file_system_config])
+
+    responses.add(responses.PUT, get_global_service_mock('create-project'),
+                      body='{"message": "success"}', status=200)
+    resp = get_client().create_project(project_configuration, True)
+    assert resp.status_code == 200 and TeamscaleClient._get_response_message(resp) == SUCCESS
+
 def test_compare_findings():
     """Tests comparing between findings."""
     first_finding = Finding("1a", "first message a", uniform_path='path/to/a', start_line=10, end_line=30)
