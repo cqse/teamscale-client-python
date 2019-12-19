@@ -524,6 +524,9 @@ class TeamscaleClient:
         """
         return "%s/%s/" % (self.url, service_name)
 
+    def get_new_project_service_url(self, service_name):
+        return "{client.url}/api/projects/{client.project}/{service}/".format(client=self, service=service_name)
+
     def get_project_service_url(self, service_name):
         """Returns the full url pointing to a project service.
 
@@ -730,7 +733,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
             """
-        service_url = self.get_project_service_url("tasks")
+        service_url = self.get_new_project_service_url("tasks")
         parameters = {
             "status": status,
             "details": details,
