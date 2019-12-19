@@ -25,9 +25,10 @@ class TeamscaleClient:
         sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
         timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
         branch (str): The branch name for which to upload/retrieve data
+        proxies (dict): Dictionary of proxies if any. Note: This needs pysocks installed.
     """
 
-    def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
+    def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None, proxies=None):
         """Constructor
         """
         self.url = url
@@ -37,10 +38,11 @@ class TeamscaleClient:
         self.sslverify = sslverify
         self.timeout = timeout
         self.branch = branch
+        self.proxies = proxies
         self.check_api_version()
 
     @staticmethod
-    def from_client_config(config, sslverify=True, timeout=30.0, branch=None):
+    def from_client_config(config, sslverify=True, timeout=30.0, branch=None, proxies=None):
         """Creates a new Teamscale client from a `TeamscaleClientConfig` object.
 
         Args:
@@ -50,7 +52,7 @@ class TeamscaleClient:
             branch (str): The branch name for which to upload/retrieve data
         """
         return TeamscaleClient(config.url, config.username, config.access_token, config.project_id,
-                               sslverify, timeout, branch)
+                               sslverify, timeout, branch, proxies=proxies)
 
     def set_project(self, project):
         """Sets the project id for subsequent calls made using the client."""
@@ -85,7 +87,7 @@ class TeamscaleClient:
         """
         headers = {'Accept': 'application/json'}
         response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers,
-                                timeout=self.timeout)
+                                timeout=self.timeout, proxies=self.proxies)
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
@@ -108,7 +110,7 @@ class TeamscaleClient:
         headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         response = requests.put(url, params=parameters, json=json, data=data,
                                 headers=headers, auth=self.auth_header,
-                                verify=self.sslverify, timeout=self.timeout)
+                                verify=self.sslverify, timeout=self.timeout, proxies=self.proxies)
         if response.status_code != 200:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
@@ -631,7 +633,8 @@ class TeamscaleClient:
                        start_line=self._get_finding_location_entry(finding_json, 'rawStartLine', 1),
                        end_line=self._get_finding_location_entry(finding_json, 'rawEndLine', 1),
                        uniform_path=finding_json['location']['uniformPath'],
-                       finding_id=finding_json['id'])
+                       finding_id=finding_json['id'],
+                       resolved='death' in finding_json)
 
     def _get_finding_location_entry(self, finding_json, key, defaultValue):
         """Safely extracts a value from the location data of a JSON encoded finding.

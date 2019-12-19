@@ -1,0 +1,4 @@
+{
+    "groupName": "C# Security Checks",
+    "mapping": "^SCS[0-9]{4}$"
+}
