@@ -8,6 +8,9 @@ http://cqse.github.io/teamscale-client-python
 Install via:
     
     pip install teamscale-client
+    
+# Setup
+Copy the file `examples/.teamscale-client.config` into your home directory and update it to reflect your setup. 
 
 # Development
 We are happy to add additional service calls to the client. Please make sure you include a test, if you add a service call. To run them use:
