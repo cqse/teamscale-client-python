@@ -86,7 +86,7 @@ class TeamscaleClient:
         headers = {'Accept': 'application/json'}
         response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers,
                                 timeout=self.timeout)
-        if response.status_code not in range(200, 300):
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
@@ -109,7 +109,7 @@ class TeamscaleClient:
         response = requests.put(url, params=parameters, json=json, data=data,
                                 headers=headers, auth=self.auth_header,
                                 verify=self.sslverify, timeout=self.timeout)
-        if response.status_code not in range(200, 300):
+        if not response.ok:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
@@ -128,7 +128,7 @@ class TeamscaleClient:
         """
         response = requests.delete(url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                    timeout=self.timeout)
-        if response.status_code not in range(200, 300):
+        if not response.ok:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
@@ -296,7 +296,7 @@ class TeamscaleClient:
         multiple_files = [('report', open(filename, 'rb')) for filename in report_files]
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=multiple_files, timeout=self.timeout)
-        if response.status_code not in range(200, 300):
+        if not response.ok:
             raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
 
@@ -323,7 +323,7 @@ class TeamscaleClient:
         architecture_files = [(path, open(filename, 'rb')) for path, filename in architectures.items()]
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=architecture_files, timeout=self.timeout)
-        if response.status_code not in range(200, 300):
+        if not response.ok:
             raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
 
@@ -360,7 +360,7 @@ class TeamscaleClient:
         headers = {'Accept': 'application/json'}
         response = requests.get(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                 headers=headers, timeout=self.timeout)
-        if response.status_code not in range(200, 300):
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return [Baseline(x['name'], x['description'], timestamp=x['timestamp']) for x in response.json()]
 
@@ -559,7 +559,7 @@ class TeamscaleClient:
         service_url = self.get_project_service_url("pre-commit") + self._get_timestamp_parameter(timestamp)
 
         response = self.put(service_url, data=to_json(precommit_data))
-        if response.status_code not in range(200, 300):
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
 
     def get_precommit_analysis_results(self):
@@ -590,7 +590,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong.
         """
-        if response.status_code not in range(200, 300):
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
 
         added_findings = self._findings_from_json(response.json()['addedFindings'])
@@ -672,7 +672,7 @@ class TeamscaleClient:
             "all": True
         }
         response = self.get(service_url, parameters=parameters)
-        if response.status_code not in range(200, 300):
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return self._findings_from_json(response.json())
 
@@ -696,7 +696,7 @@ class TeamscaleClient:
             "t": self._get_timestamp_parameter(timestamp=timestamp, branch=branch),
         }
         response = self.get(service_url, parameters=parameters)
-        if response.status_code not in range(200, 300):
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return self._finding_from_json(response.json())
 
@@ -739,7 +739,7 @@ class TeamscaleClient:
             "with-count": False
         }
         response = self.get(service_url, parameters=parameters)
-        if response.status_code not in range(200, 300):
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return TeamscaleClient._tasks_from_json(response.json())
 
@@ -758,7 +758,7 @@ class TeamscaleClient:
         """
         service_url = self.get_project_service_url("comment-task") + str(task_id)
         response = self.put(service_url, data=to_json(comment))
-        if response.status_code not in range(200, 300):
+        if not response.ok:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
 
@@ -822,6 +822,6 @@ class TeamscaleClient:
 
         }
         response = self.get(service_url, parameters=parameters)
-        if response.status_code not in range(200, 300):
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return [architecture_overview['uniformPath'] for architecture_overview in response.json()]
