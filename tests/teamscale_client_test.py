@@ -213,7 +213,7 @@ def test_compare_findings():
 
 @responses.activate
 def test_get_tasks():
-    """Tests retrieving of projects"""
+    """Tests retrieving of tasks"""
     responses.add(responses.GET, get_project_service_mock('tasks'),
                   status=200, content_type="application/json",
                   body='[{"id": 1, "subject": "uiae", "author": "admin", "description": "", "assignee": "", "created": 1536581194732, "updated": 1536583991791, "updatedBy": "admin", "status": "OPEN", "resolution": "NONE", "findings": [{"findingId": "40315BE118FE08044FBF605325445250"}], "comments": [{"author": "admin", "date": 1536583991791, "text": "Added finding: 40315BE118FE08044FBF605325445250", "changeComment": true, "resolvedAuthor": {"username": "admin", "firstName": "Default", "lastName": "Administrator", "emailAddress": "", "gravatarHash": "dummy", "useGravatar": false, "aliases": [], "authenticator": "HashedStored:anonymized", "groupIds": ["Administrators"]}}], "tags": [], "resolvedAuthor": {"username": "admin", "firstName": "Default", "lastName": "Administrator", "emailAddress": "", "gravatarHash": "dummy", "useGravatar": false, "aliases": [], "authenticator": "HashedStored:anonymized", "groupIds": ["Administrators"]}, "resolvedUpdatedBy": {"username": "admin", "firstName": "Default", "lastName": "Administrator", "emailAddress": "", "gravatarHash": "dummy", "useGravatar": false, "aliases": [], "authenticator": "HashedStored:anonymized", "groupIds": ["Administrators"]}}]')
