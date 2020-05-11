@@ -572,6 +572,9 @@ class TeamscaleClient:
 
         while True:
             response = self.get(service_url)
+            # TODO response.text can be empty when we get 204 (find out how this happens!) and the json() call fails and
+            # throws an exception then. Find when we get 204 and how to deal with the exception.
+            # one quick fix is to replace the check blow with `response.text == ""`
             if response.json() is None:
                 time.sleep(2)
             else:
@@ -712,7 +715,7 @@ class TeamscaleClient:
         """
         if not finding.finding_id:
             return None
-        return "{client.url}/findings.html#details/{client.project}/?id={finding_id}"\
+        return "{client.url}/findings.html#details/{client.project}/?id={finding_id}" \
             .format(client=self, finding_id=finding.finding_id)
 
     def get_tasks(self, status="OPEN", details=True, start=0, max=300):
