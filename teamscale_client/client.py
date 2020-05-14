@@ -714,7 +714,7 @@ class TeamscaleClient:
         """
         if not finding.finding_id:
             return None
-        return "{client.url}/findings.html#details/{client.project}/?id={finding_id}" \
+        return "{client.url}/findings.html#details/{client.project}/?id={finding_id}"\
             .format(client=self, finding_id=finding.finding_id)
 
     def get_tasks(self, status="OPEN", details=True, start=0, max=300):
