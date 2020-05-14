@@ -572,7 +572,9 @@ class TeamscaleClient:
 
         while True:
             response = self.get(service_url)
-            if response.json() is None:
+            # We need to wait for 200 here to get the findings.
+            # The service returns 204 while the pre-commit analysis is still in progress.
+            if response.status_code != 200:
                 time.sleep(2)
             else:
                 return self._parse_findings_response(service_url, response)
