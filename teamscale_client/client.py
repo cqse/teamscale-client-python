@@ -572,10 +572,9 @@ class TeamscaleClient:
 
         while True:
             response = self.get(service_url)
-            # TODO response.text can be empty when we get 204 (find out how this happens!) and the json() call fails and
-            # throws an exception then. Find when we get 204 and how to deal with the exception.
-            # one quick fix is to replace the check blow with `response.text == ""`
-            if response.json() is None:
+            # We need to wait for 200 here to get the findings.
+            # The service returns 204 while the pre-commit analysis is still in progress.
+            if response.status_code != 200:
                 time.sleep(2)
             else:
                 return self._parse_findings_response(service_url, response)
