@@ -115,6 +115,29 @@ class TeamscaleClient:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
+    def post(self, url, json=None, parameters=None, data=None):
+        """Sends a PUT request to the given service url with the json payload as content.
+
+        Args:
+            url (str):  The URL for which to execute a PUT request
+            json: The Object to attach as content, will be serialized to json (only for object that can be serialized by default)
+            parameters (dict): parameters to attach to the url
+            data: The data object to be attached to the request
+
+        Returns:
+            requests.Response: request's response
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+        response = requests.post(url, params=parameters, json=json, data=data,
+                                headers=headers, auth=self.auth_header,
+                                verify=self.sslverify, timeout=self.timeout, proxies=self.proxies)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+        return response
+
     def delete(self, url, parameters=None):
         """Sends a DELETE request to the given service url.
 
@@ -762,8 +785,8 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        service_url = self.get_project_service_url("comment-task") + str(task_id)
-        response = self.put(service_url, data=to_json(comment))
+        service_url = self.get_new_project_service_url("tasks") + str(task_id) + "/comments"
+        response = self.post(service_url, data=to_json(comment))
         if response.status_code != 200:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
