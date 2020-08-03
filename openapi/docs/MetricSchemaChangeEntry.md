@@ -1,0 +1,12 @@
+# MetricSchemaChangeEntry
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**metric_id** | **str** |  | [optional] 
+**analysis_group** | **str** |  | [optional] 
+**metric_definition** | [**MetricDirectorySchemaEntry**](MetricDirectorySchemaEntry.md) |  | [optional] 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+
