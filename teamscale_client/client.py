@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import os
+
 import requests
 from requests.auth import HTTPBasicAuth
 import time
@@ -298,7 +300,7 @@ class TeamscaleClient:
         for filename in report_files:
             with open(filename, 'rb') as inputfile:
                 dataobj = io.BytesIO(inputfile.read())
-                multiple_files.append(('report', dataobj))
+                multiple_files.append(('report', (os.path.basename(filename), dataobj)))
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=multiple_files, timeout=self.timeout)
         if not response.ok:
