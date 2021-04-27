@@ -77,7 +77,7 @@ class TeamscaleClient:
         """Sends a GET request to the given service url.
 
         Args:
-            url (str):  The URL for which to execute a PUT request
+            url (str):  The URL for which to execute a GET request
             parameters (dict): parameters to attach to the url
 
         Returns:
