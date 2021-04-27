@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import requests
 from requests.auth import HTTPBasicAuth
 import time
+import io
 
 import simplejson as json
 
@@ -293,7 +294,11 @@ class TeamscaleClient:
             "adjusttimestamp": "true",
             "movetolastcommit": str(move_to_last_commit).lower()
         }
-        multiple_files = [('report', open(filename, 'rb')) for filename in report_files]
+        multiple_files = []
+        for filename in report_files:
+            with open(filename, 'rb') as inputfile:
+                dataobj = io.BytesIO(inputfile.read())
+                multiple_files.append(('report', dataobj))
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=multiple_files, timeout=self.timeout)
         if not response.ok:
