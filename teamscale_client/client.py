@@ -656,6 +656,7 @@ class TeamscaleClient:
                        start_line=self._get_finding_location_entry(finding_json, 'rawStartLine', 1),
                        end_line=self._get_finding_location_entry(finding_json, 'rawEndLine', 1),
                        uniform_path=finding_json['location']['uniformPath'],
+                       finding_properties=finding_json['properties'],
                        finding_id=finding_json['id'],
                        resolved='death' in finding_json)
 
@@ -678,7 +679,7 @@ class TeamscaleClient:
 
         return value
 
-    def get_findings(self, uniform_path, timestamp, recursive=True):
+    def get_findings(self, uniform_path, timestamp, recursive=True, blacklisted="excluded"):
         """Retrieves the list of findings in the currently active project for the given uniform path
         at the provided timestamp on the given branch.
 
@@ -687,6 +688,8 @@ class TeamscaleClient:
             timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
             recursive (bool): Whether to query findings recursively, i.e. also get findings for files under the given
                 path.
+            blacklisted (str): Whether to exclude or include blacklisted findings or focus on them entirely (set to
+                only_false_positives or only_tolerated for that)
 
         Returns:
             List[:class:`data.Finding`]): The list of findings.
@@ -698,7 +701,8 @@ class TeamscaleClient:
         parameters = {
             "t": self._get_timestamp_parameter(timestamp=timestamp),
             "recursive": recursive,
-            "all": True
+            "all": True,
+            "blacklisted": blacklisted
         }
         response = self.get(service_url, parameters=parameters)
         if response.status_code != 200:
