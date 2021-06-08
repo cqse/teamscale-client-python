@@ -1,0 +1,932 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>The TeamscaleClient &#8212; Python Teamscale Client 0.1 alpha documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Useful Constants" href="constants.html" />
+    <link rel="prev" title="Welcome to Python Teamscale Client’s documentation!" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="constants.html" title="Useful Constants"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Python Teamscale Client’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Python Teamscale Client 0.1 alpha documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-teamscale_client.client">
+<span id="the-teamscaleclient"></span><h1>The TeamscaleClient<a class="headerlink" href="#module-teamscale_client.client" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="teamscale_client.client.TeamscaleClient">
+<em class="property">class </em><code class="descclassname">teamscale_client.client.</code><code class="descname">TeamscaleClient</code><span class="sig-paren">(</span><em>url</em>, <em>username</em>, <em>access_token</em>, <em>project</em>, <em>sslverify=True</em>, <em>timeout=30.0</em>, <em>branch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic Python service client to access Teamscale’s REST Api.</p>
+<p>Request handling done with:
+<a class="reference external" href="http://docs.python-requests.org/en/latest/">http://docs.python-requests.org/en/latest/</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>url</strong> (<em>str</em>) – The url to Teamscale (including the port)</li>
+<li><strong>username</strong> (<em>str</em>) – The username to use for authentication</li>
+<li><strong>access_token</strong> (<em>str</em>) – The IDE access token to use for authentication</li>
+<li><strong>project</strong> (<em>str</em>) – The id of the project on which to work</li>
+<li><strong>sslverify</strong> – See requests’ verify parameter in <a class="reference external" href="http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification">http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification</a></li>
+<li><strong>timeout</strong> (<em>float</em>) – TTFB timeout in seconds, see <a class="reference external" href="http://docs.python-requests.org/en/master/user/quickstart/#timeouts">http://docs.python-requests.org/en/master/user/quickstart/#timeouts</a></li>
+<li><strong>branch</strong> (<em>str</em>) – The branch name for which to upload/retrieve data</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.add_baseline">
+<code class="descname">add_baseline</code><span class="sig-paren">(</span><em>baseline</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.add_baseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.add_baseline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a baseline to the currently active project. Re-adding an existing baseline will update the original baseline.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>baseline</strong> (<a class="reference internal" href="data.html#teamscale_client.data.Baseline" title="teamscale_client.data.Baseline"><em>data.Baseline</em></a>) – The baseline that is to be added (or updated)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">object generated by the upload request</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">requests.Response</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.add_finding_descriptions">
+<code class="descname">add_finding_descriptions</code><span class="sig-paren">(</span><em>descriptions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.add_finding_descriptions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.add_finding_descriptions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds descriptions of findings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>descriptions</strong> (<em>list</em>) – List of <code class="xref py py-class docutils literal notranslate"><span class="pre">FindingDescription</span></code> to add to Teamscale.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">request’s response</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">requests.Response</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.add_findings_group">
+<code class="descname">add_findings_group</code><span class="sig-paren">(</span><em>name</em>, <em>mapping_pattern</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.add_findings_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.add_findings_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds group of findings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>str</em>) – Name of group.</li>
+<li><strong>mapping_pattern</strong> (<em>str</em>) – Regular expression to match a finding’s <code class="docutils literal notranslate"><span class="pre">typeid</span></code> in order to belong to this group.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">request’s response</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">requests.Response</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.add_issue_metric">
+<code class="descname">add_issue_metric</code><span class="sig-paren">(</span><em>name</em>, <em>issue_query</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.add_issue_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.add_issue_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds group of findings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>str</em>) – Name of issue metric</li>
+<li><strong>issue_query</strong> (<em>str</em>) – The issue query to add</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">request’s response</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">requests.Response</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.add_metric_descriptions">
+<code class="descname">add_metric_descriptions</code><span class="sig-paren">(</span><em>metric_descriptions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.add_metric_descriptions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.add_metric_descriptions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads metric definitions to Teamscale.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>metric_descriptions</strong> (list[<code class="xref py py-class docutils literal notranslate"><span class="pre">MetricDescription</span></code>]) – List of metric descriptions to add to Teamscale.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">object generated by the request</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">requests.Response</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.add_task_comment">
+<code class="descname">add_task_comment</code><span class="sig-paren">(</span><em>task_id</em>, <em>comment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.add_task_comment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.add_task_comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a comment to a task.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>task_id</strong> (<em>number</em>) – the task id to which to add the comment</li>
+<li><strong>comment</strong> (<em>str</em>) – the comment to add</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">object generated by the request</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">requests.Response</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.check_api_version">
+<code class="descname">check_api_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.check_api_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.check_api_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies the server’s api version and connectivity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If the version does not match or the server cannot be found.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.create_dashboard">
+<code class="descname">create_dashboard</code><span class="sig-paren">(</span><em>dashboard_descriptor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.create_dashboard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.create_dashboard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new dashboard from the given template.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dashboard_descriptor</strong> (<em>str</em>) – The dashboard descriptor that should be uploaded</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">request’s response</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">requests.Response</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.create_project">
+<code class="descname">create_project</code><span class="sig-paren">(</span><em>project_configuration</em>, <em>skip_project_validation=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.create_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.create_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a project with the specified configuration in Teamscale. The parameter <cite>skip_project_validation</cite>
+specifies, whether to skip the validation of the project.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>project_configuration</strong> (<a class="reference internal" href="data.html#teamscale_client.data.ProjectConfiguration" title="teamscale_client.data.ProjectConfiguration"><em>data.ProjectConfiguration</em></a>) – The configuration for the project to be created.</li>
+<li><strong>skip_project_validation</strong> (<em>bool</em>) – Whether to skip validation of the project.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">object generated by the upload request.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">requests.Response</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><em>url</em>, <em>parameters=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a DELETE request to the given service url.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> (<em>str</em>) – The URL for which to execute a DELETE request</li>
+<li><strong>parameters</strong> (<em>dict</em>) – parameters to attach to the url</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">request’s response</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">requests.Response</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.delete_baseline">
+<code class="descname">delete_baseline</code><span class="sig-paren">(</span><em>baseline_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.delete_baseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.delete_baseline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a baseline from the currently active project.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>baseline_name</strong> (<em>string</em>) – The baseline that is to be removed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">object generated by the upload request</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">requests.Response</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="teamscale_client.client.TeamscaleClient.from_client_config">
+<em class="property">static </em><code class="descname">from_client_config</code><span class="sig-paren">(</span><em>config</em>, <em>sslverify=True</em>, <em>timeout=30.0</em>, <em>branch=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.from_client_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.from_client_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new Teamscale client from a <cite>TeamscaleClientConfig</cite> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>config</strong> (<em>teamscale_client_config.TeamscaleClientConfig</em>) – The client configuration to use.</li>
+<li><strong>sslverify</strong> – See requests’ verify parameter in <a class="reference external" href="http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification">http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification</a></li>
+<li><strong>timeout</strong> (<em>float</em>) – TTFB timeout in seconds, see <a class="reference external" href="http://docs.python-requests.org/en/master/user/quickstart/#timeouts">http://docs.python-requests.org/en/master/user/quickstart/#timeouts</a></li>
+<li><strong>branch</strong> (<em>str</em>) – The branch name for which to upload/retrieve data</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>url</em>, <em>parameters=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a GET request to the given service url.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> (<em>str</em>) – The URL for which to execute a GET request</li>
+<li><strong>parameters</strong> (<em>dict</em>) – parameters to attach to the url</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">request’s response</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">requests.Response</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.get_architectures">
+<code class="descname">get_architectures</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.get_architectures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.get_architectures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the paths of all architecture in the project.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List[str] The architecture names.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.get_baselines">
+<code class="descname">get_baselines</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.get_baselines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.get_baselines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a list of baselines from the server for the currently active project.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The list of baselines.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">List[<code class="xref py py-class docutils literal notranslate"><span class="pre">data.Baseline</span></code>])</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.get_finding_by_id">
+<code class="descname">get_finding_by_id</code><span class="sig-paren">(</span><em>finding_id</em>, <em>branch=None</em>, <em>timestamp=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.get_finding_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.get_finding_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the finding with the given id.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>finding_id</strong> (<em>str</em>) – The id of the finding to retrieve.</li>
+<li><strong>branch</strong> (<em>str</em>) – The branch from which the finding should be retrieved.</li>
+<li><strong>timestamp</strong> (<em>datetime.datetime</em>) – The timestamp (unix format) for which to receive the finding.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The retrieved finding.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="data.html#teamscale_client.data.Finding" title="teamscale_client.data.Finding">data.Finding</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.get_finding_url">
+<code class="descname">get_finding_url</code><span class="sig-paren">(</span><em>finding</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.get_finding_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.get_finding_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the full url pointing to the specified finding in Teamscale,
+or <cite>None</cite> if the finding does not have an id.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>finding</strong> (<a class="reference internal" href="data.html#teamscale_client.data.Finding" title="teamscale_client.data.Finding"><em>data.Finding</em></a>) – the finding for which the url should be generated</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The full url</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.get_findings">
+<code class="descname">get_findings</code><span class="sig-paren">(</span><em>uniform_path</em>, <em>timestamp</em>, <em>recursive=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.get_findings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.get_findings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the list of findings in the currently active project for the given uniform path
+at the provided timestamp on the given branch.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>uniform_path</strong> (<em>str</em>) – The uniform path to get findings for.</li>
+<li><strong>timestamp</strong> (<em>datetime.datetime</em>) – timestamp (unix format) for which to upload the data</li>
+<li><strong>recursive</strong> (<em>bool</em>) – Whether to query findings recursively, i.e. also get findings for files under the given
+path.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The list of findings.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">List[<code class="xref py py-class docutils literal notranslate"><span class="pre">data.Finding</span></code>])</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.get_global_service_url">
+<code class="descname">get_global_service_url</code><span class="sig-paren">(</span><em>service_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.get_global_service_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.get_global_service_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the full url pointing to a global service.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>service_name</strong> (<em>str</em>) – the name of the service for which the url should be generated</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The full url</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.get_precommit_analysis_results">
+<code class="descname">get_precommit_analysis_results</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.get_precommit_analysis_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.get_precommit_analysis_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets precommit analysis results.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">added findings, findings in changed code, and removed findings.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">A tuple consisting of three lists</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.get_project_configuration">
+<code class="descname">get_project_configuration</code><span class="sig-paren">(</span><em>project_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.get_project_configuration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.get_project_configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new dashboard from the given template.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>project_id</strong> (<em>str</em>) – The id for which the project configuration should be retrieved</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The project configuration as json</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.get_project_service_url">
+<code class="descname">get_project_service_url</code><span class="sig-paren">(</span><em>service_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.get_project_service_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.get_project_service_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the full url pointing to a project service.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>service_name</strong> (<em>str</em>) – the name of the service for which the url should be generated</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The full url</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.get_projects">
+<code class="descname">get_projects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.get_projects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.get_projects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a list of projects from the server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The list of projects.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">List[<code class="xref py py-class docutils literal notranslate"><span class="pre">data.ProjectInfo</span></code>])</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.get_tasks">
+<code class="descname">get_tasks</code><span class="sig-paren">(</span><em>status=u'OPEN'</em>, <em>details=True</em>, <em>start=0</em>, <em>max=300</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.get_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.get_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the tasks for the client’s project from the server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>status</strong> (<a class="reference internal" href="constants.html#teamscale_client.constants.TaskStatus" title="teamscale_client.constants.TaskStatus"><em>constants.TaskStatus</em></a>) – The status to retrieve tickets for</li>
+<li><strong>details</strong> (<em>bool</em>) – Whether to retrieve details together with the tasks</li>
+<li><strong>start</strong> (<em>number</em>) – From which task number to start listing tasks</li>
+<li><strong>max</strong> (<em>number</em>) – Maximum number of tasks to return</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The list of tasks.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">List[<code class="xref py py-class docutils literal notranslate"><span class="pre">data.Task</span></code>])</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.put">
+<code class="descname">put</code><span class="sig-paren">(</span><em>url</em>, <em>json=None</em>, <em>parameters=None</em>, <em>data=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a PUT request to the given service url with the json payload as content.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> (<em>str</em>) – The URL for which to execute a PUT request</li>
+<li><strong>json</strong> – The Object to attach as content, will be serialized to json (only for object that can be serialized by default)</li>
+<li><strong>parameters</strong> (<em>dict</em>) – parameters to attach to the url</li>
+<li><strong>data</strong> – The data object to be attached to the request</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">request’s response</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">requests.Response</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="teamscale_client.client.TeamscaleClient.read_json_from_file">
+<em class="property">classmethod </em><code class="descname">read_json_from_file</code><span class="sig-paren">(</span><em>file_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.read_json_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.read_json_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads JSON content from a file and parses it to ensure basic integrity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_path</strong> (<em>str</em>) – File from which to read the JSON content.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The parsed JSON data.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.set_project">
+<code class="descname">set_project</code><span class="sig-paren">(</span><em>project</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.set_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.set_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the project id for subsequent calls made using the client.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.update_findings_schema">
+<code class="descname">update_findings_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.update_findings_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.update_findings_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Triggers refresh of finding groups in analysis profiles.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.update_project">
+<code class="descname">update_project</code><span class="sig-paren">(</span><em>project_configuration</em>, <em>skip_project_validation=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.update_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.update_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates an existing project in Teamscale with the given configuration. The id of the existing project is
+taken from the configuration. The parameter <cite>skip_project_validation</cite> specifies, whether to skip the validation of the project.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>project_configuration</strong> (<a class="reference internal" href="data.html#teamscale_client.data.ProjectConfiguration" title="teamscale_client.data.ProjectConfiguration"><em>data.ProjectConfiguration</em></a>) – The configuration for the project to be updated.</li>
+<li><strong>skip_project_validation</strong> (<em>bool</em>) – Whether to skip validation of the project.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">object generated by the upload request.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">requests.Response</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.upload_architectures">
+<code class="descname">upload_architectures</code><span class="sig-paren">(</span><em>architectures</em>, <em>timestamp</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.upload_architectures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.upload_architectures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload architectures to Teamscale. It is expected that the given architectures can be be read from the filesystem.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>architectures</strong> (<em>dict</em>) – mappping of teamscale paths to architecture files that should be uploaded. Files must be readable.</li>
+<li><strong>timestamp</strong> (<em>datetime.datetime</em>) – timestamp for which to upload the data</li>
+<li><strong>message</strong> (<em>str</em>) – The message to use for the generated upload commit</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">object generated by the request</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">requests.Response</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.upload_coverage_data">
+<code class="descname">upload_coverage_data</code><span class="sig-paren">(</span><em>coverage_files</em>, <em>coverage_format</em>, <em>timestamp</em>, <em>message</em>, <em>partition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.upload_coverage_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.upload_coverage_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload coverage reports to Teamscale. It is expected that the given coverage report files can be read from the filesystem.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>coverage_files</strong> (<em>list</em>) – list of coverage filenames (strings!) that should be uploaded. Files must be readable.</li>
+<li><strong>coverage_format</strong> (<a class="reference internal" href="constants.html#teamscale_client.constants.CoverageFormats" title="teamscale_client.constants.CoverageFormats"><em>constants.CoverageFormats</em></a>) – the format to use</li>
+<li><strong>timestamp</strong> (<em>datetime.datetime</em>) – timestamp (unix format) for which to upload the data</li>
+<li><strong>message</strong> (<em>str</em>) – The message to use for the generated upload commit</li>
+<li><strong>partition</strong> (<em>str</em>) – The partition’s id into which the data should be added (See also: <a class="reference internal" href="faq.html#faq-partition"><span class="std std-ref">FAQ - Partitions</span></a>).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">object generated by the request</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">requests.Response</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.upload_files_for_precommit_analysis">
+<code class="descname">upload_files_for_precommit_analysis</code><span class="sig-paren">(</span><em>timestamp</em>, <em>precommit_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.upload_files_for_precommit_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.upload_files_for_precommit_analysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads the provided files for precommit analysis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>timestamp</strong> (<em>datetime.datetime</em>) – The timestamp of the parent commit.</li>
+<li><strong>precommit_data</strong> (<em>data.PreCommitUploadData</em>) – The precommit data to upload.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.upload_findings">
+<code class="descname">upload_findings</code><span class="sig-paren">(</span><em>findings</em>, <em>timestamp</em>, <em>message</em>, <em>partition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.upload_findings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.upload_findings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads a list of findings</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>findings</strong> (List[<code class="xref py py-class docutils literal notranslate"><span class="pre">data.FileFindings</span></code>]) – the findings data</li>
+<li><strong>timestamp</strong> (<em>datetime.datetime</em>) – timestamp for which to upload the findings</li>
+<li><strong>message</strong> (<em>str</em>) – The message to use for the generated upload commit</li>
+<li><strong>partition</strong> (<em>str</em>) – The partition’s id into which the findings should be added (See also: <a class="reference internal" href="faq.html#faq-partition"><span class="std std-ref">FAQ - Partitions</span></a>).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">object generated by the request</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">requests.Response</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.upload_metrics">
+<code class="descname">upload_metrics</code><span class="sig-paren">(</span><em>metrics</em>, <em>timestamp</em>, <em>message</em>, <em>partition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.upload_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.upload_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads a list of metrics</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>metrics</strong> (List[<code class="xref py py-class docutils literal notranslate"><span class="pre">data.MetricEntry</span></code>]) – metrics data</li>
+<li><strong>timestamp</strong> (<em>datetime.datetime</em>) – timestamp for which to upload the metrics</li>
+<li><strong>message</strong> (<em>str</em>) – The message to use for the generated upload commit</li>
+<li><strong>partition</strong> (<em>str</em>) – The partition’s id into which the metrics should be added (See also: <a class="reference internal" href="faq.html#faq-partition"><span class="std std-ref">FAQ - Partitions</span></a>).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">object generated by the upload request</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">requests.Response</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.upload_non_code_metrics">
+<code class="descname">upload_non_code_metrics</code><span class="sig-paren">(</span><em>metrics</em>, <em>timestamp</em>, <em>message</em>, <em>partition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.upload_non_code_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.upload_non_code_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads a list of non-code metrics</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>metrics</strong> (List[<code class="xref py py-class docutils literal notranslate"><span class="pre">data.NonCodeMetricEntry</span></code>]) – metrics data</li>
+<li><strong>timestamp</strong> (<em>datetime.datetime</em>) – timestamp for which to upload the metrics</li>
+<li><strong>message</strong> (<em>str</em>) – The message to use for the generated upload commit</li>
+<li><strong>partition</strong> (<em>str</em>) – The partition’s id into which the metrics should be added (See also: <a class="reference internal" href="faq.html#faq-partition"><span class="std std-ref">FAQ - Partitions</span></a>).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">object generated by the upload request</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">requests.Response</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="teamscale_client.client.TeamscaleClient.upload_report">
+<code class="descname">upload_report</code><span class="sig-paren">(</span><em>report_files</em>, <em>report_format</em>, <em>timestamp</em>, <em>message</em>, <em>partition</em>, <em>move_to_last_commit=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/client.html#TeamscaleClient.upload_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.client.TeamscaleClient.upload_report" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Upload reports from external tools to Teamscale. It is expected that the given report files can be read from</dt>
+<dd>the filesystem.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>report_files</strong> (<em>list</em>) – list of filenames (strings!) that should be uploaded. Files must be readable.</li>
+<li><strong>report_format</strong> (<a class="reference internal" href="constants.html#teamscale_client.constants.ReportFormats" title="teamscale_client.constants.ReportFormats"><em>constants.ReportFormats</em></a>) – the format to use</li>
+<li><strong>timestamp</strong> (<em>datetime.datetime</em>) – timestamp (unix format) for which to upload the data</li>
+<li><strong>message</strong> (<em>str</em>) – The message to use for the generated upload commit</li>
+<li><strong>partition</strong> (<em>str</em>) – The partition’s id into which the data should be added
+(See also: <a class="reference internal" href="faq.html#faq-partition"><span class="std std-ref">FAQ - Partitions</span></a>).</li>
+<li><strong>move_to_last_commit</strong> (<em>bool</em>) – True to automatically adjust this commit to be the latest otherwise False.
+Default is True</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">object generated by the request</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">requests.Response</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ServiceError</span></code> – If anything goes wrong</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Python Teamscale Client’s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="constants.html"
+                        title="next chapter">Useful Constants</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/teamscale_client.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="constants.html" title="Useful Constants"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Python Teamscale Client’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Python Teamscale Client 0.1 alpha documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, CQSE GmbH.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

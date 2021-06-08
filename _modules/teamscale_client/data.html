@@ -1,0 +1,657 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>teamscale_client.data &#8212; Python Teamscale Client 0.1 alpha documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Python Teamscale Client 0.1 alpha documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for teamscale_client.data</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">teamscale_client.constants</span> <span class="kn">import</span> <span class="n">Assessment</span><span class="p">,</span> <span class="n">MetricAggregation</span><span class="p">,</span> <span class="n">MetricValueType</span><span class="p">,</span> <span class="n">MetricProperties</span><span class="p">,</span> \
+    <span class="n">ConnectorType</span>
+<span class="kn">from</span> <span class="nn">teamscale_client.utils</span> <span class="kn">import</span> <span class="n">auto_str</span>
+
+
+<div class="viewcode-block" id="Finding"><a class="viewcode-back" href="../../data.html#teamscale_client.data.Finding">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">Finding</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Representation of a finding in Teamscale.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        finding_type_id (str): The type id that this finding belongs to.</span>
+<span class="sd">        message (str): The main finding message</span>
+<span class="sd">        assesssment (constants.Assessment): The assessment this finding should have. Default is `YELLOW`.</span>
+<span class="sd">                                            This value is only important if in Teamscale the finding enablement</span>
+<span class="sd">                                            is set to auto, otherwise the setting from Teamscale will be used.</span>
+<span class="sd">        start_offset (int): Offset from the beginning of the file, where the finding area starts</span>
+<span class="sd">                            (zero-based, inclusive). Can be left blank, if the start/endline are given. It has to point to the beginning of a token (e.g., a keyword).</span>
+<span class="sd">                            (See also: :ref:`FAQ - Offsets &lt;faq-offsets&gt;`).</span>
+<span class="sd">        end_offset (int): Offset from the beginning of the file, where the finding area ends (zero-based, inclusive).</span>
+<span class="sd">                          Can be left blank, if the start/endline are given. It has to point to the end of a token (e.g., a keyword). (See also:</span>
+<span class="sd">                          :ref:`FAQ - Offsets &lt;faq-offsets&gt;`).</span>
+<span class="sd">        start_line (int): The finding&#39;s first line (one-based, inclusive). Can be left blank, if the offsets are given.</span>
+<span class="sd">        end_line (int): The finding&#39;s last line (one-based, inclusive). Can be left blank, if the offsets or start_line</span>
+<span class="sd">                        are given.</span>
+<span class="sd">        identifier (Optional[str]): Advanced usage! Path to special elements in Teamscale, e.g. Simulink model parts.</span>
+<span class="sd">                                    If this is given, offsets and lines do not need to be filled.</span>
+<span class="sd">        uniform_path (Optional[str]): The path of the file where the finding is located.</span>
+<span class="sd">        properties (Optional[dict]): A map of String-&gt;Object properties associated with this finding.</span>
+<span class="sd">        finding_id (str): The Teamscale internal id of this finding. Can be left empty for findings that do not yet have</span>
+<span class="sd">                          an id.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">finding_type_id</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">assessment</span><span class="o">=</span><span class="n">Assessment</span><span class="o">.</span><span class="n">YELLOW</span><span class="p">,</span> <span class="n">start_offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">end_offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_line</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_line</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">uniform_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">finding_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">finding_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">findingTypeId</span> <span class="o">=</span> <span class="n">finding_type_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assessment</span> <span class="o">=</span> <span class="n">assessment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startOffset</span> <span class="o">=</span> <span class="n">start_offset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endOffset</span> <span class="o">=</span> <span class="n">end_offset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startLine</span> <span class="o">=</span> <span class="n">start_line</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endLine</span> <span class="o">=</span> <span class="n">end_line</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniformPath</span> <span class="o">=</span> <span class="n">uniform_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">findingProperties</span> <span class="o">=</span> <span class="n">finding_properties</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finding_id</span> <span class="o">=</span> <span class="n">finding_id</span>
+
+    <span class="k">def</span> <span class="nf">__cmp__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compares this finding to another finding.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniformPath</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">uniformPath</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">startLine</span><span class="o">.</span><span class="n">__cmp__</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">startLine</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniformPath</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">uniformPath</span><span class="p">:</span>
+                <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if this finding is equal to the given finding.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">finding_id</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">finding_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">finding_id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">finding_id</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">uniformPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">startLine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">assessment</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endLine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endOffset</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">findingTypeId</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">startOffset</span><span class="p">)</span> <span class="o">==</span>
+                <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">uniformPath</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">startLine</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">assessment</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">endLine</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">endOffset</span><span class="p">,</span>
+                 <span class="n">other</span><span class="o">.</span><span class="n">findingTypeId</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">startOffset</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if this finding is not equal to the given finding.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if this finding is less than the given finding.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uniformPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">startLine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endLine</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">uniformPath</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">startLine</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">endLine</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if this finding is greater than the given finding.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uniformPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">startLine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endLine</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">uniformPath</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">startLine</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">endLine</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if this finding is less than or equal the given finding.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">other</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">uniformPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">startLine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endLine</span><span class="p">)</span> <span class="o">&lt;</span>
+                                   <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">uniformPath</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">startLine</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">endLine</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if this finding is greater than or equal the given finding.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">other</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">uniformPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">startLine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endLine</span><span class="p">)</span> <span class="o">&gt;</span>
+                                   <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">uniformPath</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">startLine</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">endLine</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="FileFindings"><a class="viewcode-back" href="../../data.html#teamscale_client.data.FileFindings">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">FileFindings</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Representation of a file and its findings.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        findings (List[:class:`Finding`]): A list containing all findings that are present in this file. </span>
+<span class="sd">        path (str): The path to the file in Teamscale.</span>
+<span class="sd">        content (Optional[str]): The content of the file (can be left empty).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">findings</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">findings</span> <span class="o">=</span> <span class="n">findings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">content</span></div>
+
+
+<div class="viewcode-block" id="FindingDescription"><a class="viewcode-back" href="../../data.html#teamscale_client.data.FindingDescription">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">FindingDescription</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Description of a finding type to be added at configuration time.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            typeid (str): The id used to reference the finding type.</span>
+<span class="sd">            name (str): Some UI friendly name for this description.</span>
+<span class="sd">            description (str): The text to display that explains what this finding type is about (and ideally how to fix it). This text will be the same for each concrete instance of the finding.</span>
+<span class="sd">            enablement (constants.Enablement): Describes the default enablement setting for this finding type, used when it is added to the analysis profile.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typeid</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">enablement</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">typeid</span> <span class="o">=</span> <span class="n">typeid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enablement</span> <span class="o">=</span> <span class="n">enablement</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="MetricDescription"><a class="viewcode-back" href="../../data.html#teamscale_client.data.MetricDescription">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">MetricDescription</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Description of a metric type to be addded at configuration time.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        metric_id (str): The globally unique metric id.</span>
+<span class="sd">        display_name (str): The metric&#39;s name that is displayed in the UI.</span>
+<span class="sd">        description (str): A description explaining what this metric means.</span>
+<span class="sd">        group_id (str): the name of an analysis group under which the metric is placed (used to group the metrics in the</span>
+<span class="sd">                        analysis profile).</span>
+<span class="sd">        aggregation (constants.MetricAggregation): How this metric is supposed to be aggregated up the directory</span>
+<span class="sd">                                                   hierarchy. Defaults to ``SUM``.</span>
+<span class="sd">        value_type (constants.MetricValueType): Determines the metric&#39;s type. Defaults to ``NUMERIC``.</span>
+<span class="sd">        properties (set[constants.MetricProperties]): Determines the metric&#39;s properties. This has effects on how/if the</span>
+<span class="sd">                                                      metric is displayed and assessed. Defaults to ``(SIZE_METRIC, )``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric_id</span><span class="p">,</span> <span class="n">display_name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">group_id</span><span class="p">,</span> <span class="n">aggregation</span><span class="o">=</span><span class="n">MetricAggregation</span><span class="o">.</span><span class="n">SUM</span><span class="p">,</span>
+                 <span class="n">value_type</span><span class="o">=</span><span class="n">MetricValueType</span><span class="o">.</span><span class="n">NUMERIC</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">(</span><span class="n">MetricProperties</span><span class="o">.</span><span class="n">SIZE_METRIC</span><span class="p">,)):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metricId</span> <span class="o">=</span> <span class="n">metric_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysisGroup</span> <span class="o">=</span> <span class="n">group_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metricDefinition</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">display_name</span><span class="p">,</span>
+            <span class="s2">&quot;aggregation&quot;</span><span class="p">:</span> <span class="n">aggregation</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">description</span><span class="p">,</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="n">properties</span><span class="p">,</span>
+            <span class="s2">&quot;valueType&quot;</span><span class="p">:</span> <span class="n">value_type</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="MetricEntry"><a class="viewcode-back" href="../../data.html#teamscale_client.data.MetricEntry">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">MetricEntry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A container for adding metric values to a file.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): Path to a resource in Teamscale (usually a file). </span>
+<span class="sd">                    This can also point to architecture components using the following syntax:</span>
+<span class="sd">                    ``-architectures-/&lt;architecture-name&gt;/path/to/component/``</span>
+<span class="sd">        metrics (dict[str, object]): A dictionary mapping from metric_id to metric value. The value depends on</span>
+<span class="sd">                                     the metric type: Numeric: ``double``, Timestamp: ``int - unix timestamp</span>
+<span class="sd">                                     in milliseconds``, Assessment: ``[&lt;GREENVALUE&gt;,&lt;YELLOWVALUE&gt;,&lt;REDVALUE&gt;]``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span></div>
+
+
+<div class="viewcode-block" id="NonCodeMetricEntry"><a class="viewcode-back" href="../../data.html#teamscale_client.data.NonCodeMetricEntry">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">NonCodeMetricEntry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A container for adding non-code metrics to a project.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): Arbitrary path to which the non-code metrics shall be attached.</span>
+<span class="sd">        content (str): The content displayed as content for the path.</span>
+<span class="sd">        count (int): The count value.</span>
+<span class="sd">        assessment (dict[:class:`constants.AssessmentMetricColors`, int]): The assessment distribution for this path.</span>
+<span class="sd">        time (double): The time used to create this result (e.g. unit test run time, or build duration).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">assessment</span><span class="o">=</span><span class="p">{},</span> <span class="n">time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">content</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="n">count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assessment</span> <span class="o">=</span> <span class="n">assessment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span></div>
+
+
+<div class="viewcode-block" id="Baseline"><a class="viewcode-back" href="../../data.html#teamscale_client.data.Baseline">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">Baseline</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a Teamscale baseline. Either the date or the timestamp must be given</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The baseline&#39;s name</span>
+<span class="sd">        description (str): The baseline&#39;s description</span>
+<span class="sd">        date (Optional[datetime.datetime]): The date for which the baseline is set</span>
+<span class="sd">        date (Optional[long]): The timestamp (in ms) for which the baseline is set</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">timestamp</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Either date or timestamp must be given.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">timestamp</span>
+        <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_date</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Baseline</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hash</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_timestamp</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_set_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date_object</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">sys</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>
+            <span class="n">long_type</span> <span class="o">=</span> <span class="nb">int</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">long_type</span> <span class="o">=</span> <span class="n">long</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">long_type</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">mktime</span><span class="p">(</span><span class="n">date_object</span><span class="o">.</span><span class="n">timetuple</span><span class="p">())</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+
+    <span class="n">date</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_get_date</span><span class="p">,</span> <span class="n">_set_date</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ServiceError"><a class="viewcode-back" href="../../data.html#teamscale_client.data.ServiceError">[docs]</a><span class="k">class</span> <span class="nc">ServiceError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Teamscale service returned an error.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ProjectInfo"><a class="viewcode-back" href="../../data.html#teamscale_client.data.ProjectInfo">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">ProjectInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents information about a Teamscale project. When querying information about a project in Teamscale,</span>
+<span class="sd">    the result is an instance of this class.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        project_id (str): The project&#39;s id</span>
+<span class="sd">        name (str): The project&#39;s name</span>
+<span class="sd">        description (Optional[str]): The project&#39;s description</span>
+<span class="sd">        creation_timestamp (Optional[long]): The project&#39;s creation timestamp (in ms)</span>
+<span class="sd">        deleting (Optional[bool]): Whether the project is currently being deleted</span>
+<span class="sd">        reanalyzing (Optional[bool]): Whether the project is currently being reanalyzed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">creation_timestamp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">deleting</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">reanalyzing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">project_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">creationTimestamp</span> <span class="o">=</span> <span class="n">creation_timestamp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alias</span> <span class="o">=</span> <span class="n">alias</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deleting</span> <span class="o">=</span> <span class="n">deleting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reanalyzing</span> <span class="o">=</span> <span class="n">reanalyzing</span></div>
+
+
+<div class="viewcode-block" id="ProjectConfiguration"><a class="viewcode-back" href="../../data.html#teamscale_client.data.ProjectConfiguration">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">ProjectConfiguration</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a Teamscale project configuration. This is used to create new and update existing projects in</span>
+<span class="sd">    Teamscale.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The project&#39;s name</span>
+<span class="sd">        project_id (str): The project&#39;s id</span>
+<span class="sd">        profile (str): The name of the profile used to analyse the project</span>
+<span class="sd">        connectors (List[:class:`ConnectorConfiguration`]): List of all connectors used in the project configuration</span>
+<span class="sd">        alias (Optional[str]): The project&#39;s alias</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">project_id</span><span class="p">,</span> <span class="n">profile</span><span class="p">,</span> <span class="n">connectors</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">project_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profile</span> <span class="o">=</span> <span class="n">profile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectors</span> <span class="o">=</span> <span class="n">connectors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alias</span> <span class="o">=</span> <span class="n">alias</span></div>
+
+
+<div class="viewcode-block" id="ConnectorConfiguration"><a class="viewcode-back" href="../../data.html#teamscale_client.data.ConnectorConfiguration">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">ConnectorConfiguration</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a Teamscale connector configuration. Connectors allow to attach external tools such as source code</span>
+<span class="sd">    repositories.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        connector_type (constants.ConnectorType): The connector type of this configuration</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector_type</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">connector_type</span></div>
+
+
+<div class="viewcode-block" id="SourceCodeConnectorConfiguration"><a class="viewcode-back" href="../../data.html#teamscale_client.data.SourceCodeConnectorConfiguration">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">SourceCodeConnectorConfiguration</span><span class="p">(</span><span class="n">ConnectorConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a Teamscale source code connector configuration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        connector_type (constants.ConnectorType): The connector type of this configuration.</span>
+<span class="sd">        included_file_names (str): Ant patterns describing the files to be read from the repository.</span>
+<span class="sd">        excluded_file_names (Optional[str]): Ant patterns describing the files to be excluded from the repository.</span>
+<span class="sd">        repository_identifier (Optional[str]): A unique identifier used to reference the repository. This is also shown</span>
+<span class="sd">                                               in the UI and should have a meaningful value. Defaults to &#39;repository1&#39;.</span>
+<span class="sd">        enable_branch_analysis (Optional[bool]): Whether not only the main line but also branches should be analyzed.</span>
+<span class="sd">                                                 Defaults to `False`.</span>
+<span class="sd">        included_branches (Optional[str]): Regex patterns describing the branches to be read from the repository.</span>
+<span class="sd">                                           All branches are included by default.</span>
+<span class="sd">        excluded_branches (Optional[str]): Regex patterns describing the branches to be excluded from the repository.</span>
+<span class="sd">                                           Defaults to `_anon.*`.</span>
+<span class="sd">        start_revision (Optional[str]): The first date or revision to be read. If left empty, the entire history</span>
+<span class="sd">                                        will be read.</span>
+<span class="sd">        content_exclude (Optional[str]): A comma-separated list of filters that removes the complete content of a file</span>
+<span class="sd">                                         (i.e. treating it as an empty file) based on a regular expression matched</span>
+<span class="sd">                                         against the file&#39;s content.</span>
+<span class="sd">        polling_interval (Optional[int]): Delay used for polling the repository in seconds (default is 60 seconds).</span>
+<span class="sd">        prepend_repository_identifier (Optional[bool]): Whether to include the repository identifier as a prefix</span>
+<span class="sd">                                                        for the created file paths. Defaults to `False`.</span>
+<span class="sd">        end_revision (Optional[str]): The last date or revision to be read. If left empty, the history up to</span>
+<span class="sd">                                      the latest revision is read.</span>
+<span class="sd">        text_filter (Optional[str]): A comma-separated list of regular expressions describing what parts of a file</span>
+<span class="sd">                                     should be excluded from analysis, e.g. generated code.</span>
+<span class="sd">        source_library_connector (Optional[bool]): If this is true, the contained files will only be used</span>
+<span class="sd">                                                   for source library lookup, but not for analysis. Defaults to `False`.</span>
+<span class="sd">        run_to_exhaustion (Optional[bool]): If this is true, the repository will not be polled after</span>
+<span class="sd">                                            the current head is reached. Defaults to `False`.</span>
+<span class="sd">        delta_size (Optional[int]): Adjusts the size of deltas produced by the connector (experts only, default is 500).</span>
+<span class="sd">        path_prefix_transformation (Optional[str]): Prefix transformations that are applied to the paths</span>
+<span class="sd">                                                    from the repository. Empty by default.</span>
+<span class="sd">        path_transformation (Optional[str]): Regex transformations that are applied to the paths</span>
+<span class="sd">                                             from the repository. Empty by default.</span>
+<span class="sd">        encoding (Optional[str]): This can be used to set the encoding used (e.g. UTF-8, latin1) when reading files.</span>
+<span class="sd">                                  Empty by default.</span>
+<span class="sd">        author_transformation (Optional[str]): Regex transformations that are applied to the authors of the repository.</span>
+<span class="sd">                                               Empty by default.</span>
+<span class="sd">        branch_transformation (Optional[str]): Regex transformations that are applied to the branch names</span>
+<span class="sd">                                               of the repository. Empty by default.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector_type</span><span class="p">,</span> <span class="n">included_file_names</span><span class="p">,</span> <span class="n">excluded_file_names</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">repository_identifier</span><span class="o">=</span><span class="s2">&quot;repository1&quot;</span><span class="p">,</span>
+                 <span class="n">enable_branch_analysis</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">included_branches</span><span class="o">=</span><span class="s2">&quot;.*&quot;</span><span class="p">,</span> <span class="n">excluded_branches</span><span class="o">=</span><span class="s2">&quot;_anon.*&quot;</span><span class="p">,</span> <span class="n">start_revision</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                 <span class="n">content_exclude</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">polling_interval</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">prepend_repository_identifier</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">end_revision</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                 <span class="n">text_filter</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">source_library_connector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">run_to_exhaustion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">delta_size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+                 <span class="n">path_prefix_transformation</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">path_transformation</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">author_transformation</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                 <span class="n">branch_transformation</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">preserve_empty_commits</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SourceCodeConnectorConfiguration</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">connector_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Included file names&quot;</span><span class="p">:</span> <span class="n">included_file_names</span><span class="p">,</span>
+            <span class="s2">&quot;Excluded file names&quot;</span><span class="p">:</span> <span class="n">excluded_file_names</span><span class="p">,</span>
+            <span class="s2">&quot;Repository identifier&quot;</span><span class="p">:</span> <span class="n">repository_identifier</span><span class="p">,</span>
+            <span class="s2">&quot;Enable branch analysis&quot;</span><span class="p">:</span> <span class="n">enable_branch_analysis</span><span class="p">,</span>
+            <span class="s2">&quot;Included branches&quot;</span><span class="p">:</span> <span class="n">included_branches</span><span class="p">,</span>
+            <span class="s2">&quot;Excluded branches&quot;</span><span class="p">:</span> <span class="n">excluded_branches</span><span class="p">,</span>
+            <span class="s2">&quot;Start revision&quot;</span><span class="p">:</span> <span class="n">start_revision</span><span class="p">,</span>
+            <span class="s2">&quot;Content exclude&quot;</span><span class="p">:</span> <span class="n">content_exclude</span><span class="p">,</span>
+            <span class="s2">&quot;Polling interval&quot;</span><span class="p">:</span> <span class="n">polling_interval</span><span class="p">,</span>
+            <span class="s2">&quot;Prepend repository identifier&quot;</span><span class="p">:</span> <span class="n">prepend_repository_identifier</span><span class="p">,</span>
+            <span class="s2">&quot;End revision&quot;</span><span class="p">:</span> <span class="n">end_revision</span><span class="p">,</span>
+            <span class="s2">&quot;Text filter&quot;</span><span class="p">:</span> <span class="n">text_filter</span><span class="p">,</span>
+            <span class="s2">&quot;Source library connector&quot;</span><span class="p">:</span> <span class="n">source_library_connector</span><span class="p">,</span>
+            <span class="s2">&quot;Run to exhaustion&quot;</span><span class="p">:</span> <span class="n">run_to_exhaustion</span><span class="p">,</span>
+            <span class="s2">&quot;Delta size&quot;</span><span class="p">:</span> <span class="n">delta_size</span><span class="p">,</span>
+            <span class="s2">&quot;Path prefix transformation&quot;</span><span class="p">:</span> <span class="n">path_prefix_transformation</span><span class="p">,</span>
+            <span class="s2">&quot;Path transformation&quot;</span><span class="p">:</span> <span class="n">path_transformation</span><span class="p">,</span>
+            <span class="s2">&quot;Encoding&quot;</span><span class="p">:</span> <span class="n">encoding</span><span class="p">,</span>
+            <span class="s2">&quot;Author transformation&quot;</span><span class="p">:</span> <span class="n">author_transformation</span><span class="p">,</span>
+            <span class="s2">&quot;Branch transformation&quot;</span><span class="p">:</span> <span class="n">branch_transformation</span><span class="p">,</span>
+            <span class="s2">&quot;Preserve empty commits&quot;</span><span class="p">:</span> <span class="n">preserve_empty_commits</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="FileSystemSourceCodeConnectorConfiguration"><a class="viewcode-back" href="../../data.html#teamscale_client.data.FileSystemSourceCodeConnectorConfiguration">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">FileSystemSourceCodeConnectorConfiguration</span><span class="p">(</span><span class="n">SourceCodeConnectorConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a Teamscale file system connector configuration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_directory (str): Path to the directory that should be analyzed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_directory</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FileSystemSourceCodeConnectorConfiguration</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">connector_type</span><span class="o">=</span><span class="n">ConnectorType</span><span class="o">.</span><span class="n">FILE_SYSTEM</span><span class="p">,</span>
+                                                                         <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Input directory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_directory</span></div>
+
+
+<div class="viewcode-block" id="MultiVersionFileSystemSourceCodeConnectorConfiguration"><a class="viewcode-back" href="../../data.html#teamscale_client.data.MultiVersionFileSystemSourceCodeConnectorConfiguration">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">MultiVersionFileSystemSourceCodeConnectorConfiguration</span><span class="p">(</span><span class="n">SourceCodeConnectorConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a Teamscale multiversion file system connector configuration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_directory (str): Path to the directory that should be analyzed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_directory</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MultiVersionFileSystemSourceCodeConnectorConfiguration</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">connector_type</span><span class="o">=</span><span class="n">ConnectorType</span><span class="o">.</span><span class="n">MULTI_VERSION_FILE_SYSTEM</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Input directory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_directory</span></div>
+
+
+<div class="viewcode-block" id="GitSourceCodeConnectorConfiguration"><a class="viewcode-back" href="../../data.html#teamscale_client.data.GitSourceCodeConnectorConfiguration">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">GitSourceCodeConnectorConfiguration</span><span class="p">(</span><span class="n">SourceCodeConnectorConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a Teamscale Git connector configuration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        default_branch_name (str): Name of the branch that should be analyzed. If not provided, the master branch will be used.</span>
+<span class="sd">                           If `enable_branch_analysis` is set to `True`, this becomes the default branch.</span>
+<span class="sd">        account (str): Name of the Teamscale account to use to connect to the repository.</span>
+<span class="sd">        path_suffix (Optional[str]): The suffix to append to the base URL of the repository. Empty by default.</span>
+<span class="sd">        include_submodules (Optional[bool]): Whether to transparently analyze submodules. Defaults to `False`.</span>
+<span class="sd">        submodule_recursion_depth (Optional[int]): The maximum recursion depth when analyzing submodules.</span>
+<span class="sd">                                                   Defaults to `10`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_branch_name</span><span class="p">,</span> <span class="n">account</span><span class="p">,</span> <span class="n">path_suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">include_submodules</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">submodule_recursion_depth</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">connector_type</span><span class="o">=</span><span class="n">ConnectorType</span><span class="o">.</span><span class="n">GIT</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GitSourceCodeConnectorConfiguration</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">connector_type</span><span class="o">=</span><span class="n">connector_type</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Default branch name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_branch_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Account&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">account</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Path suffix&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_suffix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Include Submodules&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">include_submodules</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Submodule recursion depth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">submodule_recursion_depth</span></div>
+
+
+<div class="viewcode-block" id="GerritSourceCodeConnectorConfiguration"><a class="viewcode-back" href="../../data.html#teamscale_client.data.GerritSourceCodeConnectorConfiguration">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">GerritSourceCodeConnectorConfiguration</span><span class="p">(</span><span class="n">GitSourceCodeConnectorConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a Teamscale Gerrit connector configuration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        project_name (str): Used to reference the project.</span>
+<span class="sd">        enable_voting (str): Enables Teamscale voting on Gerrit reviews.</span>
+<span class="sd">        enable_detailed_line_comments (str): When enabled, a Teamscale vote will carry a detailed comment for each</span>
+<span class="sd">                                             generated finding that is annotated to the relevant line in the reviewed</span>
+<span class="sd">                                             file.</span>
+<span class="sd">        ignore_yellow_findings_for_votes (str): When enabled, Teamscale will only consider red findings when voting.</span>
+<span class="sd">        ignore_yellow_findings_for_comments (str): When enabled, Teamscale will only consider red findings when</span>
+<span class="sd">                                                   commenting.</span>
+<span class="sd">        number_of_ref_batches_for_updates (str): Defines the number of seperate parts the refs are fetched from Gerrit.</span>
+<span class="sd">                                                 Can be between 1-100, but 100 must be cleanly dividable by the given</span>
+<span class="sd">                                                 number. DO NOT CHANGE THIS, unless you know exactly what you are doing.</span>
+<span class="sd">        review_label (str): The review label used to upload feedback to Gerrit.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">enable_voting</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">enable_detailed_line_comments</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">ignore_yellow_findings_for_votes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ignore_yellow_findings_for_comments</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">number_of_ref_batches_for_updates</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">review_label</span><span class="o">=</span><span class="s2">&quot;Code-Review&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GerritSourceCodeConnectorConfiguration</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">connector_type</span><span class="o">=</span><span class="n">ConnectorType</span><span class="o">.</span><span class="n">GERRIT</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                                                                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Project Name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">project_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Enable Voting&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">enable_voting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Enable Detailed Line Comments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">enable_detailed_line_comments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Ignore Yellow Findings For Votes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignore_yellow_findings_for_votes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Ignore Yellow Findings For Comments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignore_yellow_findings_for_comments</span>
+        <span class="c1"># self.options[&quot;Number of Ref Batches For Updates&quot;] = number_of_ref_batches_for_updates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Review Label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">review_label</span></div>
+
+
+<div class="viewcode-block" id="TFSSourceCodeConnectorConfiguration"><a class="viewcode-back" href="../../data.html#teamscale_client.data.TFSSourceCodeConnectorConfiguration">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">TFSSourceCodeConnectorConfiguration</span><span class="p">(</span><span class="n">SourceCodeConnectorConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a Teamscale TFS connector configuration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        account (str): Name of the Teamscale account to use to connect to the repository.</span>
+<span class="sd">        branch_path_suffix (Optional[str]): The suffix to append to the branch name. Empty by default.</span>
+<span class="sd">        path_suffix (Optional[str]): The suffix to append to the base URL of the repository. Empty by default.</span>
+<span class="sd">        branch_lookup_paths (Optional[str]): Sub paths in which to look for branches. Empty by default.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">account</span><span class="p">,</span> <span class="n">branch_path_suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">path_suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">branch_lookup_paths</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TFSSourceCodeConnectorConfiguration</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">connector_type</span><span class="o">=</span><span class="n">ConnectorType</span><span class="o">.</span><span class="n">TFS</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Account&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">account</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Branch path suffix&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">branch_path_suffix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Path suffix&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_suffix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Branch lookup paths&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">branch_lookup_paths</span></div>
+
+
+<div class="viewcode-block" id="SubversionSourceCodeConnectorConfiguration"><a class="viewcode-back" href="../../data.html#teamscale_client.data.SubversionSourceCodeConnectorConfiguration">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">SubversionSourceCodeConnectorConfiguration</span><span class="p">(</span><span class="n">SourceCodeConnectorConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a Teamscale Subversion connector configuration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        account (str): Name of the Teamscale account to use to connect to the repository.</span>
+<span class="sd">        enable_externals (Optional[bool]): Whether to also parse and interpret svn:externals properties.</span>
+<span class="sd">                                           Defaults to `False`.</span>
+<span class="sd">        externals_includes (Optional[str]): Ant patterns describing the directories that are checked for svn:externals.</span>
+<span class="sd">                                            Empty by default.</span>
+<span class="sd">        externals_excludes (Optional[str]): Ant patterns describing the directories that are not checked for</span>
+<span class="sd">                                            svn:externals. Empty by default.</span>
+<span class="sd">        path_suffix (Optional[str]): Path suffix that is to be appended to the repository&#39;s base path. Empty by default.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">account</span><span class="p">,</span> <span class="n">enable_externals</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">externals_includes</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">externals_excludes</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">path_suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SubversionSourceCodeConnectorConfiguration</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">connector_type</span><span class="o">=</span><span class="n">ConnectorType</span><span class="o">.</span><span class="n">SVN</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                                                                         <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Account&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">account</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Enable Externals&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">enable_externals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Path suffix&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_suffix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Externals Includes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">externals_includes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;Externals Excludes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">externals_excludes</span></div>
+
+
+<div class="viewcode-block" id="Task"><a class="viewcode-back" href="../../data.html#teamscale_client.data.Task">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">Task</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a task in Teamscale</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        id (int): The task&#39;s id</span>
+<span class="sd">        subject (str): The task&#39;s subject</span>
+<span class="sd">        author (str): The task author&#39;s name</span>
+<span class="sd">        description (str): The task&#39;s description</span>
+<span class="sd">        assignee (str): The assigned user&#39;s name</span>
+<span class="sd">        status (constants.TaskStatus): The task&#39;s status</span>
+<span class="sd">        resolution (Optional[constants.TaskResolution]): The task&#39;s resolution</span>
+<span class="sd">        findings (Optional[List[str]]): The findings attached to this task</span>
+<span class="sd">        comments (Optional[List[Comment]]): Comments attached to this task</span>
+<span class="sd">        tags (List[str]): Tags that have been added to this task</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># noinspection PyPep8Naming</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">author</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">assignee</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">findings</span><span class="p">,</span> <span class="n">comments</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span>
+                 <span class="n">created</span><span class="p">,</span> <span class="n">updated</span><span class="p">,</span> <span class="n">updatedBy</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subject</span> <span class="o">=</span> <span class="n">subject</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="n">author</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignee</span> <span class="o">=</span> <span class="n">assignee</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">findings</span> <span class="o">=</span> <span class="n">findings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comments</span> <span class="o">=</span> <span class="n">comments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="n">tags</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">created</span> <span class="o">=</span> <span class="n">created</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="n">updated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updatedBy</span> <span class="o">=</span> <span class="n">updatedBy</span>
+
+<div class="viewcode-block" id="Task.from_json"><a class="viewcode-back" href="../../data.html#teamscale_client.data.Task.from_json">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">json</span><span class="p">):</span>
+        <span class="n">comments</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">json</span><span class="p">[</span><span class="s1">&#39;comments&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">comment_json</span> <span class="ow">in</span> <span class="n">json</span><span class="p">[</span><span class="s1">&#39;comments&#39;</span><span class="p">]:</span>
+                <span class="n">comments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Comment</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">comment_json</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">Task</span><span class="p">(</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">json</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">],</span> <span class="n">json</span><span class="p">[</span><span class="s1">&#39;author&#39;</span><span class="p">],</span> <span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;assignee&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+                    <span class="n">json</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">],</span> <span class="n">json</span><span class="p">[</span><span class="s1">&#39;resolution&#39;</span><span class="p">],</span> <span class="n">json</span><span class="p">[</span><span class="s1">&#39;findings&#39;</span><span class="p">],</span> <span class="n">comments</span><span class="p">,</span> <span class="n">json</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">],</span>
+                    <span class="n">json</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">],</span> <span class="n">json</span><span class="p">[</span><span class="s1">&#39;updated&#39;</span><span class="p">],</span> <span class="n">json</span><span class="p">[</span><span class="s1">&#39;updatedBy&#39;</span><span class="p">])</span></div></div>
+
+
+<div class="viewcode-block" id="Comment"><a class="viewcode-back" href="../../data.html#teamscale_client.data.Comment">[docs]</a><span class="nd">@auto_str</span>
+<span class="k">class</span> <span class="nc">Comment</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a comment on a Task in Teamscale</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        author (str): The author of this comment</span>
+<span class="sd">        date (long): Creation date in ms</span>
+<span class="sd">        text (str): The comment&#39;s text</span>
+<span class="sd">        changeComment (bool): Whether this is a system generated change comment</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># noinspection PyPep8Naming</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">author</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">changeComment</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="n">author</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">date</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changeComment</span> <span class="o">=</span> <span class="n">changeComment</span>
+
+<div class="viewcode-block" id="Comment.from_json"><a class="viewcode-back" href="../../data.html#teamscale_client.data.Comment.from_json">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">json</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Comment</span><span class="p">(</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;author&#39;</span><span class="p">],</span> <span class="n">json</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">json</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">],</span> <span class="n">json</span><span class="p">[</span><span class="s1">&#39;changeComment&#39;</span><span class="p">])</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Python Teamscale Client 0.1 alpha documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, CQSE GmbH.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

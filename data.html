@@ -1,0 +1,578 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Data Classes &#8212; Python Teamscale Client 0.1 alpha documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Utils" href="utils.html" />
+    <link rel="prev" title="Useful Constants" href="constants.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="Utils"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="constants.html" title="Useful Constants"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Python Teamscale Client 0.1 alpha documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-teamscale_client.data">
+<span id="data-classes"></span><h1>Data Classes<a class="headerlink" href="#module-teamscale_client.data" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="teamscale_client.data.Baseline">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">Baseline</code><span class="sig-paren">(</span><em>name</em>, <em>description</em>, <em>date=None</em>, <em>timestamp=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#Baseline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.Baseline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a Teamscale baseline. Either the date or the timestamp must be given</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>str</em>) – The baseline’s name</li>
+<li><strong>description</strong> (<em>str</em>) – The baseline’s description</li>
+<li><strong>date</strong> (<em>Optional</em><em>[</em><em>long</em><em>]</em>) – The date for which the baseline is set</li>
+<li><strong>date</strong> – The timestamp (in ms) for which the baseline is set</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="teamscale_client.data.Baseline.date">
+<code class="descname">date</code><a class="headerlink" href="#teamscale_client.data.Baseline.date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.Comment">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">Comment</code><span class="sig-paren">(</span><em>author</em>, <em>date</em>, <em>text</em>, <em>changeComment=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#Comment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.Comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a comment on a Task in Teamscale</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>author</strong> (<em>str</em>) – The author of this comment</li>
+<li><strong>date</strong> (<em>long</em>) – Creation date in ms</li>
+<li><strong>text</strong> (<em>str</em>) – The comment’s text</li>
+<li><strong>changeComment</strong> (<em>bool</em>) – Whether this is a system generated change comment</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="teamscale_client.data.Comment.from_json">
+<em class="property">classmethod </em><code class="descname">from_json</code><span class="sig-paren">(</span><em>json</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#Comment.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.Comment.from_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.ConnectorConfiguration">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">ConnectorConfiguration</code><span class="sig-paren">(</span><em>connector_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#ConnectorConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.ConnectorConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a Teamscale connector configuration. Connectors allow to attach external tools such as source code
+repositories.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>connector_type</strong> (<a class="reference internal" href="constants.html#teamscale_client.constants.ConnectorType" title="teamscale_client.constants.ConnectorType"><em>constants.ConnectorType</em></a>) – The connector type of this configuration</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.FileFindings">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">FileFindings</code><span class="sig-paren">(</span><em>findings</em>, <em>path</em>, <em>content=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#FileFindings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.FileFindings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Representation of a file and its findings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>findings</strong> (List[<a class="reference internal" href="#teamscale_client.data.Finding" title="teamscale_client.data.Finding"><code class="xref py py-class docutils literal notranslate"><span class="pre">Finding</span></code></a>]) – A list containing all findings that are present in this file.</li>
+<li><strong>path</strong> (<em>str</em>) – The path to the file in Teamscale.</li>
+<li><strong>content</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The content of the file (can be left empty).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.FileSystemSourceCodeConnectorConfiguration">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">FileSystemSourceCodeConnectorConfiguration</code><span class="sig-paren">(</span><em>input_directory</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#FileSystemSourceCodeConnectorConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.FileSystemSourceCodeConnectorConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a Teamscale file system connector configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_directory</strong> (<em>str</em>) – Path to the directory that should be analyzed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.Finding">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">Finding</code><span class="sig-paren">(</span><em>finding_type_id</em>, <em>message</em>, <em>assessment=u'YELLOW'</em>, <em>start_offset=None</em>, <em>end_offset=None</em>, <em>start_line=None</em>, <em>end_line=None</em>, <em>identifier=None</em>, <em>uniform_path=None</em>, <em>finding_properties=None</em>, <em>finding_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#Finding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.Finding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Representation of a finding in Teamscale.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>finding_type_id</strong> (<em>str</em>) – The type id that this finding belongs to.</li>
+<li><strong>message</strong> (<em>str</em>) – The main finding message</li>
+<li><strong>assesssment</strong> (<a class="reference internal" href="constants.html#teamscale_client.constants.Assessment" title="teamscale_client.constants.Assessment"><em>constants.Assessment</em></a>) – The assessment this finding should have. Default is <cite>YELLOW</cite>.
+This value is only important if in Teamscale the finding enablement
+is set to auto, otherwise the setting from Teamscale will be used.</li>
+<li><strong>start_offset</strong> (<em>int</em>) – Offset from the beginning of the file, where the finding area starts
+(zero-based, inclusive). Can be left blank, if the start/endline are given. It has to point to the beginning of a token (e.g., a keyword).
+(See also: <a class="reference internal" href="faq.html#faq-offsets"><span class="std std-ref">FAQ - Offsets</span></a>).</li>
+<li><strong>end_offset</strong> (<em>int</em>) – Offset from the beginning of the file, where the finding area ends (zero-based, inclusive).
+Can be left blank, if the start/endline are given. It has to point to the end of a token (e.g., a keyword). (See also:
+<a class="reference internal" href="faq.html#faq-offsets"><span class="std std-ref">FAQ - Offsets</span></a>).</li>
+<li><strong>start_line</strong> (<em>int</em>) – The finding’s first line (one-based, inclusive). Can be left blank, if the offsets are given.</li>
+<li><strong>end_line</strong> (<em>int</em>) – The finding’s last line (one-based, inclusive). Can be left blank, if the offsets or start_line
+are given.</li>
+<li><strong>identifier</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Advanced usage! Path to special elements in Teamscale, e.g. Simulink model parts.
+If this is given, offsets and lines do not need to be filled.</li>
+<li><strong>uniform_path</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The path of the file where the finding is located.</li>
+<li><strong>properties</strong> (<em>Optional</em><em>[</em><em>dict</em><em>]</em>) – A map of String-&gt;Object properties associated with this finding.</li>
+<li><strong>finding_id</strong> (<em>str</em>) – The Teamscale internal id of this finding. Can be left empty for findings that do not yet have
+an id.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.FindingDescription">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">FindingDescription</code><span class="sig-paren">(</span><em>typeid</em>, <em>description</em>, <em>enablement</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#FindingDescription"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.FindingDescription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of a finding type to be added at configuration time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>typeid</strong> (<em>str</em>) – The id used to reference the finding type.</li>
+<li><strong>name</strong> (<em>str</em>) – Some UI friendly name for this description.</li>
+<li><strong>description</strong> (<em>str</em>) – The text to display that explains what this finding type is about (and ideally how to fix it). This text will be the same for each concrete instance of the finding.</li>
+<li><strong>enablement</strong> (<a class="reference internal" href="constants.html#teamscale_client.constants.Enablement" title="teamscale_client.constants.Enablement"><em>constants.Enablement</em></a>) – Describes the default enablement setting for this finding type, used when it is added to the analysis profile.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.GerritSourceCodeConnectorConfiguration">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">GerritSourceCodeConnectorConfiguration</code><span class="sig-paren">(</span><em>project_name</em>, <em>enable_voting=False</em>, <em>enable_detailed_line_comments=True</em>, <em>ignore_yellow_findings_for_votes=False</em>, <em>ignore_yellow_findings_for_comments=False</em>, <em>number_of_ref_batches_for_updates=1</em>, <em>review_label=u'Code-Review'</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#GerritSourceCodeConnectorConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.GerritSourceCodeConnectorConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a Teamscale Gerrit connector configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>project_name</strong> (<em>str</em>) – Used to reference the project.</li>
+<li><strong>enable_voting</strong> (<em>str</em>) – Enables Teamscale voting on Gerrit reviews.</li>
+<li><strong>enable_detailed_line_comments</strong> (<em>str</em>) – When enabled, a Teamscale vote will carry a detailed comment for each
+generated finding that is annotated to the relevant line in the reviewed
+file.</li>
+<li><strong>ignore_yellow_findings_for_votes</strong> (<em>str</em>) – When enabled, Teamscale will only consider red findings when voting.</li>
+<li><strong>ignore_yellow_findings_for_comments</strong> (<em>str</em>) – When enabled, Teamscale will only consider red findings when
+commenting.</li>
+<li><strong>number_of_ref_batches_for_updates</strong> (<em>str</em>) – Defines the number of seperate parts the refs are fetched from Gerrit.
+Can be between 1-100, but 100 must be cleanly dividable by the given
+number. DO NOT CHANGE THIS, unless you know exactly what you are doing.</li>
+<li><strong>review_label</strong> (<em>str</em>) – The review label used to upload feedback to Gerrit.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.GitSourceCodeConnectorConfiguration">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">GitSourceCodeConnectorConfiguration</code><span class="sig-paren">(</span><em>default_branch_name</em>, <em>account</em>, <em>path_suffix=u''</em>, <em>include_submodules=False</em>, <em>submodule_recursion_depth=10</em>, <em>connector_type=u'Git'</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#GitSourceCodeConnectorConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.GitSourceCodeConnectorConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a Teamscale Git connector configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>default_branch_name</strong> (<em>str</em>) – Name of the branch that should be analyzed. If not provided, the master branch will be used.
+If <cite>enable_branch_analysis</cite> is set to <cite>True</cite>, this becomes the default branch.</li>
+<li><strong>account</strong> (<em>str</em>) – Name of the Teamscale account to use to connect to the repository.</li>
+<li><strong>path_suffix</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The suffix to append to the base URL of the repository. Empty by default.</li>
+<li><strong>include_submodules</strong> (<em>Optional</em><em>[</em><em>bool</em><em>]</em>) – Whether to transparently analyze submodules. Defaults to <cite>False</cite>.</li>
+<li><strong>submodule_recursion_depth</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – The maximum recursion depth when analyzing submodules.
+Defaults to <cite>10</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.MetricDescription">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">MetricDescription</code><span class="sig-paren">(</span><em>metric_id</em>, <em>display_name</em>, <em>description</em>, <em>group_id</em>, <em>aggregation=u'SUM'</em>, <em>value_type=u'NUMERIC'</em>, <em>properties=(u'SIZE_METRIC'</em>, <em>)</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#MetricDescription"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.MetricDescription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of a metric type to be addded at configuration time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>metric_id</strong> (<em>str</em>) – The globally unique metric id.</li>
+<li><strong>display_name</strong> (<em>str</em>) – The metric’s name that is displayed in the UI.</li>
+<li><strong>description</strong> (<em>str</em>) – A description explaining what this metric means.</li>
+<li><strong>group_id</strong> (<em>str</em>) – the name of an analysis group under which the metric is placed (used to group the metrics in the
+analysis profile).</li>
+<li><strong>aggregation</strong> (<a class="reference internal" href="constants.html#teamscale_client.constants.MetricAggregation" title="teamscale_client.constants.MetricAggregation"><em>constants.MetricAggregation</em></a>) – How this metric is supposed to be aggregated up the directory
+hierarchy. Defaults to <code class="docutils literal notranslate"><span class="pre">SUM</span></code>.</li>
+<li><strong>value_type</strong> (<a class="reference internal" href="constants.html#teamscale_client.constants.MetricValueType" title="teamscale_client.constants.MetricValueType"><em>constants.MetricValueType</em></a>) – Determines the metric’s type. Defaults to <code class="docutils literal notranslate"><span class="pre">NUMERIC</span></code>.</li>
+<li><strong>properties</strong> (<em>set</em><em>[</em><a class="reference internal" href="constants.html#teamscale_client.constants.MetricProperties" title="teamscale_client.constants.MetricProperties"><em>constants.MetricProperties</em></a><em>]</em>) – Determines the metric’s properties. This has effects on how/if the
+metric is displayed and assessed. Defaults to <code class="docutils literal notranslate"><span class="pre">(SIZE_METRIC,</span> <span class="pre">)</span></code>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.MetricEntry">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">MetricEntry</code><span class="sig-paren">(</span><em>path</em>, <em>metrics</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#MetricEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.MetricEntry" title="Permalink to this definition">¶</a></dt>
+<dd><p>A container for adding metric values to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<em>str</em>) – Path to a resource in Teamscale (usually a file).
+This can also point to architecture components using the following syntax:
+<code class="docutils literal notranslate"><span class="pre">-architectures-/&lt;architecture-name&gt;/path/to/component/</span></code></li>
+<li><strong>metrics</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>object</em><em>]</em>) – A dictionary mapping from metric_id to metric value. The value depends on
+the metric type: Numeric: <code class="docutils literal notranslate"><span class="pre">double</span></code>, Timestamp: <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">-</span> <span class="pre">unix</span> <span class="pre">timestamp</span>
+<span class="pre">in</span> <span class="pre">milliseconds</span></code>, Assessment: <code class="docutils literal notranslate"><span class="pre">[&lt;GREENVALUE&gt;,&lt;YELLOWVALUE&gt;,&lt;REDVALUE&gt;]</span></code></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.MultiVersionFileSystemSourceCodeConnectorConfiguration">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">MultiVersionFileSystemSourceCodeConnectorConfiguration</code><span class="sig-paren">(</span><em>input_directory</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#MultiVersionFileSystemSourceCodeConnectorConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.MultiVersionFileSystemSourceCodeConnectorConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a Teamscale multiversion file system connector configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_directory</strong> (<em>str</em>) – Path to the directory that should be analyzed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.NonCodeMetricEntry">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">NonCodeMetricEntry</code><span class="sig-paren">(</span><em>path</em>, <em>content=u''</em>, <em>count=1</em>, <em>assessment={}</em>, <em>time=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#NonCodeMetricEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.NonCodeMetricEntry" title="Permalink to this definition">¶</a></dt>
+<dd><p>A container for adding non-code metrics to a project.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<em>str</em>) – Arbitrary path to which the non-code metrics shall be attached.</li>
+<li><strong>content</strong> (<em>str</em>) – The content displayed as content for the path.</li>
+<li><strong>count</strong> (<em>int</em>) – The count value.</li>
+<li><strong>assessment</strong> (dict[<code class="xref py py-class docutils literal notranslate"><span class="pre">constants.AssessmentMetricColors</span></code>, int]) – The assessment distribution for this path.</li>
+<li><strong>time</strong> (<em>double</em>) – The time used to create this result (e.g. unit test run time, or build duration).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.ProjectConfiguration">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">ProjectConfiguration</code><span class="sig-paren">(</span><em>name</em>, <em>project_id</em>, <em>profile</em>, <em>connectors</em>, <em>alias=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#ProjectConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.ProjectConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a Teamscale project configuration. This is used to create new and update existing projects in
+Teamscale.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>str</em>) – The project’s name</li>
+<li><strong>project_id</strong> (<em>str</em>) – The project’s id</li>
+<li><strong>profile</strong> (<em>str</em>) – The name of the profile used to analyse the project</li>
+<li><strong>connectors</strong> (List[<a class="reference internal" href="#teamscale_client.data.ConnectorConfiguration" title="teamscale_client.data.ConnectorConfiguration"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConnectorConfiguration</span></code></a>]) – List of all connectors used in the project configuration</li>
+<li><strong>alias</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The project’s alias</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.ProjectInfo">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">ProjectInfo</code><span class="sig-paren">(</span><em>project_id</em>, <em>name</em>, <em>description=None</em>, <em>creation_timestamp=None</em>, <em>alias=None</em>, <em>deleting=False</em>, <em>reanalyzing=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#ProjectInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.ProjectInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents information about a Teamscale project. When querying information about a project in Teamscale,
+the result is an instance of this class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>project_id</strong> (<em>str</em>) – The project’s id</li>
+<li><strong>name</strong> (<em>str</em>) – The project’s name</li>
+<li><strong>description</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The project’s description</li>
+<li><strong>creation_timestamp</strong> (<em>Optional</em><em>[</em><em>long</em><em>]</em>) – The project’s creation timestamp (in ms)</li>
+<li><strong>deleting</strong> (<em>Optional</em><em>[</em><em>bool</em><em>]</em>) – Whether the project is currently being deleted</li>
+<li><strong>reanalyzing</strong> (<em>Optional</em><em>[</em><em>bool</em><em>]</em>) – Whether the project is currently being reanalyzed</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="exception">
+<dt id="teamscale_client.data.ServiceError">
+<em class="property">exception </em><code class="descclassname">teamscale_client.data.</code><code class="descname">ServiceError</code><a class="reference internal" href="_modules/teamscale_client/data.html#ServiceError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.ServiceError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Teamscale service returned an error.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.SourceCodeConnectorConfiguration">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">SourceCodeConnectorConfiguration</code><span class="sig-paren">(</span><em>connector_type</em>, <em>included_file_names</em>, <em>excluded_file_names=u''</em>, <em>repository_identifier=u'repository1'</em>, <em>enable_branch_analysis=False</em>, <em>included_branches=u'.*'</em>, <em>excluded_branches=u'_anon.*'</em>, <em>start_revision=u''</em>, <em>content_exclude=u''</em>, <em>polling_interval=60</em>, <em>prepend_repository_identifier=False</em>, <em>end_revision=u''</em>, <em>text_filter=u''</em>, <em>source_library_connector=False</em>, <em>run_to_exhaustion=False</em>, <em>delta_size=500</em>, <em>path_prefix_transformation=u''</em>, <em>path_transformation=u''</em>, <em>encoding=u''</em>, <em>author_transformation=u''</em>, <em>branch_transformation=u''</em>, <em>preserve_empty_commits=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#SourceCodeConnectorConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.SourceCodeConnectorConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a Teamscale source code connector configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>connector_type</strong> (<a class="reference internal" href="constants.html#teamscale_client.constants.ConnectorType" title="teamscale_client.constants.ConnectorType"><em>constants.ConnectorType</em></a>) – The connector type of this configuration.</li>
+<li><strong>included_file_names</strong> (<em>str</em>) – Ant patterns describing the files to be read from the repository.</li>
+<li><strong>excluded_file_names</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Ant patterns describing the files to be excluded from the repository.</li>
+<li><strong>repository_identifier</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – A unique identifier used to reference the repository. This is also shown
+in the UI and should have a meaningful value. Defaults to ‘repository1’.</li>
+<li><strong>enable_branch_analysis</strong> (<em>Optional</em><em>[</em><em>bool</em><em>]</em>) – Whether not only the main line but also branches should be analyzed.
+Defaults to <cite>False</cite>.</li>
+<li><strong>included_branches</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Regex patterns describing the branches to be read from the repository.
+All branches are included by default.</li>
+<li><strong>excluded_branches</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Regex patterns describing the branches to be excluded from the repository.
+Defaults to <cite>_anon.*</cite>.</li>
+<li><strong>start_revision</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The first date or revision to be read. If left empty, the entire history
+will be read.</li>
+<li><strong>content_exclude</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – A comma-separated list of filters that removes the complete content of a file
+(i.e. treating it as an empty file) based on a regular expression matched
+against the file’s content.</li>
+<li><strong>polling_interval</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – Delay used for polling the repository in seconds (default is 60 seconds).</li>
+<li><strong>prepend_repository_identifier</strong> (<em>Optional</em><em>[</em><em>bool</em><em>]</em>) – Whether to include the repository identifier as a prefix
+for the created file paths. Defaults to <cite>False</cite>.</li>
+<li><strong>end_revision</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The last date or revision to be read. If left empty, the history up to
+the latest revision is read.</li>
+<li><strong>text_filter</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – A comma-separated list of regular expressions describing what parts of a file
+should be excluded from analysis, e.g. generated code.</li>
+<li><strong>source_library_connector</strong> (<em>Optional</em><em>[</em><em>bool</em><em>]</em>) – If this is true, the contained files will only be used
+for source library lookup, but not for analysis. Defaults to <cite>False</cite>.</li>
+<li><strong>run_to_exhaustion</strong> (<em>Optional</em><em>[</em><em>bool</em><em>]</em>) – If this is true, the repository will not be polled after
+the current head is reached. Defaults to <cite>False</cite>.</li>
+<li><strong>delta_size</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – Adjusts the size of deltas produced by the connector (experts only, default is 500).</li>
+<li><strong>path_prefix_transformation</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Prefix transformations that are applied to the paths
+from the repository. Empty by default.</li>
+<li><strong>path_transformation</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Regex transformations that are applied to the paths
+from the repository. Empty by default.</li>
+<li><strong>encoding</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – This can be used to set the encoding used (e.g. UTF-8, latin1) when reading files.
+Empty by default.</li>
+<li><strong>author_transformation</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Regex transformations that are applied to the authors of the repository.
+Empty by default.</li>
+<li><strong>branch_transformation</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Regex transformations that are applied to the branch names
+of the repository. Empty by default.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.SubversionSourceCodeConnectorConfiguration">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">SubversionSourceCodeConnectorConfiguration</code><span class="sig-paren">(</span><em>account</em>, <em>enable_externals=False</em>, <em>externals_includes=u''</em>, <em>externals_excludes=u''</em>, <em>path_suffix=u''</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#SubversionSourceCodeConnectorConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.SubversionSourceCodeConnectorConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a Teamscale Subversion connector configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>account</strong> (<em>str</em>) – Name of the Teamscale account to use to connect to the repository.</li>
+<li><strong>enable_externals</strong> (<em>Optional</em><em>[</em><em>bool</em><em>]</em>) – Whether to also parse and interpret svn:externals properties.
+Defaults to <cite>False</cite>.</li>
+<li><strong>externals_includes</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Ant patterns describing the directories that are checked for svn:externals.
+Empty by default.</li>
+<li><strong>externals_excludes</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Ant patterns describing the directories that are not checked for
+svn:externals. Empty by default.</li>
+<li><strong>path_suffix</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Path suffix that is to be appended to the repository’s base path. Empty by default.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.TFSSourceCodeConnectorConfiguration">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">TFSSourceCodeConnectorConfiguration</code><span class="sig-paren">(</span><em>account</em>, <em>branch_path_suffix=u''</em>, <em>path_suffix=u''</em>, <em>branch_lookup_paths=u''</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#TFSSourceCodeConnectorConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.TFSSourceCodeConnectorConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a Teamscale TFS connector configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>account</strong> (<em>str</em>) – Name of the Teamscale account to use to connect to the repository.</li>
+<li><strong>branch_path_suffix</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The suffix to append to the branch name. Empty by default.</li>
+<li><strong>path_suffix</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The suffix to append to the base URL of the repository. Empty by default.</li>
+<li><strong>branch_lookup_paths</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Sub paths in which to look for branches. Empty by default.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="teamscale_client.data.Task">
+<em class="property">class </em><code class="descclassname">teamscale_client.data.</code><code class="descname">Task</code><span class="sig-paren">(</span><em>id</em>, <em>subject</em>, <em>author</em>, <em>description</em>, <em>assignee</em>, <em>status</em>, <em>resolution</em>, <em>findings</em>, <em>comments</em>, <em>tags</em>, <em>created</em>, <em>updated</em>, <em>updatedBy</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#Task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.Task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a task in Teamscale</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>int</em>) – The task’s id</li>
+<li><strong>subject</strong> (<em>str</em>) – The task’s subject</li>
+<li><strong>author</strong> (<em>str</em>) – The task author’s name</li>
+<li><strong>description</strong> (<em>str</em>) – The task’s description</li>
+<li><strong>assignee</strong> (<em>str</em>) – The assigned user’s name</li>
+<li><strong>status</strong> (<a class="reference internal" href="constants.html#teamscale_client.constants.TaskStatus" title="teamscale_client.constants.TaskStatus"><em>constants.TaskStatus</em></a>) – The task’s status</li>
+<li><strong>resolution</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="constants.html#teamscale_client.constants.TaskResolution" title="teamscale_client.constants.TaskResolution"><em>constants.TaskResolution</em></a><em>]</em>) – The task’s resolution</li>
+<li><strong>findings</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) – The findings attached to this task</li>
+<li><strong>comments</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><a class="reference internal" href="#teamscale_client.data.Comment" title="teamscale_client.data.Comment"><em>Comment</em></a><em>]</em><em>]</em>) – Comments attached to this task</li>
+<li><strong>tags</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – Tags that have been added to this task</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="teamscale_client.data.Task.from_json">
+<em class="property">classmethod </em><code class="descname">from_json</code><span class="sig-paren">(</span><em>json</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/teamscale_client/data.html#Task.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#teamscale_client.data.Task.from_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="constants.html"
+                        title="previous chapter">Useful Constants</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="utils.html"
+                        title="next chapter">Utils</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/data.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="Utils"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="constants.html" title="Useful Constants"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Python Teamscale Client 0.1 alpha documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, CQSE GmbH.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>
