@@ -92,7 +92,22 @@ class CoverageFormats:
     BULLSEYE = "BULLSEYE"
 
     SIMPLE = "SIMPLE"
-
+    
+    OPEN_COVER = "OPEN_COVER"
+    
+    IEC_COVERAGE = "IEC_COVERAGE"
+    
+    LLVM = "LLVM"
+    
+    CLOVER = "CLOVER"
+    
+    XCODE = "XCODE"
+    
+    TESTWISE_COVERAGE = "TESTWISE_COVERAGE"
+    
+    SAP_COVERAGE = "SAP_COVERAGE"
+    
+    ISTANBUL = "ISTANBUL"
 
 class ReportFormats:
     """Report formats that Teamscale understands."""
@@ -124,7 +139,7 @@ class UnitTestReportFormats:
 class ConnectorType:
     """Connector types."""
 
-    TFS = "TFS"
+    TFS = "Azure DevOps TFVC (TFS)"
 
     FILE_SYSTEM = "File System"
 

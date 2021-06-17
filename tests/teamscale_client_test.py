@@ -34,6 +34,10 @@ def get_global_service_mock(service_id):
     """Returns mock global service url"""
     return re.compile(r'%s/%s/.*' % (URL, service_id))
 
+def get_global_service_mock_with_api_version(service_id, api_version):
+    """Returns mock global service url for a specific api version"""
+    return re.compile(r'%s/api/%s/%s/.*' % (URL, api_version, service_id))
+
 @responses.activate
 def test_put():
     """Tests PUT requests to server"""
@@ -158,12 +162,12 @@ def _get_test_findings():
 def test_finding_json_serialization():
     """Tests that findings json is correctly serialized"""
     findings = _get_test_findings()
-    assert '[{"content": null, "findings": [{"assessment": "YELLOW", "endLine": null, "endOffset": null, "findingProperties": null, "findingTypeId": "test-id", "identifier": null, "message": "message", "startLine": null, "startOffset": null, "uniformPath": null}], "path": "path/to/file"}]' == to_json(findings)
+    assert '[{"content": null, "findings": [{"assessment": "YELLOW", "endLine": null, "endOffset": null, "findingProperties": null, "findingTypeId": "test-id", "finding_id": null, "identifier": null, "message": "message", "startLine": null, "startOffset": null, "uniformPath": null}], "path": "path/to/file"}]' == to_json(findings)
 
 @responses.activate
 def test_get_projects():
     """Tests retrieving of projects"""
-    responses.add(responses.GET, get_global_service_mock('projects'),
+    responses.add(responses.GET, get_global_service_mock_with_api_version('projects', 'v5.6.0'),
                       status=200, content_type="application/json", body='[{"description": "", "creationTimestamp": 1487534523817, "alias": "My Test Project", "reanalyzing": false, "deleting": false, "id": "test-project", "name": "Test Project"}]')
     resp = get_client().get_projects()
     assert len(resp) == 1
@@ -183,6 +187,20 @@ def test_add_project():
     resp = get_client().create_project(project_configuration)
     assert resp.status_code == 200 and TeamscaleClient._get_response_message(resp) == SUCCESS
 
+@responses.activate
+def test_add_project_without_validation():
+    """Test adding projects"""
+    file_system_config = FileSystemSourceCodeConnectorConfiguration(input_directory="/path/to/folder",
+                                                                    repository_identifier="Local",
+                                                                    included_file_names="**.py")
+    project_configuration = ProjectConfiguration(name="Test Project", project_id="test-project",
+                                                 profile="Python (default)", connectors=[file_system_config])
+
+    responses.add(responses.PUT, get_global_service_mock('create-project'),
+                      body='{"message": "success"}', status=200)
+    resp = get_client().create_project(project_configuration, True)
+    assert resp.status_code == 200 and TeamscaleClient._get_response_message(resp) == SUCCESS
+
 def test_compare_findings():
     """Tests comparing between findings."""
     first_finding = Finding("1a", "first message a", uniform_path='path/to/a', start_line=10, end_line=30)
@@ -199,7 +217,7 @@ def test_compare_findings():
 
 @responses.activate
 def test_get_tasks():
-    """Tests retrieving of projects"""
+    """Tests retrieving of tasks"""
     responses.add(responses.GET, get_project_service_mock('tasks'),
                   status=200, content_type="application/json",
                   body='[{"id": 1, "subject": "uiae", "author": "admin", "description": "", "assignee": "", "created": 1536581194732, "updated": 1536583991791, "updatedBy": "admin", "status": "OPEN", "resolution": "NONE", "findings": [{"findingId": "40315BE118FE08044FBF605325445250"}], "comments": [{"author": "admin", "date": 1536583991791, "text": "Added finding: 40315BE118FE08044FBF605325445250", "changeComment": true, "resolvedAuthor": {"username": "admin", "firstName": "Default", "lastName": "Administrator", "emailAddress": "", "gravatarHash": "dummy", "useGravatar": false, "aliases": [], "authenticator": "HashedStored:anonymized", "groupIds": ["Administrators"]}}], "tags": [], "resolvedAuthor": {"username": "admin", "firstName": "Default", "lastName": "Administrator", "emailAddress": "", "gravatarHash": "dummy", "useGravatar": false, "aliases": [], "authenticator": "HashedStored:anonymized", "groupIds": ["Administrators"]}, "resolvedUpdatedBy": {"username": "admin", "firstName": "Default", "lastName": "Administrator", "emailAddress": "", "gravatarHash": "dummy", "useGravatar": false, "aliases": [], "authenticator": "HashedStored:anonymized", "groupIds": ["Administrators"]}}]')

@@ -20,10 +20,10 @@ class Finding(object):
                                             This value is only important if in Teamscale the finding enablement
                                             is set to auto, otherwise the setting from Teamscale will be used.
         start_offset (int): Offset from the beginning of the file, where the finding area starts
-                            (zero-based, inclusive). Can be left blank, if the start/endline are given.
+                            (zero-based, inclusive). Can be left blank, if the start/endline are given. It has to point to the beginning of a token (e.g., a keyword).
                             (See also: :ref:`FAQ - Offsets <faq-offsets>`).
         end_offset (int): Offset from the beginning of the file, where the finding area ends (zero-based, inclusive).
-                          Can be left blank, if the start/endline are given. (See also:
+                          Can be left blank, if the start/endline are given. It has to point to the end of a token (e.g., a keyword). (See also:
                           :ref:`FAQ - Offsets <faq-offsets>`).
         start_line (int): The finding's first line (one-based, inclusive). Can be left blank, if the offsets are given.
         end_line (int): The finding's last line (one-based, inclusive). Can be left blank, if the offsets or start_line
@@ -32,11 +32,13 @@ class Finding(object):
                                     If this is given, offsets and lines do not need to be filled.
         uniform_path (Optional[str]): The path of the file where the finding is located.
         properties (Optional[dict]): A map of String->Object properties associated with this finding.
+        finding_id (str): The Teamscale internal id of this finding. Can be left empty for findings that do not yet have
+                          an id.
     """
 
-    def __init__(self, finding_type_id, message, assessment=Assessment.YELLOW, start_offset=None, end_offset=None,
-                 start_line=None, end_line=None, identifier=None, uniform_path=None, finding_properties=None,
-                 resolved=False):
+    def __init__(self, finding_type_id, message, assessment=Assessment.YELLOW, start_offset=None,
+                 end_offset=None, start_line=None, end_line=None, identifier=None, uniform_path=None,
+                 finding_properties=None, finding_id=None, resolved=False):
         self.findingTypeId = finding_type_id
         self.message = message
         self.assessment = assessment
@@ -48,6 +50,7 @@ class Finding(object):
 
         self.uniformPath = uniform_path
         self.findingProperties = finding_properties
+        self.finding_id = finding_id
         self.resolved = resolved
 
     def __cmp__(self, other):
@@ -62,6 +65,8 @@ class Finding(object):
 
     def __eq__(self, other):
         """Checks if this finding is equal to the given finding."""
+        if self.finding_id and other.finding_id:
+            return self.finding_id == other.finding_id
         return ((self.uniformPath, self.startLine, self.assessment, self.message, self.endLine, self.endOffset,
                  self.findingTypeId, self.identifier, self.startOffset) ==
                 (other.uniformPath, other.startLine, other.assessment, other.message, other.endLine, other.endOffset,
@@ -339,7 +344,6 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
                                                Empty by default.
         branch_transformation (Optional[str]): Regex transformations that are applied to the branch names
                                                of the repository. Empty by default.
-        path_suffix (Optional[str]): The suffix to append to the base URL of the repository. Empty by default.
     """
 
     def __init__(self, connector_type, included_file_names, excluded_file_names="", repository_identifier="repository1",
@@ -347,7 +351,7 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
                  content_exclude="", polling_interval=60, prepend_repository_identifier=False, end_revision="",
                  text_filter="", source_library_connector=False, run_to_exhaustion=False, delta_size=500,
                  path_prefix_transformation="", path_transformation="", encoding="", author_transformation="",
-                 branch_transformation="", path_suffix="", preserve_empty_commits=False):
+                 branch_transformation="", preserve_empty_commits=False):
         super(SourceCodeConnectorConfiguration, self).__init__(connector_type)
         self.options = {
             "Included file names": included_file_names,
@@ -370,7 +374,6 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
             "Encoding": encoding,
             "Author transformation": author_transformation,
             "Branch transformation": branch_transformation,
-            "Path suffix": path_suffix,
             "Preserve empty commits": preserve_empty_commits
         }
 
@@ -408,7 +411,7 @@ class GitSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguration):
     """Represents a Teamscale Git connector configuration.
 
     Args:
-        branch_name (str): Name of the branch that should be analyzed. If not provided, the master branch will be used.
+        default_branch_name (str): Name of the branch that should be analyzed. If not provided, the master branch will be used.
                            If `enable_branch_analysis` is set to `True`, this becomes the default branch.
         account (str): Name of the Teamscale account to use to connect to the repository.
         path_suffix (Optional[str]): The suffix to append to the base URL of the repository. Empty by default.
@@ -417,10 +420,10 @@ class GitSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguration):
                                                    Defaults to `10`.
     """
 
-    def __init__(self, branch_name, account, path_suffix="", include_submodules=False,
+    def __init__(self, default_branch_name, account, path_suffix="", include_submodules=False,
                  submodule_recursion_depth=10, connector_type=ConnectorType.GIT, *args, **kwargs):
         super(GitSourceCodeConnectorConfiguration, self).__init__(connector_type=connector_type, *args, **kwargs)
-        self.options["Branch Name"] = branch_name
+        self.options["Default branch name"] = default_branch_name
         self.options["Account"] = account
         self.options["Path suffix"] = path_suffix
         self.options["Include Submodules"] = include_submodules
@@ -494,7 +497,8 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
         path_suffix (Optional[str]): Path suffix that is to be appended to the repository's base path. Empty by default.
     """
 
-    def __init__(self, account, enable_externals=False, externals_includes="", externals_excludes="", path_suffix="", *args, **kwargs):
+    def __init__(self, account, enable_externals=False, externals_includes="", externals_excludes="", path_suffix="",
+                 *args, **kwargs):
         super(SubversionSourceCodeConnectorConfiguration, self).__init__(connector_type=ConnectorType.SVN, *args,
                                                                          **kwargs)
         self.options["Account"] = account

@@ -1,11 +1,13 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import requests
-from requests.auth import HTTPBasicAuth
+import io
+import os
 import time
 
+import requests
 import simplejson as json
+from requests.auth import HTTPBasicAuth
 
 from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task
 from teamscale_client.utils import to_json
@@ -76,7 +78,7 @@ class TeamscaleClient:
         """Sends a GET request to the given service url.
 
         Args:
-            url (str):  The URL for which to execute a PUT request
+            url (str):  The URL for which to execute a GET request
             parameters (dict): parameters to attach to the url
 
         Returns:
@@ -88,7 +90,7 @@ class TeamscaleClient:
         headers = {'Accept': 'application/json'}
         response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers,
                                 timeout=self.timeout, proxies=self.proxies)
-        if response.status_code != 200:
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
@@ -111,7 +113,7 @@ class TeamscaleClient:
         response = requests.put(url, params=parameters, json=json, data=data,
                                 headers=headers, auth=self.auth_header,
                                 verify=self.sslverify, timeout=self.timeout, proxies=self.proxies)
-        if response.status_code != 200:
+        if not response.ok:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
@@ -130,7 +132,7 @@ class TeamscaleClient:
         """
         response = requests.delete(url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                    timeout=self.timeout)
-        if response.status_code != 200:
+        if not response.ok:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
@@ -295,10 +297,14 @@ class TeamscaleClient:
             "adjusttimestamp": "true",
             "movetolastcommit": str(move_to_last_commit).lower()
         }
-        multiple_files = [('report', open(filename, 'rb')) for filename in report_files]
+        multiple_files = []
+        for filename in report_files:
+            with open(filename, 'rb') as inputfile:
+                dataobj = io.BytesIO(inputfile.read())
+                multiple_files.append(('report', (os.path.basename(filename), dataobj)))
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=multiple_files, timeout=self.timeout)
-        if response.status_code != 200:
+        if not response.ok:
             raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
 
@@ -325,7 +331,7 @@ class TeamscaleClient:
         architecture_files = [(path, open(filename, 'rb')) for path, filename in architectures.items()]
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=architecture_files, timeout=self.timeout)
-        if response.status_code != 200:
+        if not response.ok:
             raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
 
@@ -362,7 +368,7 @@ class TeamscaleClient:
         headers = {'Accept': 'application/json'}
         response = requests.get(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                 headers=headers, timeout=self.timeout)
-        if response.status_code != 200:
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return [Baseline(x['name'], x['description'], timestamp=x['timestamp']) for x in response.json()]
 
@@ -407,7 +413,8 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        service_url = self.get_global_service_url("projects")
+        service_url = self.get_global_service_url_versioned("projects", "v5.6.0")
+
         parameters = {
             "detail": True
         }
@@ -417,35 +424,39 @@ class TeamscaleClient:
                         creation_timestamp=x['creationTimestamp'], alias=x.get('alias'),
                         deleting=x['deleting'], reanalyzing=x['reanalyzing']) for x in response.json()]
 
-    def create_project(self, project_configuration):
-        """Creates a project with the specified configuration in Teamscale.
+    def create_project(self, project_configuration, skip_project_validation=False):
+        """Creates a project with the specified configuration in Teamscale. The parameter `skip_project_validation`
+        specifies, whether to skip the validation of the project.
 
         Args:
             project_configuration (data.ProjectConfiguration): The configuration for the project to be created.
+            skip_project_validation (bool): Whether to skip validation of the project.
         Returns:
             requests.Response: object generated by the upload request.
 
         Raises:
             ServiceError: If anything goes wrong.
         """
-        return self._add_project(project_configuration, perfrom_update_call=False)
+        return self._add_project(project_configuration, skip_project_validation, perfrom_update_call=False)
 
-    def update_project(self, project_configuration):
+    def update_project(self, project_configuration, skip_project_validation=False):
         """Updates an existing project in Teamscale with the given configuration. The id of the existing project is
-        taken from the configuration.
+        taken from the configuration. The parameter `skip_project_validation` specifies, whether to skip the validation of the project.
 
         Args:
             project_configuration (data.ProjectConfiguration): The configuration for the project to be updated.
+            skip_project_validation (bool): Whether to skip validation of the project.
         Returns:
             requests.Response: object generated by the upload request.
 
         Raises:
             ServiceError: If anything goes wrong.
         """
-        return self._add_project(project_configuration, perfrom_update_call=True)
+        return self._add_project(project_configuration, skip_project_validation, perfrom_update_call=True)
 
-    def _add_project(self, project_configuration, perfrom_update_call):
-        """Adds a project to Teamscale. The parameter `perfrom_update_call` specifies, whether an update call should be
+    def _add_project(self, project_configuration, skip_project_validation, perfrom_update_call):
+        """Adds a project to Teamscale. The parameter `skip_project_validation` specifies, whether to skip the validation of the project.
+        The parameter `perfrom_update_call` specifies, whether an update call should be
         made:
         - If `perfrom_update_call` is set to `True`, re-adding a project with an existing id will update the original
         project.
@@ -455,6 +466,7 @@ class TeamscaleClient:
 
         Args:
             project_configuration (data.ProjectConfiguration): The project that is to be created (or updated).
+            skip_project_validation (bool): Whether to skip validation of the project.
             perfrom_update_call (bool): Whether to perform an update call.
         Returns:
             requests.Response: object generated by the upload request.
@@ -464,6 +476,7 @@ class TeamscaleClient:
         """
         service_url = self.get_global_service_url("create-project")
         parameters = {
+            "skip-project-validation": skip_project_validation,
             "only-config-update": perfrom_update_call
         }
         response = self.put(service_url, parameters=parameters, data=to_json(project_configuration))
@@ -504,9 +517,9 @@ class TeamscaleClient:
         if timestamp:
             timestamp_seconds = time.mktime(timestamp.timetuple())
             timestamp_or_head = str(int(timestamp_seconds * 1000))
-        branch_name = branch if branch else self.branch
-        if branch_name:
-            return branch_name + ":" + timestamp_or_head
+        default_branch_name = branch if branch else self.branch
+        if default_branch_name:
+            return default_branch_name + ":" + timestamp_or_head
         return timestamp_or_head
 
     def get_global_service_url(self, service_name):
@@ -519,6 +532,18 @@ class TeamscaleClient:
             str: The full url
         """
         return "%s/%s/" % (self.url, service_name)
+
+    def get_global_service_url_versioned(self, service_name, api_version):
+        """Returns the full url pointing to a specific version of a global service.
+
+        Args:
+           service_name(str): the name of the service for which the url should be generated
+           api_version(str): the teamscale api version (e.g. "v5.6.0")
+
+        Returns:
+            str: The full url
+        """
+        return "%s/api/%s/%s/" % (self.url, api_version, service_name)
 
     def get_project_service_url(self, service_name):
         """Returns the full url pointing to a project service.
@@ -555,7 +580,7 @@ class TeamscaleClient:
         service_url = self.get_project_service_url("pre-commit") + self._get_timestamp_parameter(timestamp)
 
         response = self.put(service_url, data=to_json(precommit_data))
-        if response.status_code != 200:
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
 
     def get_precommit_analysis_results(self):
@@ -568,7 +593,9 @@ class TeamscaleClient:
 
         while True:
             response = self.get(service_url)
-            if response.json() is None:
+            # We need to wait for 200 here to get the findings.
+            # The service returns 204 while the pre-commit analysis is still in progress.
+            if response.status_code != 200:
                 time.sleep(2)
             else:
                 return self._parse_findings_response(service_url, response)
@@ -586,7 +613,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong.
         """
-        if response.status_code != 200:
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
 
         added_findings = self._findings_from_json(response.json()['addedFindings'])
@@ -624,6 +651,7 @@ class TeamscaleClient:
                        start_line=self._get_finding_location_entry(finding_json, 'rawStartLine', 1),
                        end_line=self._get_finding_location_entry(finding_json, 'rawEndLine', 1),
                        uniform_path=finding_json['location']['uniformPath'],
+                       finding_id=finding_json['id'],
                        resolved='death' in finding_json)
 
     def _get_finding_location_entry(self, finding_json, key, defaultValue):
@@ -668,7 +696,7 @@ class TeamscaleClient:
             "all": True
         }
         response = self.get(service_url, parameters=parameters)
-        if response.status_code != 200:
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return self._findings_from_json(response.json())
 
@@ -692,10 +720,24 @@ class TeamscaleClient:
             "t": self._get_timestamp_parameter(timestamp=timestamp, branch=branch),
         }
         response = self.get(service_url, parameters=parameters)
-        if response.status_code != 200:
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return self._finding_from_json(response.json())
 
+    def get_finding_url(self, finding):
+        """Returns the full url pointing to the specified finding in Teamscale,
+        or `None` if the finding does not have an id.
+
+        Args:
+           finding(data.Finding): the finding for which the url should be generated
+
+        Returns:
+            str: The full url
+        """
+        if not finding.finding_id:
+            return None
+        return "{client.url}/findings.html#details/{client.project}/?id={finding_id}" \
+            .format(client=self, finding_id=finding.finding_id)
 
     def get_tasks(self, status="OPEN", details=True, start=0, max=300):
         """Retrieves the tasks for the client's project from the server.
@@ -721,7 +763,7 @@ class TeamscaleClient:
             "with-count": False
         }
         response = self.get(service_url, parameters=parameters)
-        if response.status_code != 200:
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return TeamscaleClient._tasks_from_json(response.json())
 
@@ -740,7 +782,7 @@ class TeamscaleClient:
         """
         service_url = self.get_project_service_url("comment-task") + str(task_id)
         response = self.put(service_url, data=to_json(comment))
-        if response.status_code != 200:
+        if not response.ok:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
 
@@ -804,6 +846,6 @@ class TeamscaleClient:
 
         }
         response = self.get(service_url, parameters=parameters)
-        if response.status_code != 200:
+        if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return [architecture_overview['uniformPath'] for architecture_overview in response.json()]
