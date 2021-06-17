@@ -412,7 +412,8 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        service_url = self.get_global_service_url("projects")
+        service_url = self.get_global_service_url_versioned("projects", "v5.6.0")
+
         parameters = {
             "detail": True
         }
@@ -530,6 +531,18 @@ class TeamscaleClient:
             str: The full url
         """
         return "%s/%s/" % (self.url, service_name)
+
+    def get_global_service_url_versioned(self, service_name, api_version):
+        """Returns the full url pointing to a specific version of a global service.
+
+        Args:
+           service_name(str): the name of the service for which the url should be generated
+           api_version(str): the teamscale api version (e.g. "v5.6.0")
+
+        Returns:
+            str: The full url
+        """
+        return "%s/api/%s/%s/" % (self.url, api_version, service_name)
 
     def get_project_service_url(self, service_name):
         """Returns the full url pointing to a project service.
@@ -721,7 +734,7 @@ class TeamscaleClient:
         """
         if not finding.finding_id:
             return None
-        return "{client.url}/findings.html#details/{client.project}/?id={finding_id}"\
+        return "{client.url}/findings.html#details/{client.project}/?id={finding_id}" \
             .format(client=self, finding_id=finding.finding_id)
 
     def get_tasks(self, status="OPEN", details=True, start=0, max=300):

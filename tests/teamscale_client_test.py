@@ -34,6 +34,10 @@ def get_global_service_mock(service_id):
     """Returns mock global service url"""
     return re.compile(r'%s/%s/.*' % (URL, service_id))
 
+def get_global_service_mock_with_api_version(service_id, api_version):
+    """Returns mock global service url for a specific api version"""
+    return re.compile(r'%s/api/%s/%s/.*' % (URL, api_version, service_id))
+
 @responses.activate
 def test_put():
     """Tests PUT requests to server"""
@@ -163,7 +167,7 @@ def test_finding_json_serialization():
 @responses.activate
 def test_get_projects():
     """Tests retrieving of projects"""
-    responses.add(responses.GET, get_global_service_mock('projects'),
+    responses.add(responses.GET, get_global_service_mock_with_api_version('projects', 'v5.6.0'),
                       status=200, content_type="application/json", body='[{"description": "", "creationTimestamp": 1487534523817, "alias": "My Test Project", "reanalyzing": false, "deleting": false, "id": "test-project", "name": "Test Project"}]')
     resp = get_client().get_projects()
     assert len(resp) == 1
