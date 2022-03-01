@@ -139,7 +139,7 @@ class UnitTestReportFormats:
 class ConnectorType:
     """Connector types."""
 
-    TFS = "TFS"
+    TFS = "Azure DevOps TFVC (TFS)"
 
     FILE_SYSTEM = "File System"
 

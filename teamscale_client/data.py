@@ -20,10 +20,10 @@ class Finding(object):
                                             This value is only important if in Teamscale the finding enablement
                                             is set to auto, otherwise the setting from Teamscale will be used.
         start_offset (int): Offset from the beginning of the file, where the finding area starts
-                            (zero-based, inclusive). Can be left blank, if the start/endline are given.
+                            (zero-based, inclusive). Can be left blank, if the start/endline are given. It has to point to the beginning of a token (e.g., a keyword).
                             (See also: :ref:`FAQ - Offsets <faq-offsets>`).
         end_offset (int): Offset from the beginning of the file, where the finding area ends (zero-based, inclusive).
-                          Can be left blank, if the start/endline are given. (See also:
+                          Can be left blank, if the start/endline are given. It has to point to the end of a token (e.g., a keyword). (See also:
                           :ref:`FAQ - Offsets <faq-offsets>`).
         start_line (int): The finding's first line (one-based, inclusive). Can be left blank, if the offsets are given.
         end_line (int): The finding's last line (one-based, inclusive). Can be left blank, if the offsets or start_line
