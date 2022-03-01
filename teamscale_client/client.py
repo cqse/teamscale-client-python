@@ -116,6 +116,29 @@ class TeamscaleClient:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
+    def post(self, url, json=None, parameters=None, data=None):
+        """Sends a POST request to the given service url with the json payload as content.
+
+        Args:
+            url (str):  The URL for which to execute a POST request
+            json: The Object to attach as content, will be serialized to json (only for object that can be serialized by default)
+            parameters (dict): parameters to attach to the url
+            data: The data object to be attached to the request
+
+        Returns:
+            requests.Response: request's response
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+        response = requests.post(url, params=parameters, json=json, data=data,
+                                 headers=headers, auth=self.auth_header,
+                                 verify=self.sslverify, timeout=self.timeout)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+        return response
+
     def delete(self, url, parameters=None):
         """Sends a DELETE request to the given service url.
 
@@ -671,7 +694,7 @@ class TeamscaleClient:
 
         return value
 
-    def get_findings(self, uniform_path, timestamp, recursive=True):
+    def get_findings(self, uniform_path, timestamp, recursive=True, blacklisted="excluded"):
         """Retrieves the list of findings in the currently active project for the given uniform path
         at the provided timestamp on the given branch.
 
@@ -680,6 +703,8 @@ class TeamscaleClient:
             timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
             recursive (bool): Whether to query findings recursively, i.e. also get findings for files under the given
                 path.
+            blacklisted (str): Whether to exclude or include blacklisted findings or focus on them entirely (set to
+                only_false_positives or only_tolerated for that)
 
         Returns:
             List[:class:`data.Finding`]): The list of findings.
@@ -691,7 +716,8 @@ class TeamscaleClient:
         parameters = {
             "t": self._get_timestamp_parameter(timestamp=timestamp),
             "recursive": recursive,
-            "all": True
+            "all": True,
+            "blacklisted": blacklisted
         }
         response = self.get(service_url, parameters=parameters)
         if not response.ok:
