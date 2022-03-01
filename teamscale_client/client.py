@@ -116,10 +116,10 @@ class TeamscaleClient:
         return response
 
     def post(self, url, json=None, parameters=None, data=None):
-        """Sends a PUT request to the given service url with the json payload as content.
+        """Sends a POST request to the given service url with the json payload as content.
 
         Args:
-            url (str):  The URL for which to execute a PUT request
+            url (str):  The URL for which to execute a POST request
             json: The Object to attach as content, will be serialized to json (only for object that can be serialized by default)
             parameters (dict): parameters to attach to the url
             data: The data object to be attached to the request
@@ -132,10 +132,10 @@ class TeamscaleClient:
         """
         headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         response = requests.post(url, params=parameters, json=json, data=data,
-                                headers=headers, auth=self.auth_header,
-                                verify=self.sslverify, timeout=self.timeout, proxies=self.proxies)
+                                 headers=headers, auth=self.auth_header,
+                                 verify=self.sslverify, timeout=self.timeout, proxies=self.proxies)
         if response.status_code != 200:
-            raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+            raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
     def delete(self, url, parameters=None):
@@ -708,6 +708,46 @@ class TeamscaleClient:
         if response.status_code != 200:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return self._findings_from_json(response.json())
+
+    def get_findings_summary(self, uniform_path, timestamp, recursive=True, blacklisted="excluded"):
+        service_url = self.get_new_project_service_url("findings/summary")
+        parameters = {
+            "t": self._get_timestamp_parameter(timestamp=timestamp),
+            "uniform-path": uniform_path,
+            "blacklisted": blacklisted,
+            "recursive": recursive,
+            "report-categories-without-findings": True
+        }
+        response = self.get(service_url, parameters=parameters)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return response.json()
+
+    def get_findings_with_count(self, uniform_path, timestamp, recursive=True, blacklisted="excluded", filter=""):
+        service_url = self.get_new_project_service_url("findings") + "list/with-count"
+        parameters = {
+            "t": self._get_timestamp_parameter(timestamp=timestamp),
+            "uniform-path": uniform_path,
+            "blacklisted": blacklisted,
+            "filter": filter,
+            "recursive": recursive,
+            "all": True,
+        }
+        response = self.get(service_url, parameters=parameters)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return response.json()
+
+    def get_findings_descriptions(self, language):
+        service_url = self.get_global_service_url("api/language-rules") + f"{self.project}"
+        parameters = {
+            "language": language
+        }
+        response = self.get(service_url, parameters=parameters)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        print(response.url)
+        return response.json()
 
     def get_finding_by_id(self, finding_id, branch=None, timestamp=None):
         """Retrieves the finding with the given id.
