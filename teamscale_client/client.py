@@ -671,7 +671,7 @@ class TeamscaleClient:
 
         return value
 
-    def get_findings(self, uniform_path, timestamp, recursive=True):
+    def get_findings(self, uniform_path, timestamp, recursive=True, filter=None, invert=False, assessmentFilters=None):
         """Retrieves the list of findings in the currently active project for the given uniform path
         at the provided timestamp on the given branch.
 
@@ -680,6 +680,9 @@ class TeamscaleClient:
             timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
             recursive (bool): Whether to query findings recursively, i.e. also get findings for files under the given
                 path.
+            filter: Whether to filter specific findings from the result
+            invert: flip the filter to only include specific findings in the result
+            assessmentFilters: filter out YELLOW or RED findings from the result
 
         Returns:
             List[:class:`data.Finding`]): The list of findings.
@@ -693,6 +696,13 @@ class TeamscaleClient:
             "recursive": recursive,
             "all": True
         }
+
+        if filter:
+            parameters["filter"] = filter
+        if invert:
+            parameters["invert"] = True
+        if assessmentFilters:
+            parameters["assessment-filters"] = assessmentFilters
         response = self.get(service_url, parameters=parameters)
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
