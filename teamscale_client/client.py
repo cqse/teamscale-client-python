@@ -671,7 +671,7 @@ class TeamscaleClient:
 
         return value
 
-    def get_findings(self, uniform_path, timestamp, recursive=True, filter=None, invert=False, assessmentFilters=None):
+    def get_findings(self, uniform_path, timestamp, recursive=True, revision_id=None, filter=None, invert=False, assessmentFilters=None):
         """Retrieves the list of findings in the currently active project for the given uniform path
         at the provided timestamp on the given branch.
 
@@ -680,9 +680,14 @@ class TeamscaleClient:
             timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
             recursive (bool): Whether to query findings recursively, i.e. also get findings for files under the given
                 path.
-            filter: Whether to filter specific findings from the result
-            invert: flip the filter to only include specific findings in the result
-            assessmentFilters: filter out YELLOW or RED findings from the result
+            revision_id (str): If provided, the client will first resolve the ID (e.g., commit hash) to a Teamscale
+               commit and retrieve the findings for the corresponding branch.
+            filter: The finding category, group, and type filters. 
+                Every string must be either a single category, a combination category/group, or a type ID. 
+                If a category or group is given, all matching findings will be filtered out and not included in the result.
+            invert: Whether to invert the category, group, type filters, 
+                i.e. including the elements given in the filters instead of excluding them.
+            assessmentFilters: The assessment filter. All mentioned assessment colors will be filtered out and not included in the result.
 
         Returns:
             List[:class:`data.Finding`]): The list of findings.
@@ -690,9 +695,14 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
+        if revision_id:
+            timestamp = self.get_commit_for_revision(revision_id)
+        else:
+            timestamp = self._get_timestamp_parameter(timestamp=timestamp)
+
         service_url = self.get_project_service_url("findings") + uniform_path
         parameters = {
-            "t": self._get_timestamp_parameter(timestamp=timestamp),
+            "t": timestamp,
             "recursive": recursive,
             "all": True
         }
@@ -707,6 +717,28 @@ class TeamscaleClient:
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return self._findings_from_json(response.json())
+
+    def get_commit_for_revision(self, revision_id):
+        """Retrieves the Teamscale commit corresponding to a revision, raising an error if the commit is not known
+        to Teamscale.
+
+        Args:
+            revision_id (str) The revision ID (e.g., commit SHA)
+
+        Returns:
+            str: The teamscale commit
+        """
+        service_url = self.get_project_service_url("repository-timestamp-by-revision") + revision_id
+        response = self.get(service_url)
+        if not response.ok:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+
+        response_json = response.json()
+
+        if not response_json:
+            raise ServiceError("Could not find commit in Teamscale for given revision: {rev}".format(rev=revision_id))
+
+        return response_json[0]["branchName"] + ":" + str(response_json[0]["timestamp"])
 
     def get_finding_by_id(self, finding_id, branch=None, timestamp=None):
         """Retrieves the finding with the given id.
