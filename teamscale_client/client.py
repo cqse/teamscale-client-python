@@ -671,7 +671,7 @@ class TeamscaleClient:
 
         return value
 
-    def get_findings(self, uniform_path, timestamp, recursive=True, revision_id=None):
+    def get_findings(self, uniform_path, timestamp, recursive=True, revision_id=None, filter=None, invert=False, assessmentFilters=None):
         """Retrieves the list of findings in the currently active project for the given uniform path
         at the provided timestamp on the given branch.
 
@@ -681,7 +681,13 @@ class TeamscaleClient:
             recursive (bool): Whether to query findings recursively, i.e. also get findings for files under the given
                 path.
             revision_id (str): If provided, the client will first resolve the ID (e.g., commit hash) to a Teamscale
-            commit and retrieve the findings for the corresponding branch.
+               commit and retrieve the findings for the corresponding branch.
+            filter: The finding category, group, and type filters. 
+                Every string must be either a single category, a combination category/group, or a type ID. 
+                If a category or group is given, all matching findings will be filtered out and not included in the result.
+            invert: Whether to invert the category, group, type filters, 
+                i.e. including the elements given in the filters instead of excluding them.
+            assessmentFilters: The assessment filter. All mentioned assessment colors will be filtered out and not included in the result.
 
         Returns:
             List[:class:`data.Finding`]): The list of findings.
@@ -700,6 +706,13 @@ class TeamscaleClient:
             "recursive": recursive,
             "all": True
         }
+
+        if filter:
+            parameters["filter"] = filter
+        if invert:
+            parameters["invert"] = True
+        if assessmentFilters:
+            parameters["assessment-filters"] = assessmentFilters
         response = self.get(service_url, parameters=parameters)
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
