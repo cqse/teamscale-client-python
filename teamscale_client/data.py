@@ -352,6 +352,7 @@ class SourceCodeConnectorConfiguration(ConnectorConfiguration):
                  path_prefix_transformation="", path_transformation="", encoding="", author_transformation="",
                  branch_transformation="", preserve_empty_commits=False):
         super(SourceCodeConnectorConfiguration, self).__init__(connector_type)
+        self.connectorIdentifierOptionName = "Repository identifier"
         self.options = {
             "Included file names": included_file_names,
             "Excluded file names": excluded_file_names,
