@@ -38,7 +38,7 @@ class Finding(object):
 
     def __init__(self, finding_type_id, message, assessment=Assessment.YELLOW, start_offset=None,
                  end_offset=None, start_line=None, end_line=None, identifier=None, uniform_path=None,
-                 finding_properties=None, finding_id=None):
+                 finding_properties=None, finding_id=None, resolved=False):
         self.findingTypeId = finding_type_id
         self.message = message
         self.assessment = assessment
@@ -51,6 +51,7 @@ class Finding(object):
         self.uniformPath = uniform_path
         self.findingProperties = finding_properties
         self.finding_id = finding_id
+        self.resolved = resolved
 
     def __cmp__(self, other):
         """Compares this finding to another finding."""
@@ -497,7 +498,8 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
         path_suffix (Optional[str]): Path suffix that is to be appended to the repository's base path. Empty by default.
     """
 
-    def __init__(self, account, enable_externals=False, externals_includes="", externals_excludes="", path_suffix="", *args, **kwargs):
+    def __init__(self, account, enable_externals=False, externals_includes="", externals_excludes="", path_suffix="",
+                 *args, **kwargs):
         super(SubversionSourceCodeConnectorConfiguration, self).__init__(connector_type=ConnectorType.SVN, *args,
                                                                          **kwargs)
         self.options["Account"] = account

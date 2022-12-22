@@ -1,0 +1,914 @@
+[
+  {
+    "typeId": "CS0108",
+    "name": "'member1' hides inherited member 'member2'. Use the new keyword if hiding was intended.",
+    "description": "A variable was declared with the same name as a variable in a base class. However, the new keyword was not used. This warning informs you that you should use new; the variable is declared as if new had been used in the declaration.\nThe following sample generates CS0108:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1570",
+    "name": "XML comment on 'construct' has badly formed XML \u2014 'reason'",
+    "description": "When using /doc, any comments in the source code must be in XML. Any error with your XML markup will generate CS1570. For example:\nIf you are passing a string to a cref, such as in an <exception> tag, the string must be enclosed in double quotation marks. If you are using a tag, such as <seealso>, which does not have a closing tag, you must specify a forward slash before the closing angle bracket. If you need to use a greater-than or less-than symbol in the text of description, you need to represent them with &gt; or &lt;. The file or path attribute on an <include> tag was missing or improperly formed.\nThe following sample generates CS1570:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS2002",
+    "name": "Source file 'file' specified multiple times",
+    "description": "A source file name was passed to the compiler more than once. You can only specify a file once to the compiler to build an output file.\nThis warning cannot be suppressed by the /nowarn option.\nThe following sample generates CS2002:\nTo generate the error, compile the example with the command line:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1572",
+    "name": "XML comment on 'construct' has a param tag for 'parameter', but there is no parameter by that name",
+    "description": "When using the /doc compiler option, a comment was specified for a parameter that does not exist for the method. Change the value passed to the name attribute or remove one of the comment lines.\nThe following sample generates CS1572:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0109",
+    "name": "The member 'member' does not hide an inherited member. The new keyword is not required",
+    "description": "A class declaration included the new keyword even though the declaration does not override an existing declaration in a base class. You can delete the new keyword.\nThe following sample generates CS0109:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0414",
+    "name": "The private field 'field' is assigned but its value is never used",
+    "description": "This warning can occur in several scenarios in which the compiler can verify that a variable is never referenced:\nA private field is assigned a constant value but is never subsequently read. The unnecessary assignment could effect performance. Consider removing the field. A private or internal static field is assigned a constant value only in the initializer. Consider changing the field to a const. A private or internal field is assigned constant values and only used in blocks that are excluded by #ifdef directives. Consider putting the field inside the #ifdef block. A private or internal field is assigned constant values in multiple locations but not otherwise accessed. If you do not need the field, consider removing it. Otherwise, use it in some appropriate way.\nIn other situations, or where the suggested workaround is not acceptable, use #pragma 0414.\nThe following sample shows one way in which CS0414 will be generated:\nNote\u00a0\u00a0\u00a0If the variable i is declared as protected or public, no error will be generated because the compiler cannot know whether a derived class might use it or some other client code might instantiate the class and reference the variable",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1571",
+    "name": "XML comment on 'construct' has a duplicate param tag for 'parameter'",
+    "description": "When using the /doc compiler option, multiple comments were found for the same method parameter. Remove one of the duplicate lines.\nThe following sample generates CS1571:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1607",
+    "name": "Assembly generation -- reason",
+    "description": "A warning was generated from the assembly-creation phase of the compilation.\nIf you are building a 64-bit application on a 32-bit operating system, you must ensure that 64-bit versions of all referenced assemblies are installed on the target operating system.\nAll x86-specific common language runtime (CLR) assemblies have 64-bit counterparts (every CLR assembly will exist on all operating systems). Therefore, you can safely ignore CS1607 for CLR assemblies.\nYou can ignore this warning if you encounter it when you create a AssemblyInformationalVersionAttribute. The informational version is a string that attaches additional version information to an assembly; this information is not used at run time. Although you can specify any text, a warning message appears on compilation if the string is not in the format that is used by the assembly version number, or if it is in that format but contains wildcard characters. This warning is harmless.\nFor more information, see Al.exe Tool Errors and Warnings.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0183",
+    "name": "The given expression is always of the provided ('type') type",
+    "description": "If a conditional statement always evaluates to true, then you do not need a conditional statement. This warning occurs when you try to evaluate a type using the is operator. If the evaluation is a value type, then the check is unnecessary.\nThe following sample generates CS0183:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0184",
+    "name": "The given expression is never of the provided ('type') type",
+    "description": "The expression can never be true because the variable you are testing is neither declared as type nor derived from type.\nThe following sample generates CS0184:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0419",
+    "name": "Ambiguous reference in cref attribute: 'Method Name1'. Assuming 'Method Name2', but could have also matched other overloads including 'Method Name3'.",
+    "description": "In an XML documentation comment in the code, a reference could not be resolved. This could occur if the method is overloaded, or if two different identifiers with the same name are found. To resolve the warning, use a qualified name to disambiguate the reference, or include the specific overload in parentheses.\nThe following sample generates CS0419.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1957",
+    "name": "Member 'name' overrides 'method'. There are multiple override candidates at run-time. It is implementation dependent which method will be called.",
+    "description": "Method parameters that vary only by whether they are ref or out cannot be differentiated at run-time.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1956",
+    "name": "Member 'name' implements interface member 'name' in type 'type'. There are multiple matches for the interface member at run-time. It is implementation dependent which method will be called.",
+    "description": "This warning can be generated when two interface methods are differentiated only by whether a particular parameter is marked with ref or with out. It is best to change your code to avoid this warning because it is not obvious or guaranteed which method is called at runtime.\nAlthough C# distinguishes between out and ref, the CLR sees them as the same. When deciding which method implements the interface, the CLR just picks one.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0105",
+    "name": "The using directive for 'namespace' appeared previously in this namespace",
+    "description": "A namespace, which should only be declared once, was declared more than once; remove all duplicate namespace declarations.\nThe following sample generates CS0105:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0628",
+    "name": "'member' : new protected member declared in sealed class",
+    "description": "A sealed class cannot introduce a protected member because no other class will be able to inherit from the sealed class and use the protected member.\nThe following sample generates CS0628:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0626",
+    "name": "Method, operator, or accessor 'method' is marked external and has no attributes on it. Consider adding a DllImport attribute to specify the external implementation",
+    "description": "A method marked extern should also be marked with an attribute, for example, the DllImport attribute.\nThe attribute specifies where the method is implemented. At run time, the program will need this information.\nThe following sample generates CS0626:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1573",
+    "name": "Parameter 'parameter' has no matching param tag in the XML comment for 'parameter' (but other parameters do)",
+    "description": "When using the /doc compiler option, a comment was specified for some but not all parameters in a method. You may have forgotten to enter a comment for these parameters.\nThe following sample generates CS1573:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1574",
+    "name": "XML comment on 'construct' has syntactically incorrect cref attribute 'name'",
+    "description": "A string passed to a cref tag, for example, within an <exception> tag, referred to a member that is not available within the current build environment. The string that you pass to a cref tag must be the syntactically correct name of a member or field.\nFor more information, see Recommended Tags for Documentation Comments.\nThe following sample generates CS1574:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0824",
+    "name": "Constructor 'name' is marked external.",
+    "description": "A constructor may be marked as extern. However, the compiler cannot verify that the constructor actually exists. Therefore the warning is generated.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1616",
+    "name": "Option 'option' overrides attribute 'attribute' given in a source file or added module",
+    "description": "This warning occurs if the assembly attributes AssemblyKeyFileAttribute or AssemblyKeyNameAttribute found in source conflict with the /keyfile or /keycontainer command line option or key file name or key container specified in the Project Properties.\nFor the example below, assume you have a key file named cs1616.snk. This file could be generated with the command line:\nThe following sample generates CS1616:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0422",
+    "name": "The /incremental option is no longer supported",
+    "description": "Incremental compilation (/incr or /incremental) is not supported in Visual C# 2005.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0420",
+    "name": "'identifier': a reference to a volatile field will not be treated as volatile",
+    "description": "A volatile field should not normally be passed using a ref or out parameter, since it will not be treated as volatile within the scope of the function. There are exceptions to this, such as when calling an interlocked API. As with any warning, you may use the #pragma warning to disable this warning in those rare cases where you are intentionally using a volatile field as a reference parameter.\nThe following sample generates CS0420:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0809",
+    "name": "Obsolete member 'memberA' overrides non-obsolete member 'memberB'.",
+    "description": "Typically, a member that is marked as obsolete should not override a member that is not marked as obsolete. This warning is generated in Visual Studio 2008 but not in Visual Studio 2005.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1058",
+    "name": "A previous catch clause already catches all exceptions. All exceptions thrown will be wrapped in a System.Runtime.CompilerServices.RuntimeWrappedException",
+    "description": "This attribute causes CS1058 if a catch() block has no specified exception type after a catch (System.Exception e) block. The warning advises that the catch() block will not catch any exceptions.\nA catch() block after a catch (System.Exception e) block can catch non-CLS exceptions if the RuntimeCompatibilityAttribute is set to false in the AssemblyInfo.cs file: [assembly: RuntimeCompatibilityAttribute(WrapNonExceptionThrows = false)]. If this attribute is not set explicitly to false, all thrown non-CLS exceptions are wrapped as Exceptions and the catch (System.Exception e) block catches them. For more information, see How to: Catch a non-CLS Exception.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0429",
+    "name": "Unreachable expression code detected",
+    "description": "This error occurs whenever part of an expression in your code is unreachable. In the following example, the condition false && myTest() meets this criteria because the myTest() method will never get evaluated due to the fact that the left side of the && operation is always false. As soon as the && operator evaluates the false statement as false, it stops the evaluation, and will never evaluate the right side.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1610",
+    "name": "Unable to delete temporary file 'file' used for default Win32 resource -- resource",
+    "description": "When using the /win32res compiler option and when your %TEMP% directory does not have DELETE permission, this warning indicates that the compiler could not delete a temporary file that it created.\nMake sure that you have read/write/delete permissions for the %TEMP% directory.\nIf necessary, you can manually delete these files and there will be no harm to C# or any of your programs.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0618",
+    "name": "'member' is obsolete: 'text'",
+    "description": "A class member was marked with the Obsolete attribute, such that a warning will be issued when the class member is referenced. For more information, see Common Attributes (C# and Visual Basic).\nThe following sample generates CS0618:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0612",
+    "name": "'member' is obsolete",
+    "description": "The class designer marked a member with the Obsolete attribute. This means that the member might not be supported in a future version of the class.\nThe following sample shows how accessing an obsolete member generates CS0612:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0028",
+    "name": "'function declaration' has the wrong signature to be an entry point",
+    "description": "The method declaration for Main was invalid: it was declared with an invalid signature. Main must be declared as static and it must return either int or void. For more information, see Main() and Command-Line Arguments (C# Programming Guide).\nThe following sample generates CS0028:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS2029",
+    "name": "Invalid value for '/define'; 'identifier' is not a valid identifier",
+    "description": "This warning occurs if the value that is used in the /define option has some invalid characters.\nThis warning cannot be suppressed by the /nowarn option.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0693",
+    "name": "Type parameter 'type parameter' has the same name as the type parameter from outer type 'type'",
+    "description": "This error occurs when you have a generic member such as a method inside a generic class. Since the method's type parameter is not necessarily the same as the class's type parameter, you cannot give them both the same name. For more information, see Generic Methods (C# Programming Guide).\nTo avoid this situation, use a different name for one of the type parameters.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0435",
+    "name": "The namespace 'namespace' in 'assembly' conflicts with the imported type 'type' in 'assembly'. Using the namespace defined in 'assembly'..",
+    "description": "This warning is issued when a namespace in a source file (file_2) conflicts with an imported type in file_1. The compiler uses the one in the source file.\nThe following example generates CS0435:\nCompile this file first:\nThen, compile this file:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0436",
+    "name": "The type 'type' in 'assembly' conflicts with the imported type 'type2' in 'assembly'. Using the type defined in 'assembly'.",
+    "description": "This warning is issued when a type in a source file (file_2) conflicts with an imported type in file _1. The compiler uses the one in the source file.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0437",
+    "name": "The type 'type' in 'assembly2' conflicts with the imported namespace 'namespace' in 'fassembly1'. Using the type defined in 'assembly'.",
+    "description": "This warning is issued when a type in a source file, file_2, conflicts with an imported namespace in file _1. The compiler uses the type in the source file.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0649",
+    "name": "Field 'field' is never assigned to, and will always have its default value 'value'",
+    "description": "The compiler detected an uninitialized private or internal field declaration that is never assigned a value.\nThe following sample generates CS0649:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS2023",
+    "name": "Ignoring /noconfig option because it was specified in a response file",
+    "description": "The /noconfig compiler option was specified in a response file, which is not allowed.\nThis warning cannot be suppressed by the /nowarn option.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1762",
+    "name": "A reference was created to embedded interop assembly '<assembly1>' because of an indirect reference to that assembly from assembly '<assembly2>'. Consider changing the 'Embed Interop Types' property on either assembly.",
+    "description": "You have added a reference to an assembly (assembly1) that has the Embed Interop Types property set to True. This instructs the compiler to embed interop type information from that assembly. However, the compiler cannot embed interop type information from that assembly because another assembly that you have referenced (assembly2) also references that assembly (assembly1) and has the Embed Interop Types property set to False.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0642",
+    "name": "Possible mistaken empty statement",
+    "description": "A semicolon after a conditional statement may cause your code to execute differently than intended.\nYou can use /nowarn compiler option or #pragmas warning to disable this warning; see /nowarn (Suppress Specified Warnings) (C# Compiler Options) or #pragma warning (C# Reference) for more information.\nThe following sample generates CS0642:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0440",
+    "name": "Defining an alias named 'global' is ill-advised since 'global::' always references the global namespace and not an alias",
+    "description": "This warning is issued when you define an alias named global.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0197",
+    "name": "Passing 'argument' as ref or out or taking its address may cause a runtime exception because it is a field of a marshal-by-reference class",
+    "description": "Any class that derives, directly or indirectly, from MarshalByRefObject is a marshal-by-reference class. Such a class can be marshaled by reference across process and machine boundaries. Thus, instances of this class could be proxies to remote objects. You cannot pass a field of a proxy object as ref or out. So, you cannot pass fields of such a class as ref or out, unless the instance is this, which can not be a proxy object.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0444",
+    "name": "Predefined type 'type name 1' was not found in 'System namespace 1' but was found in 'System namespace 2'",
+    "description": "A predefined object such as Int32 was not found where the compiler expected to find it, but instead found it in 'System namespace 2'.\nThe error could indicate that the .NET Framework is installed incorrectly. To fix this, reinstall the .NET Framework.\nIf you are writing your own base class libraries, you might also encounter this error. In this case, to resolve the error, rebuild mscorlib.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS2014",
+    "name": "Compiler option 'old option' is obsolete, please use 'new option' instead",
+    "description": "The form of the compiler option is deprecated. See C# Compiler Options for more information.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0219",
+    "name": "The variable 'variable' is assigned but its value is never used",
+    "description": "The compiler issues a level-three warning, when you declare and assign a variable, but do not use it.\nThe following sample generates CS0219:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0114",
+    "name": "'function1' hides inherited member 'function2'. To make the current method override that implementation, add the override keyword. Otherwise add the new keyword.",
+    "description": "A declaration in a class conflicts with a declaration in a base class such that the base class member will be hidden.\nFor more information, see base.\nThe following sample generates CS0114:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS4014",
+    "name": "Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.",
+    "description": "The current method calls an async method that returns a Task or a Task<TResult> and doesn\u2019t apply the await operator to the result. The call to the async method starts an asynchronous task. However, because no await operator is applied, the program continues without waiting for the task to complete. In most cases, that behavior isn't what you expect. Usually other aspects of the calling method depend on the results of the call or, minimally, the called method is expected to complete before you return from the method that contains the call.\nAn equally important issue is what happens to exceptions that are raised in the called async method. An exception that's raised in a method that returns a Task or Task<TResult> is stored in the returned task. If you don't await the task or explicitly check for exceptions, the exception is lost. If you await the task, its exception is rethrown.\nAs a best practice, you should always await the call.\nYou should consider suppressing the warning only if you're sure that you don't want to wait for the asynchronous call to complete and that the called method won't raise any exceptions. In that case, you can suppress the warning by assigning the task result of the call to a variable.\nThe following example shows how to cause the warning, how to suppress it, and how to await the call.\nIn the example, if you choose Call #1 or Call #2, the unawaited async method (CalledMethodAsync) finishes after both its caller (CallingMethodAsync) and the caller's caller (startButton_Click) are complete. The last line in the following output shows you when the called method finishes. Entry to and exit from the event handler that calls CallingMethodAsync in the full example are marked in the output.\nYou can also suppress compiler warnings by using #pragma warning (C# Reference) directives.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1030",
+    "name": "#warning: 'text'",
+    "description": "Displays the text of a warning defined with the #warning directive.\nThe following sample shows how to create a user-defined warning:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1203",
+    "name": "The feature 'feature' is deprecated. Please use 'feature' instead'.",
+    "description": "The feature 'invalid feature' is deprecated. Please use 'valid feature' instead'.\nThe feature you are attempting to use is now deprecated. Update your code to use the valid feature instead.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0728",
+    "name": "Possibly incorrect assignment to local 'variable' which is the argument to a using or lock statement. The Dispose call or unlocking will happen on the original value of the local.",
+    "description": "There are several scenarios where using or lock blocks will result in a temporary leak of resources. Here is one example:\nthisType f = null;\nusing (f)\n{\nf = new thisType();\n...\n}\nIn this case, the original value, such as null, of the variable thisType will be disposed of when the using block finishes executing, but the thisType object created inside the block will not be, although it will eventually get garbage collected.\nTo resolve this error, use the following form:\nusing (thisType f = new thisType())\n{\n...\n}\nIn this case, the newly allocated thisType object will be disposed of.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1645",
+    "name": "Feature 'feature' is not part of the standardized ISO C# language specification, and may not be accepted by other compilers",
+    "description": "The feature you are using is not part of the ISO standard. Code using this feature may not compile on other compilers.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3019",
+    "name": "CLS compliance checking will not be performed on 'type' because it is not visible from outside this assembly.",
+    "description": "This warning occurs when a type or a member that has the CLSCompliantAttribute attribute is not visible from another assembly. To resolve this error, remove the attribute on any classes or members that are not visible from the other assembly, or make the type or members visible. For more information on CLS Compliance, see Writing CLS-Compliant Code.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3018",
+    "name": "'type' cannot be marked as CLS-Compliant because it is a member of non CLS-compliant type 'type'",
+    "description": "This warning occurs if a nested class with the CLSCompliant attribute set to true is declared as a member of a class declared with the CLSCompliant attribute set to false. This is not allowed, since a nested class cannot be CLS-compliant if it is a member of an outer class that is not CLS-compliant. To resolve this warning, remove the CLSCompliant attribute from the nested class, or change it from true to false. For more information on CLS Compliance, see Writing CLS-Compliant Code and Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3015",
+    "name": "'method signature' has no accessible constructors which use only CLS-compliant types",
+    "description": "To be compliant with the Common Language Specification (CLS), the argument list of an attribute class cannot contain an array. For more information on CLS Compliance, see Writing CLS-Compliant Code and Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3014",
+    "name": "'member' does not need a CLSCompliant attribute because the assembly does not have a CLSCompliant attribute",
+    "description": "In a source code file where compliance with the Common Language Specification (CLS) was not specified, a construct in the file was marked as being CLS compliant. This is not allowed. To resolve this warning, add an assembly level CLS compliant attribute to the file (in the following example, uncomment the line that contains the assembly level attribute). For more information about CLS Compliance, see Writing CLS-Compliant Code and Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3017",
+    "name": "You cannot specify the CLSCompliant attribute on a module that differs from the CLSCompliant attribute on the assembly (CS3017)",
+    "description": "This warning occurs if you have a assembly CLSCompliant attribute that conflicts with a module CLSCompliant attribute. An assembly that is CLS compliant cannot contain modules that are not CLS compliant. To resolve this warning, make sure the assembly and module CLSCompliant attributes are either both true or both false, or remove one of the attributes. For more information on CLS Compliance, see Writing CLS-Compliant Code and Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3016",
+    "name": "Arrays as attribute arguments is not CLS-compliant",
+    "description": "It is not compliant with the Common Language Specification (CLS) to pass an array to an attribute. For more information on CLS Compliance, see Writing CLS-Compliant Code and Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3010",
+    "name": "'member': CLS-compliant interfaces must have only CLS-compliant members",
+    "description": "In an assembly marked with [assembly:CLCSompliant(true)], an interface contains a member marked with [CLCSompliant(false)]. Remove one of the Common Language Specification (CLS) compliance attributes. For more information about CLS Compliance, see Writing CLS-Compliant Code and Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0282",
+    "name": "There is no defined ordering between fields in multiple declarations of partial class or struct 'type'. To specify an ordering, all instance fields must be in the same declaration.",
+    "description": "To resolve this error, put all member variables in a single partial class definition.\nA common way to get this error is by having a partial struct defined in more than one place, with some of the member variables in one definition, and some in another.\nThe following code generates CS0282.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3011",
+    "name": "'member': only CLS-compliant members can be abstract",
+    "description": "A class member cannot be both abstract and non-compliant with the Common Language Specification (CLS). The CLS specifies that all class members shall be implemented. For more information about CLS Compliance, see Writing CLS-Compliant Code and Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0665",
+    "name": "Assignment in conditional expression is always constant; did you mean to use == instead of = ?",
+    "description": "A conditional expression used the = operator and not the == operator.\nThe following sample generates CS0665:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1700",
+    "name": "Assembly reference Assembly Name is invalid and cannot be resolved",
+    "description": "This warning indicates that an attribute, such as InternalsVisibleToAttribute, was not specified correctly.\nFor more information, see Friend Assemblies (C# and Visual Basic).",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3012",
+    "name": "You cannot specify the CLSCompliant attribute on a module that differs from the CLSCompliant attribute on the assembly (CS3012)",
+    "description": "In order for a module to be compliant with the Common Language Specification (CLS) through [module:System.CLCSompliant(true)], it must be built with the /target:module compiler option. For more information on the CLS, see Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1701",
+    "name": "Assuming assembly reference \"Assembly Name #1\" matches \"Assembly Name #2\", you may need to supply runtime policy (CS1701)",
+    "description": "The two assemblies differ in release and/or version number. For unification to occur, you must specify directives in the application's .config file, and you must provide the correct strong name of an assembly, as demonstrated in the following example code.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3013",
+    "name": "Added modules must be marked with the CLSCompliant attribute to match the assembly",
+    "description": "A module that was compiled with the /target:module compiler option was added to a compilation with /addmodule. However, the module's compliance with the Common Language Specification (CLS) does not agree with the CLS state of the current compilation.\nCLS compliance is indicated with the module attribute. For example, [module:CLSCompliant(true)] indicates that the module is CLS compliant, and [module:CLSCompliant(false)] indicates that the module is not CLS compliant. The default is [module:CLSCompliant(false)]. For more information on the CLS, see Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1911",
+    "name": "Access to member 'name' through a 'base' keyword from an anonymous method, lambda expression, query expression, or iterator results in unverifiable code. Consider moving the access into a helper method on the containing type.",
+    "description": "Calling virtual functions with the base keyword inside the method body of an iterator or anonymous methods will result in unverifiable code. Unverifiable code will fail to run in a partial trust environment.\nOne resolution for CS1911 is to move the virtual function call to a helper function.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0661",
+    "name": "'class' defines operator == or operator != but does not override Object.GetHashCode()",
+    "description": "The compiler detected the user-defined equality or inequality operator, but no override for the GetHashCode function. A user-defined equality or inequality operator implies that you also want to override the GetHashCode function.\nThe following sample generates CS0661:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0660",
+    "name": "Updated: September 2008",
+    "description": "The compiler detected the user-defined equality or inequality operator, but no override for the Equals function. A user-defined equality or inequality operator implies that you also want to override the Equals function. For more information, see Equality Comparisons (C# Programming Guide).\nThe following sample generates CS0660:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0280",
+    "name": "'type' does not implement the 'pattern name' pattern. 'method name' has the wrong signature.",
+    "description": "Two statements in C#, foreach and using, rely on predefined patterns, \"collection\" and \"resource\" respectively. This warning occurs when the compiler cannot match one of these statements to its pattern due to a method's incorrect signature. For example, the \"collection\" pattern requires that there be a method called MoveNext which takes no parameters and returns a boolean. Your code might contain a MoveNext method that has a parameter or perhaps returns an object.\nThe \"resource\" pattern and using provide another example. The \"resource\" pattern requires the Dispose method; if you define a property with the same name, you will get this warning.\nTo resolve this warning, ensure that the method signatures in your type match the signatures of the corresponding methods in the pattern, and ensure that you have no properties with the same name as a method required by the pattern.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1707",
+    "name": "Delegate 'DelegateName' bound to 'MethodName1' instead of 'MethodName2' because of new language rules",
+    "description": "C# 2.0 implements new rules for binding a delegate to a method. Additional information is considered that was not looked at in the past. This warning indicates that the delegate is now bound to a different overload of the method than it was previously bound to. You may wish to verify that the delegate really should be bound to 'MethodName1' instead of 'MethodName2'.\nFor a description of how the compiler determines which method to bind a delegate to, see Covariance and Contravariance in Delegates (C# Programming Guide).",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1709",
+    "name": "Filename specified for preprocessor directive is empty",
+    "description": "You have specified a preprocessor directive that includes a file name, but that file is empty. To resolve this warning, put the needed content into the file.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1702",
+    "name": "Assuming assembly reference \"Assembly Name #1\" matches \"Assembly Name #2\", you may need to supply runtime policy (CS1702)",
+    "description": "The two assembly references have differing build and/or revision numbers, so will not automatically unify. You may need to supply run-time policy to force unification by using directives in the application .config file.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0067",
+    "name": "The event 'event' is never used",
+    "description": "An event was declared but never used in the class in which it was declared.\nThe following sample generates CS0067:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1668",
+    "name": "Invalid search path 'path' specified in 'path string' -- 'system error message'",
+    "description": "The path supplied to /lib at the command line was not valid, or a path in the LIB environment variable is invalid. Check the path used to verify that it exists and can be accessed. The error message in single quotation marks is the error returned from the operating system.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0472",
+    "name": "The result of the expression is always 'value1' since a value of type 'value2' is never equal to 'null' of type 'value3'",
+    "description": "The compiler should warn if you use an operator with a constant null value.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3009",
+    "name": "'type': base type 'type' is not CLS-compliant",
+    "description": "A base type was marked as not having to be compliant with the Common Language Specification (CLS) in an assembly that was marked as being CLS compliant. Either remove the attribute that specifies the assembly is CLS compliant or remove the attribute that indicates the type is not CLS compliant. For more information on CLS Compliance, see Writing CLS-Compliant Code and Language Independence and Language-Independent Components.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0279",
+    "name": "'type name' does not implement the 'pattern name' pattern. 'method name' is either static or not public.",
+    "description": "There are several statements in C# that rely on defined patterns, such as foreach and using. For example, foreach relies on the collection class implementing the enumerable pattern. This error occurs when the compiler is unable to make the match due to a method being declared static or not public. Methods in patterns are required to be instances of classes, and to be public.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3008",
+    "name": "Identifier 'identifier' differing only in case is not CLS-compliant (CS3008)",
+    "description": "A public, protected, or protected internal identifier breaks compliance with the Common Language Specification (CLS) if it begins with an underscore character (_).For more information on CLS Compliance, see Writing CLS-Compliant Code and Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1658",
+    "name": "'warning text'. See also error 'error code'",
+    "description": "The compiler emits this warning when it overrides an error with a warning. For information about the problem, refer to the error mentioned. To find the appropriate error from within the Visual Studio IDE, use the index. For example, if the text above reads \"See also error 'CS1037',\" look for CS1037 in the index.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3007",
+    "name": "Overloaded method 'method' differing only by unnamed array types is not CLS-compliant",
+    "description": "This error occurs if you have an overloaded method that takes a jagged array and the only difference between the method signatures is the element type of the array. To avoid this error, consider using a rectangular array rather than a jagged array; use an additional parameter to disambiguate the function call; rename one or more of the overloaded methods; or, if CLS Compliance is not needed, remove the CLSCompliantAttribute attribute. For more information on CLS Compliance, see Language Independence and Language-Independent Components.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3006",
+    "name": "Overloaded method 'method' differing only in ref or out, or in array rank, is not CLS-compliant",
+    "description": "A method does not cannot be overloaded based on the ref or out parameter and still comply with the Common Language Specification (CLS). For more information on CLS Compliance, see Writing CLS-Compliant Code and Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0278",
+    "name": "'type' does not implement the 'pattern name' pattern. 'method name' is ambiguous with 'method name'.",
+    "description": "There are several statements in C# that rely on defined patterns, such as foreach and using. For example, foreach relies on the collection class implementing the \"enumerable\" pattern.\nCS0278 can occur if the compiler is unable to make the match due to ambiguities. For example, the \"enumerable\" pattern requires that there be a method called MoveNext, and your code might contain two methods called MoveNext. The compiler will attempt to find an interface to use, but it is recommended that you determine and resolve the cause of the ambiguity.\nFor more information, see How to: Access a Collection Class with foreach (C# Programming Guide).",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3005",
+    "name": "Identifier 'identifier' differing only in case is not CLS-compliant (CS3005)",
+    "description": "A public, protected, or protected internal identifier, which differs from another public, protected, or protected internal identifier only in the case of one or more letters, is not compliant with the Common Language Specification (CLS). For more information on CLS Compliance, see Writing CLS-Compliant Code and Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3004",
+    "name": "Mixed and decomposed Unicode characters are not CLS-compliant",
+    "description": "Only composed UNICODE characters are allowed in public, protected, or protected internal identifiers in order to be compliant with the Common Language Specification (CLS). For more information on CLS Compliance, see Writing CLS-Compliant Code and Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3003",
+    "name": "Type of 'variable' is not CLS-compliant",
+    "description": "A public, protected, or protected internal variable must be of a type that is compliant with the Common Language Specification (CLS). For more information on CLS Compliance, see Writing CLS-Compliant Code and Language Independence and Language-Independent Components.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1711",
+    "name": "XML comment on 'type' has a typeparam tag for 'parameter', but there is no type parameter by that name",
+    "description": "The documentation of a generic type includes a tag for the type parameter that has the wrong name.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3001",
+    "name": "Argument type 'type' is not CLS-compliant",
+    "description": "A public, protected, or protected internal method must accept a parameter whose type is compliant with the Common Language Specification (CLS). For more information on CLS Compliance, see Writing CLS-Compliant Code and Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1712",
+    "name": "Type parameter 'type parameter' has no matching typeparam tag in the XML comment on 'type' (but other type parameters do)",
+    "description": "The documentation of a generic type is missing a typeparam tag. For more information, see <typeparam> (C# Programming Guide).",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3002",
+    "name": "Return type of 'method' is not CLS-compliant",
+    "description": "A public, protected, or protected internal method must return a value whose type is compliant with the Common Language Specification (CLS). For more information on CLS Compliance, see Writing CLS-Compliant Code and Common Language Specification.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1710",
+    "name": "XML comment on 'type' has a duplicate typeparam tag for 'parameter'",
+    "description": "The documentation of a generic type includes a duplicate tag for the type parameter.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3000",
+    "name": "Methods with variable arguments are not CLS-compliant",
+    "description": "The arguments used in the method expose features that are not in the Common Language Specifications (CLS). For more information on CLS Compliance, see Writing CLS-Compliant Code.\nThe following example generates the warning CS3000.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0652",
+    "name": "Comparison to integral constant is useless; the constant is outside the range of type 'type'",
+    "description": "The compiler detected a comparison between a constant and a variable where the constant is out of the range of the variable.\nThe following sample generates CS0652:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1717",
+    "name": "Assignment made to same variable; did you mean to assign something else?",
+    "description": "This warning occurs when you assign a variable to itself, such as a = a.\nSeveral common mistakes can generate this warning:\nWriting a = a as the condition of an if statement, such as if (a = a). You probably meant to say if (a == a), which is always true, so you could write this more concisely as if (true). Mistyping. You probably meant to say a = b. In a constructor where the parameter has the same name as the field, not using the this keyword: you probably meant to say this.a = a.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1718",
+    "name": "Comparison made to same variable; did you mean to compare something else?",
+    "description": "If you meant to compare to something else, then you should simply correct the statement.\nBut another possibility is that you were testing for true or false, and were doing so by statements such as if (a == a) (true) or if (a < a) (false). It is better to simply say if (true) or if (false). There are two reasons for this:\nIt is simpler: it is always clearer to simply say what you mean. It helps avoid confusion: a new feature of C# 2.0 is nullable value types, which are analogous to the value null in Transact-SQL, the programming language used by SQL Server. Developers familiar with Transact-SQL might be concerned about the effect of nullable types on expressions such as if (a == a), because of the use of ternary logic in Transact-SQL. If you use true or false, you avoid this possible confusion.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0658",
+    "name": "'attribute modifier' is not a recognized attribute location. All attributes in this block will be ignored.",
+    "description": "An invalid attribute modifier was specified. See Attribute Targets for more information.\nThe following sample generates CS0658:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0657",
+    "name": "'attribute modifier' is not a valid attribute location for this declaration. Valid attribute locations for this declaration are 'locations'. All attributes in this block will be ignored.",
+    "description": "The compiler found an attribute modifier in an invalid location. See Attribute Targets for more information.\nThe following sample generates CS0657:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0659",
+    "name": "'class' overrides Object.Equals(object o) but does not override Object.GetHashCode()",
+    "description": "The compiler detected an override of the Equals function but no override for GetHashCode. An override of Equals implies that you also want to override GetHashCode.\nFor more information, see\nHashtable. Guidelines for Implementing Equals and the Equality Operator (==) Implementing the Equals Method GetHashCode\nThe following sample generates CS0659:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0169",
+    "name": "The private field 'class member' is never used",
+    "description": "A private variable was declared but never referenced. A common way to generate this warning is when you declare a private member of a class and do not use it.\nThe following sample generates CS0169:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1698",
+    "name": "Circular assembly reference 'AssemblyName1' does not match the output assembly name 'AssemblyName2'. Try adding a reference to 'AssemblyName1' or changing the output assembly name to match.",
+    "description": "CS1698 occurs when an assembly reference is incorrect. This can happen if a referenced assembly is recompiled. To resolve, do not replace an assembly that itself is a dependency of an assembly you are referencing.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1699",
+    "name": "Use command line option \"compiler_option\" or appropriate project settings instead of \"attribute_name\"",
+    "description": "In order to sign an assembly, it is necessary to specify a key file. Prior to Microsoft Visual C# 2005, you specified the key file using CLR attributes in source code. These attributes are now deprecated.\nBeginning in Microsoft Visual C# 2005, you should use the Signing Page of the Project Designer or the Assembly Linker to specify the key file.\nThe Signing Page of the Project Designer is the preferred method; for more information, see Signing Page, Project Designer and Managing Assembly and Manifest Signing.\nThe How to: Sign an Assembly with a Strong Name uses the following compiler options:\n/keyfile (C# Compiler Options) instead of the AssemblyKeyFileAttribute attribute. /keycontainer (C# Compiler Options) instead ofAssemblyKeyNameAttribute. /delaysign (C# Compiler Options) instead of AssemblyDelaySignAttribute.\nThese attributes have been deprecated for the following reasons:\nThere were security issues due to the attributes being embedded in the binary files produced by the compiler. Everyone who had your binary also had the keys stored in it. There were usability issues due to the fact that the path specified in the attributes was relative to the current working directory, which could change in the integrated development environment (IDE), or to the output directory. Thus, most times the key file is likely to be ..\\\\..\\\\mykey.snk. Attributes also make it more difficult for the project system to properly sign satellite assemblies. When you use the compiler options instead of these attributes, you can use a fully qualified path and file name for the key without anything being embedded in the output file; the project system and source code control system can properly manipulate that full path when projects are moved around; the project system can maintain a project-relative path to the key file, and still pass a full path to the compiler; other build programs can more easily sign outputs by passing the proper path directly to the compiler instead of generating a source file with the correct attributes. Using attributes with friend assemblies can hamper compiler efficiency. When you use attributes, the compiler does not know what the key is when it has to decide whether or not to grant friendship and so it has to guess. At the end of compilation, the compiler is able to verify the guess once it finally knows the key. When the key file is specified with a compiler option, the compiler can immediately decide whether to grant friendship.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1694",
+    "name": "Invalid filename specified for preprocessor directive. Filename is too long or not a valid filename.",
+    "description": "This warning occurs when using the #pragma checksum preprocessor directive. The file name specified is longer than 256 characters. To resolve this warning, use a shorter file name.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1695",
+    "name": "Invalid #pragma checksum syntax; should be #pragma checksum \"filename\" \"{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}\" \"XXXX...\"",
+    "description": "You should rarely encounter this error since the checksum is generally inserted at run time if you are generating code by means of the Code Dom API.\nHowever, if you were to type in this #pragma statement and mistype either the GUID or checksum, you would get this error. The syntax checking by the compiler does not validate that you typed in a correct GUID, but it does check for the right number of digits and delimiters, and that the digits are hexadecimal. Likewise, it verifies that the checksum contains an even number of digits, and that the digits are hexadecimal.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1696",
+    "name": "Single-line comment or end-of-line expected",
+    "description": "The compiler requires a preprocessor directive to be followed by an end-of-line terminator or by a single-line comment. The compiler has finished processing a valid preprocessor directive, and has encountered something that violates this syntax constraint.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0078",
+    "name": "The 'l' suffix is easily confused with the digit '1' -- use 'L' for clarity",
+    "description": "The compiler warns when it detects a cast to long using a lowercase l instead of an uppercase L.\nThe following sample generates CS0078:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0168",
+    "name": "The variable 'var' is assigned but its value is never used",
+    "description": "The compiler warns when a variable is declared but not used.\nThe following sample generates two CS0168 warnings:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1697",
+    "name": "Different checksum values given for 'file name'",
+    "description": "You have specified more than one checksum for a given file. The debugger uses the checksum value to determine which file to debug when there is more than one file in a project with the same name. Most users will not encounter this error, but if you are writing an application that generates code, you may run into it. To resolve this error, ensure that you generate the checksum only once for any given code file.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0602",
+    "name": "The feature 'old_feature' is deprecated. Please use 'new_feature' instead",
+    "description": "A language feature used in your code (old_feature) is still supported, but that support may be removed in a future release. Instead, you should use the recommended syntax (new_feature).",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1590",
+    "name": "Invalid XML include element -- Missing file attribute",
+    "description": "A path or doc attribute, passed to the <include> tag, was missing or incomplete.\nThe following sample generates CS1590:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1591",
+    "name": "Missing XML comment for publicly visible type or member 'Type_or_Member'",
+    "description": "The /doc compiler option was specified, but one or more constructs did not have comments.\nThe following sample generates CS1591:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1522",
+    "name": "Empty switch block",
+    "description": "The compiler detected a switch block with no case or default statement. A switch block must have one or more case or default statements.\nThe following sample generates CS1522:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1592",
+    "name": "Badly formed XML in included comments file -- 'reason'",
+    "description": "A problem, reported as reason, was found in the file specified by the <include> tag.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0684",
+    "name": "'interface' interface marked with 'CoClassAttribute' not marked with 'ComImportAttribute'",
+    "description": "If you specify CoClassAttribute on an interface, you must also specify ComImportAttribute.\nThe following sample generates CS0684:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1598",
+    "name": "XML parser could not be loaded for the following reason: 'reason'. The XML documentation file 'file' will not be generated.",
+    "description": "The /doc option was specified, but the compiler could not find and load msxml3.dll. Make sure that the file msxml3.dll is installed and registered.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1060",
+    "name": "Use of possibly unassigned field 'name'. Struct instance variables are initially unassigned if struct is unassigned.",
+    "description": "Struct members are initialized to their default value if you do not explicitly initialize them. The default value for class types (and other reference types) is null. If the class is not initialized before any attempt to access it, a NullReferenceException will be thrown at runtime. The compiler cannot determine definitively whether the class member will be initialized or not, and so CS1060 is a warning and not an error.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0465",
+    "name": "Introducing a 'Finalize' method can interfere with destructor invocation. Did you intend to declare a destructor?",
+    "description": "This warning occurs when you create a class with a method whose signature is public virtual void Finalize.\nIf such a class is used as a base class and if the deriving class defines a destructor, the destructor will override the base class Finalize method, not Finalize.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0464",
+    "name": "Comparing with null of type 'type' always produces 'false'",
+    "description": "This warning is produced when you perform a comparison between a nullable variable and null, and the comparison is not == or !=. To resolve this error, verify if you really want to check a value for null. A comparison like i == null can be either true of false. A comparison like i > null is always false.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0467",
+    "name": "Ambiguity between method 'method' and non-method 'non-method'. Using method group.",
+    "description": "Inherited members from different interfaces that have the same signature cause an ambiguity error.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1720",
+    "name": "Expression will always cause a System.NullReferenceException because the default value of 'generic type' is null",
+    "description": "If you write an expression involving the default of a generic type variable that is a reference type (for example, a class), this error will occur. Consider the following expression:\nSince T is a reference type, its default value is null, and so attempting to apply the ToString method to it will throw a NullReferenceException.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0688",
+    "name": "'method1' has a link demand, but overrides or implements 'method2' which does not have a link demand. A security hole may exist.",
+    "description": "The link demand set up on the derived class method can easily be circumvented by calling the base class method. To close the security hole, the base class method needs to also use the link demand. For more information, see Demand vs. LinkDemand.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0469",
+    "name": "The 'goto case' value is not implicitly convertible to type 'type'",
+    "description": "When you use goto case, there must be an implicit conversion from the value of the goto case to the type of the switch.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1723",
+    "name": "XML comment on 'param' has cref attribute 'attribute' that refers to a type parameter",
+    "description": "This error is generated by an XML comment that refers to a type parameter.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0162",
+    "name": "Unreachable code detected",
+    "description": "The compiler detected code that will never be executed.\nThe following sample generates CS0162:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1691",
+    "name": "'number' is not a valid warning number",
+    "description": "A number that was passed to the #pragma warning preprocessor directive was not a valid warning number. Verify that the number represents a warning, not an error or another sequence of characters.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1690",
+    "name": "Accessing a member on 'member' may cause a runtime exception because it is a field of a marshal-by-reference class",
+    "description": "This warning occurs when you try to call a method, property, or indexer on a member of a class that derives from MarshalByRefObject, and the member is a value type. Objects that inherit from MarshalByRefObject are typically intended to be marshaled by reference across an application domain. If any code ever attempts to directly access the value-type member of such an object across an application domain, a runtime exception will occur. To resolve the warning, first copy the member into a local variable and call the method on that variable.\nThe following sample generates CS1690:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0164",
+    "name": "This label has not been referenced",
+    "description": "A label was declared but never used.\nThe following sample generates CS0164:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1692",
+    "name": "Invalid number",
+    "description": "A number of preprocessor directives, such as #pragma and #line, use numbers as parameters. One of these numbers is invalid because it is too big, in the wrong format, contains illegal characters, and so on. To correct this error, correct the number.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1635",
+    "name": "Cannot restore warning 'warning code' because it was disabled globally",
+    "description": "This warning occurs if you use the /nowarn command line option or project setting to disable a warning for the entire compilation unit, but you use #pragma warning restore to attempt to restore that warning. To resolve this error, remove the /nowarn command line option or project setting, or remove the #pragma warning restore for any warnings you are disabling via the command line or project settings. For more information, see the #pragma warning topic.\nThe following sample generates CS1635:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1634",
+    "name": "Expected disable or restore",
+    "description": "This error occurs if a #pragma warning clause is badly formed, such as if disable or restore was omitted. For more information, see the #pragma warning topic.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1633",
+    "name": "Unrecognized #pragma directive",
+    "description": "The pragma used was not one of the known pragmas supported by the C# compiler. To resolve this error, use only pragmas supported.\nThe following sample generates CS1633:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1687",
+    "name": "Source file has exceeded the limit of 16,707,565 lines representable in the PDB, debug information will be incorrect",
+    "description": "The PDB and debugger have some limitations about how big a file can be. If the source file is too big, the debugger will not behave properly beyond that limit. The user should either not emit debug information for that file by possibly using #line hidden, or they should find a way to shrink the file, possibly by splitting the file into multiple files. They might want to use the partial keyword to split up a large class.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1685",
+    "name": "The predefined type 'System.type name' is defined in multiple assemblies in the global alias; using definition from 'File Name'",
+    "description": "This error occurs when a predefined system type such as System.int32 is found in two assemblies. One way this can happen is if you are referencing mscorlib from two different places, such as trying to run the.Net Framework versions 1.0 and 1.1 side-by-side.\nThe compiler will use the definition from only one of the assemblies. The compiler searches only global aliases, does not search libraries defined /reference. If you have specified /nostdlib, the compiler will search for Object, and in the future start all searches for predefined types in the file where it found Object.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1683",
+    "name": "Reference to type 'Type Name' claims it is defined in this assembly, but it is not defined in source or any added modules",
+    "description": "This error can occur when you are importing an assembly that contains a reference back to the assembly you are currently compiling, but the assembly being compiled contains nothing matching the reference. One way to get to this situation is to compile your assembly, which initially does contain the member that the assembly being imported is referencing. Then you update your assembly, mistakenly removing the members that the imported assembly is referencing.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1684",
+    "name": "Reference to type 'Type Name' claims it is defined in 'Namespace', but it could not be found",
+    "description": "This error can be caused by a reference inside one namespace referring to a type that it says exists inside a second namespace, but the type does not exist. For example, mydll.dll says that type A exists inside yourdll.dll, but no such type exists inside yourdll.dll. One possible cause of this error is that the version of yourdll.dll you are using is too old and A has not yet been defined.\nThe following sample generates CS1684.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3027",
+    "name": "'type_1' is not CLS-compliant because base interface 'type_2' is not CLS-compliant",
+    "description": "A non-CLS compliant type cannot be a base type for a type that is CLS compliant.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0253",
+    "name": "Possible unintended reference comparison; to get a value comparison, cast the right hand side to type 'type'",
+    "description": "The compiler is doing a reference comparison. If you want to compare the value of strings, cast the right side of the expression to type.\nThe following sample generates CS0253:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3026",
+    "name": "CLS-compliant field 'field' cannot be volatile",
+    "description": "A volatile variable should not be CLS compliant.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0402",
+    "name": "'identifier' : an entry point cannot be generic or in a generic type",
+    "description": "The entry point was found in a generic type. To remove this warning, implement Main in a non-generic class or struct.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS5000",
+    "name": "Unknown compiler option '/option'",
+    "description": "An invalid compiler option was specified.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1580",
+    "name": "Invalid type for parameter 'parameter number' in XML comment cref attribute",
+    "description": "When attempting to reference an overload form of a method, the compiler detected a syntax error. Typically, this indicates that the parameter name, and not the type, was specified. A malformed line will appear in the generated XML file.\nThe following sample generates CS1580:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1581",
+    "name": "Invalid return type in XML comment cref attribute",
+    "description": "When attempting to reference a method, the compiler detected an error due to an invalid return type.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1587",
+    "name": "XML comment is not placed on a valid language element",
+    "description": "Recommended tags for documentation comments are not allowed on all language elements. For example, a tag is not allowed on a namespace. For more information on XML comments, see Recommended Tags for Documentation Comments (C# Programming Guide).",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0672",
+    "name": "Member 'member1' overrides obsolete member 'member2. Add the Obsolete attribute to 'member1'",
+    "description": "The compiler found an override to a method marked as obsolete. However, the overriding method was not itself marked as obsolete. The overriding method will still generate CS0612, if called.\nReview your method declarations and explicitly indicate whether a method (and all of its overrides) should be marked obsolete.\nThe following sample generates CS0672:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1584",
+    "name": "XML comment on 'member' has syntactically incorrect cref attribute 'invalid_syntax'",
+    "description": "One of the parameters passed to a tag for documentation comments has invalid syntax. For more information, see Recommended Tags for Documentation Comments (C# Programming Guide).",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0458",
+    "name": "The result of the expression is always 'null' of type 'type name'",
+    "description": "This warning is caused by a nullable expression that always results in null.\nThe following code generates warning CS0458.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0252",
+    "name": "Possible unintended reference comparison; to get a value comparison, cast the left hand side to type 'type'",
+    "description": "The compiler is doing a reference comparison. If you want to compare the value of strings, cast the left side of the expression to type.\nThe following sample generates CS0252:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3023",
+    "name": "CLSCompliant attribute has no meaning when applied to return types. Try putting it on the method instead.",
+    "description": "Function return types are not checked for CLS Compliance, since the CLS Compliance rules apply to methods and type declarations.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0251",
+    "name": "Indexing an array with a negative index (array indices always start at zero)",
+    "description": "Do not use a negative number to index into an array.\nThe following sample generates CS0251:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3024",
+    "name": "Constraint type 'type' is not CLS-compliant.",
+    "description": "The compiler issues this warning because the use of a non-CLS-compliant type as a generic type constraint could make it impossible for code written in some languages to consume your generic class.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS0675",
+    "name": "Bitwise-or operator used on a sign-extended operand; consider casting to a smaller unsigned type first",
+    "description": "The compiler implicitly widened and sign-extended a variable, and then used the resulting value in a bitwise OR operation. This can result in unexpected behavior.\nThe following sample generates CS0675:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3021",
+    "name": "'type' does not need a CLSCompliant attribute because the assembly does not have a CLSCompliant attribute",
+    "description": "This warning occurs if [CLSCompliant(false)] appears on a class in an assembly which does not have an assembly-level CLSCompliant attribute set to true (i.e., the line [assembly: CLSCompliant(true)]). Since the assembly is not declaring itself CLS compliant, there is no need for anything within the assembly to declare itself non-compliant, since it is assumed to be non-compliant. For more information on CLS Compliance, see Writing CLS-Compliant Code.\nTo get rid of this warning, remove the attribute or add the assembly level attribute.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1589",
+    "name": "Unable to include XML fragment 'fragment' of file 'file' -- reason",
+    "description": "The syntax (fragment) of a <include> tag, which referenced a file (file), was incorrect for the specified reason.\nA malformed line will be placed in the generated XML file.\nThe following sample generates CS1589:",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1927",
+    "name": "Ignoring /win32manifest for module because it only applies to assemblies.",
+    "description": "A win32 manifest is only applied at the assembly level. Your module will compile but it will not have a manifest.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS3022",
+    "name": "CLSCompliant attribute has no meaning when applied to parameters. Try putting it on the method instead.",
+    "description": "Method parameters are not checked for CLS Compliance, since the CLS Compliance rules apply to methods and type declarations.",
+    "enablement": "YELLOW"
+  },
+  {
+    "typeId": "CS1682",
+    "name": "Reference to type 'type' claims it is nested within 'nested type', but it could not be found",
+    "description": "This error arises when you import references that do not agree with other references or with code you have written. A common way to get this error is to write code that refers to a class in metadata, and then you either delete that class or modify its definition.",
+    "enablement": "YELLOW"
+  }
+]

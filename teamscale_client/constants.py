@@ -128,6 +128,7 @@ class ReportFormats:
 
     FINDBUGS = "FINDBUGS"
 
+
 class UnitTestReportFormats:
     """Reports for unit test results that Teamscale understands."""
 
