@@ -27,10 +27,9 @@ class TeamscaleClient:
         sslverify: See requests' verify parameter in http://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
         timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
         branch (str): The branch name for which to upload/retrieve data
-        proxies (dict): Dictionary of proxies if any. Note: This needs pysocks installed.
     """
 
-    def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None, proxies=None):
+    def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
         """Constructor
         """
         self.url = url
@@ -40,11 +39,10 @@ class TeamscaleClient:
         self.sslverify = sslverify
         self.timeout = timeout
         self.branch = branch
-        self.proxies = proxies
         self.check_api_version()
 
     @staticmethod
-    def from_client_config(config, sslverify=True, timeout=30.0, branch=None, proxies=None):
+    def from_client_config(config, sslverify=True, timeout=30.0, branch=None):
         """Creates a new Teamscale client from a `TeamscaleClientConfig` object.
 
         Args:
@@ -54,7 +52,7 @@ class TeamscaleClient:
             branch (str): The branch name for which to upload/retrieve data
         """
         return TeamscaleClient(config.url, config.username, config.access_token, config.project_id,
-                               sslverify, timeout, branch, proxies=proxies)
+                               sslverify, timeout, branch)
 
     def set_project(self, project):
         """Sets the project id for subsequent calls made using the client."""
@@ -89,7 +87,7 @@ class TeamscaleClient:
         """
         headers = {'Accept': 'application/json'}
         response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers,
-                                timeout=self.timeout, proxies=self.proxies)
+                                timeout=self.timeout)
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
@@ -112,9 +110,32 @@ class TeamscaleClient:
         headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         response = requests.put(url, params=parameters, json=json, data=data,
                                 headers=headers, auth=self.auth_header,
-                                verify=self.sslverify, timeout=self.timeout, proxies=self.proxies)
+                                verify=self.sslverify, timeout=self.timeout)
         if not response.ok:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+        return response
+
+    def post(self, url, json=None, parameters=None, data=None):
+        """Sends a POST request to the given service url with the json payload as content.
+
+        Args:
+            url (str):  The URL for which to execute a POST request
+            json: The Object to attach as content, will be serialized to json (only for object that can be serialized by default)
+            parameters (dict): parameters to attach to the url
+            data: The data object to be attached to the request
+
+        Returns:
+            requests.Response: request's response
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+        response = requests.post(url, params=parameters, json=json, data=data,
+                                 headers=headers, auth=self.auth_header,
+                                 verify=self.sslverify, timeout=self.timeout)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
     def delete(self, url, parameters=None):
@@ -533,6 +554,9 @@ class TeamscaleClient:
         """
         return "%s/%s/" % (self.url, service_name)
 
+    def get_new_project_service_url(self, service_name):
+        return "{client.url}/api/projects/{client.project}/{service}/".format(client=self, service=service_name)
+
     def get_global_service_url_versioned(self, service_name, api_version):
         """Returns the full url pointing to a specific version of a global service.
 
@@ -651,6 +675,7 @@ class TeamscaleClient:
                        start_line=self._get_finding_location_entry(finding_json, 'rawStartLine', 1),
                        end_line=self._get_finding_location_entry(finding_json, 'rawEndLine', 1),
                        uniform_path=finding_json['location']['uniformPath'],
+                       finding_properties=finding_json['properties'],
                        finding_id=finding_json['id'],
                        resolved='death' in finding_json)
 
@@ -673,7 +698,7 @@ class TeamscaleClient:
 
         return value
 
-    def get_findings(self, uniform_path, timestamp, recursive=True):
+    def get_findings(self, uniform_path, timestamp, recursive=True, blacklisted="excluded"):
         """Retrieves the list of findings in the currently active project for the given uniform path
         at the provided timestamp on the given branch.
 
@@ -682,6 +707,8 @@ class TeamscaleClient:
             timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
             recursive (bool): Whether to query findings recursively, i.e. also get findings for files under the given
                 path.
+            blacklisted (str): Whether to exclude or include blacklisted findings or focus on them entirely (set to
+                only_false_positives or only_tolerated for that)
 
         Returns:
             List[:class:`data.Finding`]): The list of findings.
@@ -693,12 +720,54 @@ class TeamscaleClient:
         parameters = {
             "t": self._get_timestamp_parameter(timestamp=timestamp),
             "recursive": recursive,
-            "all": True
+            "all": True,
+            "blacklisted": blacklisted
         }
         response = self.get(service_url, parameters=parameters)
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return self._findings_from_json(response.json())
+
+    def get_findings_summary(self, uniform_path, timestamp, recursive=True, blacklisted="excluded"):
+        """Gets the list of finding summaries for an element or a resource sub-tree.
+
+        Args:
+            uniform_path (str): The uniform path to get findings for.
+            timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
+            recursive (bool): Whether to query findings recursively, i.e. also get findings for files under the given
+                path.
+            blacklisted (str): Whether to exclude or include blacklisted findings or focus on them entirely (set to
+                only_false_positives or only_tolerated for that)
+
+        Returns:
+            Json encoded response
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        service_url = self.get_new_project_service_url("findings/summary")
+        parameters = {
+            "t": self._get_timestamp_parameter(timestamp=timestamp),
+            "uniform-path": uniform_path,
+            "blacklisted": blacklisted,
+            "recursive": recursive,
+            "report-categories-without-findings": True
+        }
+        response = self.get(service_url, parameters=parameters)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return response.json()
+
+    def get_findings_descriptions(self, language):
+        service_url = self.get_global_service_url("api/language-rules") + f"{self.project}"
+        parameters = {
+            "language": language
+        }
+        response = self.get(service_url, parameters=parameters)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        print(response.url)
+        return response.json()
 
     def get_finding_by_id(self, finding_id, branch=None, timestamp=None):
         """Retrieves the finding with the given id.
@@ -754,7 +823,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
             """
-        service_url = self.get_project_service_url("tasks")
+        service_url = self.get_new_project_service_url("tasks")
         parameters = {
             "status": status,
             "details": details,
@@ -780,8 +849,8 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        service_url = self.get_project_service_url("comment-task") + str(task_id)
-        response = self.put(service_url, data=to_json(comment))
+        service_url = self.get_new_project_service_url("tasks") + str(task_id) + "/comments"
+        response = self.post(service_url, data=to_json(comment))
         if not response.ok:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return response
