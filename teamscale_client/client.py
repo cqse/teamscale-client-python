@@ -226,7 +226,9 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        return self._upload_external_data("add-external-findings", findings, timestamp, message, partition)
+        # TODO The server does not accept the JSON payload
+        json_data = to_json(findings)
+        return self._upload_external_data("external-findings", json_data, timestamp, message, partition)
 
     def upload_metrics(self, metrics, timestamp, message, partition):
         """Uploads a list of metrics
@@ -261,15 +263,24 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        service_url = self.get_project_service_url(service_name)
-        parameters = {
-            "t": self._get_timestamp_parameter(timestamp),
-            "message": message,
-            "partition": partition,
-            "skip-session": "true",
-            "adjusttimestamp": "true"
-        }
-        return self.put(service_url, parameters=parameters, data=to_json(json_data))
+        session_id, session_base_url = None, None
+        try:
+            session_base_url = self.get_service_url("external-analysis/session", project_id=self.project)
+            response = self.post(session_base_url, parameters={
+                "t": self._get_timestamp_parameter(timestamp),
+                "message": message,
+                "partition": partition
+            })
+            session_id = response.json()
+
+            service_url = session_base_url + "{session_id}/{service_name}".format(
+                session_id=session_id,
+                service_name=service_name
+            )
+            response = self.post(service_url, json=json_data)
+            return response
+        finally:
+            self.delete(session_base_url + session_id)
 
     def add_metric_descriptions(self, metric_descriptions):
         """Uploads metric definitions to Teamscale.
