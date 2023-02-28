@@ -124,11 +124,38 @@ class TeamscaleClient:
             ServiceError: If anything goes wrong
         """
         headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
-        response = requests.put(url, params=parameters, json=json, data=data,
-                                headers=headers, auth=self.auth_header,
-                                verify=self.sslverify, timeout=self.timeout)
+        response = requests.put(
+            url, params=parameters, json=json, data=data,
+            headers=headers, auth=self.auth_header,
+            verify=self.sslverify, timeout=self.timeout
+        )
         if not response.ok:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+        return response
+
+    def post(self, url, json=None, parameters=None, data=None):
+        """Sends a POST request to the given service url with the json payload as content.
+
+        Args:
+            url (str):  The URL for which to execute a POST request
+            json: The Object to attach as content, will be serialized to json (only for object that can be serialized by default)
+            parameters (dict): parameters to attach to the url
+            data: The data object to be attached to the request
+
+        Returns:
+            requests.Response: request's response
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+        response = requests.post(
+            url, params=parameters, json=json, data=data,
+            headers=headers, auth=self.auth_header,
+            verify=self.sslverify, timeout=self.timeout
+        )
+        if not response.ok:
+            raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
     def delete(self, url, parameters=None):
@@ -170,19 +197,12 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
-        base_url = self.get_global_service_url('external-findings-description')
+        url = self.get_service_url('external-findings/description')
         response = None
         for finding_description in descriptions:
-            some_description = dict()
-            some_description['typeId'] = finding_description.typeid
-            some_description['description'] = finding_description.description
-            some_description['enablement'] = finding_description.enablement
-            some_description['name'] = finding_description.name
-            url = "%s/%s" % (base_url, finding_description.typeid)
-            response = self.put(url, some_description)
+            response = self.post(url, vars(finding_description))
             if response.text != 'success':
                 return response
-
         return response
 
     def update_findings_schema(self):
