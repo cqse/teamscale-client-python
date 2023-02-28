@@ -159,7 +159,7 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
-        url = "%s/%s" % (self.get_global_service_url('external-findings-group'), name)
+        url = self.get_service_url("external-findings/group")
         return self.put(url, {'groupName': name, 'mapping': mapping_pattern})
 
     def add_finding_descriptions(self, descriptions):
@@ -427,7 +427,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        service_url = self.get_global_service_url_versioned("projects", "v5.6.0")
+        service_url = self.get_service_url("projects", "v5.6.0")
 
         parameters = {
             "detail": True
@@ -537,41 +537,44 @@ class TeamscaleClient:
             return default_branch_name + ":" + timestamp_or_head
         return timestamp_or_head
 
-    def get_global_service_url(self, service_name):
-        """Returns the full url pointing to a global service.
-        TODO: Deprecate
+    def get_service_url(self, service_name, **kwargs):
+        """Returns the full url pointing for a REST endpoint specifying the service itself,
+        and parameters in the URI (see kwargs).
 
         Args:
            service_name(str): the name of the service for which the url should be generated
+           **kwargs: see below, sorted in-order in which they are appended to the URI
+
+        Keyword Args:
+            project_id (str): specifies the project, required for services with operating on a single project
+            issue_id (str): specifies the issue_id, required for services operating with a specific issue
+            finding_id (str): specifies a finding, required for services operating with a specific finding
 
         Returns:
             str: The full url
         """
-        return "{url}/{service}/".format(url=self.url, service=service_name)
-
-    def get_global_service_url_versioned(self, service_name, api_version):
-        """Returns the full url pointing to a specific version of a global service.
-
-        Args:
-           service_name(str): the name of the service for which the url should be generated
-           api_version(str): the teamscale api version (e.g. "v5.6.0")
-
-        Returns:
-            str: The full url
-        """
-        return "{url}/api/{version}/{service}/".format(url=self.url, version=api_version, service=service_name)
-
-    def get_project_service_url(self, service_name):
-        """Returns the full url pointing to a project service.
-        TODO: Deprecate
-
-        Args:
-           service_name(str): the name of the service for which the url should be generated
-
-        Returns:
-            str: The full url
-        """
-        return "{client.url}/p/{client.project}/{service}/".format(client=self, service=service_name)
+        parameter_names = {
+            "project_id": "projects",
+            "issue_id": "issues",
+            "finding_id": "findings"
+        }
+        try:
+            path_parameters = '/'.join(["{path_name}/{path_value}".format(
+                path_name=parameter_names[value_name], path_value=value) for value_name, value in kwargs.items()
+            ])
+            # The '/' is inserted with the parameters if they are not empty
+            return "{url}/api/{version}/{path_parameter}{service}/".format(
+                url=self.url,
+                version=TeamscaleClient.TEAMSCALE_API_VERSION,
+                path_parameter=path_parameters + '/' if len(kwargs) != 0 else "",
+                service=service_name
+            )
+        except KeyError as e:
+            raise ServiceError(
+                "The parameter {} cannot be placed inside the URI! The only allowed kwargs are: [{}]".format(
+                    e, ', '.join(parameter_names.keys())
+                )
+            )
 
     @classmethod
     def read_json_from_file(cls, file_path):
