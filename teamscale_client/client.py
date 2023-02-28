@@ -197,18 +197,19 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
-        url = self.get_service_url('external-findings/description')
+        url = self.get_service_url("external-findings/description")
         response = None
         for finding_description in descriptions:
             response = self.post(url, vars(finding_description))
-            if response.text != 'success':
+            if response.text != "success":
                 return response
         return response
 
     def update_findings_schema(self):
         """Triggers refresh of finding groups in analysis profiles."""
-        url = self.get_global_service_url('update-findings-schema')
-        return self.get(url, {'projects': self.project})
+        # TODO Ensure that this is the correct replacement for 'update-findings-schema'
+        url = self.get_service_url("metric-update", omit_version=True, project_id=self.project)
+        return self.post(url, {"projects": self.project})
 
     def upload_findings(self, findings, timestamp, message, partition):
         """Uploads a list of findings
@@ -557,13 +558,14 @@ class TeamscaleClient:
             return default_branch_name + ":" + timestamp_or_head
         return timestamp_or_head
 
-    def get_service_url(self, service_name, **kwargs):
-        """Returns the full url pointing for a REST endpoint specifying the service itself,
-        and parameters in the URI (see kwargs).
+    def get_service_url(self, service_name, omit_version=False, **kwargs):
+        """Returns the full URL pointing for a REST endpoint specifying the service itself,
+        and parameters in the URL (see kwargs).
 
         Args:
-           service_name(str): the name of the service for which the url should be generated
-           **kwargs: see below, sorted in-order in which they are appended to the URI
+           service_name(str): the name of the service for which the URL should be generated
+           omit_version (bool): omits the version in the URL if True, useful for internal API (defaults to False)
+           **kwargs: see below, sorted in-order in which they are appended to the URL
 
         Keyword Args:
             project_id (str): specifies the project, required for services with operating on a single project
@@ -583,11 +585,11 @@ class TeamscaleClient:
                 path_name=parameter_names[value_name], path_value=value) for value_name, value in kwargs.items()
             ])
             # The '/' is inserted with the parameters if they are not empty
-            return "{url}/api/{version}/{path_parameter}{service}/".format(
+            return "{url}/api/{version}{path_parameter}{service}".format(
                 url=self.url,
-                version=TeamscaleClient.TEAMSCALE_API_VERSION,
+                version=TeamscaleClient.TEAMSCALE_API_VERSION + '/' if omit_version else "",
                 path_parameter=path_parameters + '/' if len(kwargs) != 0 else "",
-                service=service_name
+                service=service_name + '/' if service_name != "" else ""
             )
         except KeyError as e:
             raise ServiceError(
