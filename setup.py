@@ -15,15 +15,16 @@ setup(
         "Topic :: Utilities",
     ],
     install_requires=[
-          'simplejson',
-          'requests>=2.0',
-          'jsonpickle',
-          'configparser'
+        'simplejson',
+        'requests>=2.0',
+        'jsonpickle',
+        'configparser',
+        'packaging'
     ],
 
     tests_require=[
-          'pytest',
-          'responses'
+        'pytest',
+        'responses'
     ],
     setup_requires=["pytest-runner"]
 )

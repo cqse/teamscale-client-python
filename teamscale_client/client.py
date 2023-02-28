@@ -1,15 +1,15 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import io
 import os
+import time
 
 import requests
-from requests.auth import HTTPBasicAuth
-import time
-import io
-
 import simplejson as json
+from requests.auth import HTTPBasicAuth
 
+from teamscale_client.client_utils import parse_version
 from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task
 from teamscale_client.utils import to_json
 
@@ -29,6 +29,8 @@ class TeamscaleClient:
         timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
         branch (str): The branch name for which to upload/retrieve data
     """
+
+    TEAMSCALE_API_VERSION = "8.0.0"
 
     def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
         """Constructor
@@ -65,13 +67,26 @@ class TeamscaleClient:
         Raises:
             ServiceError: If the version does not match or the server cannot be found.
         """
-        url = self.get_global_service_url('service-api-info')
+        url = "{url}/api/version".format(url=self.url)
         response = self.get(url)
         json_response = response.json()
-        api_version = json_response['apiVersion']
-        if api_version < 6:
-            raise ServiceError("Server api version " + str(
-                api_version) + " too low and not compatible. This client requires Teamscale 4.1 or newer.")
+        python_client_api = parse_version(TeamscaleClient.TEAMSCALE_API_VERSION)
+
+        min_supported_api = parse_version(json_response["minApiVersion"])
+        if min_supported_api > python_client_api:
+            raise ServiceError(
+                "The Server API minimally supports {min}, which is too high for this client running {current}".format(
+                    min=min_supported_api,
+                    current=python_client_api
+                ))
+
+        max_supported_api = parse_version(json_response["maxApiVersion"])
+        if max_supported_api < python_client_api:
+            raise ServiceError(
+                "The Server API maximally supports {max}, which is too low for this client running {current}".format(
+                    max=max_supported_api,
+                    current=python_client_api
+                ))
 
     def get(self, url, parameters=None):
         """Sends a GET request to the given service url.
@@ -477,7 +492,7 @@ class TeamscaleClient:
         parameters = {
             "skip-project-validation": skip_project_validation,
             "only-config-update": perform_update_call,
-            "reanalyze-if-required": True # Otherwise, changes which require a reanalysis would silently be ignored
+            "reanalyze-if-required": True  # Otherwise, changes which require a reanalysis would silently be ignored
         }
         response = self.put(service_url, parameters=parameters, data=to_json(project_configuration))
 
@@ -524,6 +539,7 @@ class TeamscaleClient:
 
     def get_global_service_url(self, service_name):
         """Returns the full url pointing to a global service.
+        TODO: Deprecate
 
         Args:
            service_name(str): the name of the service for which the url should be generated
@@ -531,7 +547,7 @@ class TeamscaleClient:
         Returns:
             str: The full url
         """
-        return "%s/%s/" % (self.url, service_name)
+        return "{url}/{service}/".format(url=self.url, service=service_name)
 
     def get_global_service_url_versioned(self, service_name, api_version):
         """Returns the full url pointing to a specific version of a global service.
@@ -543,10 +559,11 @@ class TeamscaleClient:
         Returns:
             str: The full url
         """
-        return "%s/api/%s/%s/" % (self.url, api_version, service_name)
+        return "{url}/api/{version}/{service}/".format(url=self.url, version=api_version, service=service_name)
 
     def get_project_service_url(self, service_name):
         """Returns the full url pointing to a project service.
+        TODO: Deprecate
 
         Args:
            service_name(str): the name of the service for which the url should be generated
@@ -672,7 +689,8 @@ class TeamscaleClient:
 
         return value
 
-    def get_findings(self, uniform_path, timestamp, recursive=True, revision_id=None, filter=None, invert=False, assessmentFilters=None):
+    def get_findings(self, uniform_path, timestamp, recursive=True, revision_id=None, filter=None, invert=False,
+                     assessmentFilters=None):
         """Retrieves the list of findings in the currently active project for the given uniform path
         at the provided timestamp on the given branch.
 
