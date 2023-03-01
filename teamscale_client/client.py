@@ -1,13 +1,16 @@
+import datetime
 import io
 import json
 import os
 import time
+from typing import Dict, Union, List
 
 import requests
 from requests.auth import HTTPBasicAuth
 
 from teamscale_client.client_utils import parse_version
-from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task
+from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task, MetricEntry, FileFindings, \
+    FindingDescription, MetricDescription
 from teamscale_client.utils import to_json, to_json_dict
 
 
@@ -62,7 +65,7 @@ class TeamscaleClient:
         """Sets the project id for subsequent calls made using the client."""
         self.project = project
 
-    def check_api_version(self):
+    def check_api_version(self) -> None:
         """Verifies the server's api version and connectivity.
 
         Raises:
@@ -84,12 +87,12 @@ class TeamscaleClient:
                 "The Server API maximally supports {max}, which is too low for this client running {current}".format(
                     max=max_supported_api, current=python_client_api))
 
-    def get(self, url, parameters=None):
+    def get(self, url: str, parameters: Union[None, Dict] = None) -> requests.Response:
         """Sends a GET request to the given service url.
 
         Args:
-            url (str):  The URL for which to execute a GET request
-            parameters (dict): parameters to attach to the url
+            url:  The URL for which to execute a GET request
+            parameters: parameters to attach to the url
 
         Returns:
             requests.Response: request's response
@@ -104,13 +107,16 @@ class TeamscaleClient:
             raise ServiceError(f"ERROR: GET {url}: {response.status_code}:{response.text}")
         return response
 
-    def put(self, url, json=None, parameters=None, data=None):
+    def put(
+            self, url: str, json: Union[None, Dict] = None,
+            parameters: Union[None, Dict] = None, data: Union[None, any] = None
+    ) -> requests.Response:
         """Sends a PUT request to the given service url with the json payload as content.
 
         Args:
-            url (str):  The URL for which to execute a PUT request
+            url:  The URL for which to execute a PUT request
             json: The Object to attach as content, will be serialized to json (only for object that can be serialized by default)
-            parameters (dict): parameters to attach to the url
+            parameters: parameters to attach to the url
             data: The data object to be attached to the request
 
         Returns:
@@ -126,13 +132,16 @@ class TeamscaleClient:
             raise ServiceError(f"ERROR: PUT {url}: {response.status_code}:{response.text}")
         return response
 
-    def post(self, url, json=None, parameters=None, data=None):
+    def post(
+            self, url: str, json: Union[None, Dict] = None,
+            parameters: Union[None, Dict] = None, data: Union[None, any] = None
+    ) -> requests.Response:
         """Sends a POST request to the given service url with the json payload as content.
 
         Args:
-            url (str):  The URL for which to execute a POST request
+            url:  The URL for which to execute a POST request
             json: The Object to attach as content, will be serialized to json (only for object that can be serialized by default)
-            parameters (dict): parameters to attach to the url
+            parameters: parameters to attach to the url
             data: The data object to be attached to the request
 
         Returns:
@@ -148,7 +157,7 @@ class TeamscaleClient:
             raise ServiceError(f"ERROR: POST {url}: {response.status_code}:{response.text}")
         return response
 
-    def delete(self, url, parameters=None):
+    def delete(self, url: str, parameters: Union[None, Dict] = None) -> requests.Response:
         """Sends a DELETE request to the given service url.
 
         Args:
@@ -167,12 +176,12 @@ class TeamscaleClient:
             raise ServiceError(f"ERROR: DELETE {url}: {response.status_code}:{response.text}")
         return response
 
-    def add_findings_group(self, name, mapping_pattern):
+    def add_findings_group(self, name: str, mapping_pattern: str) -> requests.Response:
         """Adds group of findings.
 
         Args:
-            name (str): Name of group.
-            mapping_pattern (str): Regular expression to match a finding's ``typeid`` in order to belong to this group.
+            name: Name of group.
+            mapping_pattern: Regular expression to match a finding's ``typeid`` in order to belong to this group.
         Returns:
             requests.Response: request's response
         """
@@ -181,11 +190,11 @@ class TeamscaleClient:
             json={'groupName': name, 'mapping': mapping_pattern}
         )
 
-    def add_finding_descriptions(self, descriptions):
+    def add_finding_descriptions(self, descriptions: List[FindingDescription]) -> requests.Response:
         """Adds descriptions of findings.
 
         Args:
-            descriptions (list): List of :class:`FindingDescription` to add to Teamscale.
+            descriptions: List of :class:`FindingDescription` to add to Teamscale.
         Returns:
             requests.Response: request's response
         """
@@ -202,14 +211,16 @@ class TeamscaleClient:
         # TODO Ensure that this is the correct replacement for 'update-findings-schema'
         return self.post(f"{self._api_url}/projects/{self.project}/metric-update", {"projects": self.project})
 
-    def upload_findings(self, findings, timestamp, message, partition):
+    def upload_findings(
+            self, findings: List[FileFindings], timestamp: datetime.datetime, message: str, partition: str
+    ) -> requests.Response:
         """Uploads a list of findings
 
         Args:
-            findings (List[:class:`data.FileFindings`]): the findings data 
-            timestamp (datetime.datetime): timestamp for which to upload the findings
-            message (str): The message to use for the generated upload commit
-            partition (str): The partition's id into which the findings should be added (See also: :ref:`FAQ - Partitions<faq-partition>`).
+            findings: the findings data
+            timestamp: timestamp for which to upload the findings
+            message: The message to use for the generated upload commit
+            partition: The partition's id into which the findings should be added (See also: :ref:`FAQ - Partitions<faq-partition>`).
 
         Returns:
             requests.Response: object generated by the request
@@ -217,16 +228,18 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        return self._upload_external_data("external-findings", to_json_dict(findings), timestamp, message, partition)
+        return self._upload_external_data("external-findings", to_json(findings), timestamp, message, partition)
 
-    def upload_metrics(self, metrics, timestamp, message, partition):
+    def upload_metrics(
+            self, metrics: List[MetricEntry], timestamp: datetime.datetime, message: str, partition: str
+    ) -> requests.Response:
         """Uploads a list of metrics
 
         Args:
-            metrics (List[:class:`data.MetricEntry`]): metrics data
-            timestamp (datetime.datetime): timestamp for which to upload the metrics
-            message (str): The message to use for the generated upload commit
-            partition (str): The partition's id into which the metrics should be added (See also: :ref:`FAQ - Partitions<faq-partition>`).
+            metrics: metrics data
+            timestamp: timestamp for which to upload the metrics
+            message: The message to use for the generated upload commit
+            partition: The partition's id into which the metrics should be added (See also: :ref:`FAQ - Partitions<faq-partition>`).
 
         Returns:
             requests.Response: object generated by the upload request
@@ -234,17 +247,19 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        return self._upload_external_data("external-metrics", to_json_dict(metrics), timestamp, message, partition)
+        return self._upload_external_data("external-metrics", to_json(metrics), timestamp, message, partition)
 
-    def _upload_external_data(self, service_name, json_data, timestamp, message, partition):
+    def _upload_external_data(
+            self, service_name: str, json_data: str, timestamp: datetime.datetime, message: str, partition: str
+    ) -> requests.Response:
         """Uploads externals data in json format
 
         Args:
-            service_name (str): The service name to which to upload the data
+            service_name: The service name to which to upload the data
             json_data: data in json format
-            timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
-            message (str): The message to use for the generated upload commit
-            partition (str): The partition's id into which the data should be added (See also: :ref:`FAQ - Partitions<faq-partition>`).
+            timestamp: timestamp (unix format) for which to upload the data
+            message: The message to use for the generated upload commit
+            partition: The partition's id into which the data should be added (See also: :ref:`FAQ - Partitions<faq-partition>`).
 
         Returns:
             requests.Response: object generated by the request
@@ -265,16 +280,18 @@ class TeamscaleClient:
             )
             session_id = response.json()
 
-            response = self.post(f"{session_base_url}/{session_id}/{service_name}", json=json_data)
+            # The data argument takes any object, the json argument just a dict
+            # If we would use json=json_data then, we would need to use in the parent method: to_json_dict(..)!
+            response = self.post(f"{session_base_url}/{session_id}/{service_name}", data=json_data)
             return response
         finally:
             self.delete(f"{session_base_url}/{session_id}")
 
-    def add_metric_descriptions(self, metric_descriptions):
+    def add_metric_descriptions(self, metric_descriptions: List[MetricDescription]) -> requests.Response:
         """Uploads metric definitions to Teamscale.
 
         Args:
-            metric_descriptions (list[:class:`MetricDescription`]): List of metric descriptions to add to Teamscale.
+            metric_descriptions: List of metric descriptions to add to Teamscale.
 
         Returns:
             requests.Response: object generated by the request
@@ -282,8 +299,10 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        service_url = self.get_global_service_url("external-metric")
-        return self.put(service_url, data=to_json(metric_descriptions))
+        return self.post(
+            f"{self._api_url_version}/external-metrics",
+            json=to_json_dict(metric_descriptions)
+        )
 
     def upload_coverage_data(self, coverage_files, coverage_format, timestamp, message, partition):
         """Upload coverage reports to Teamscale. It is expected that the given coverage report files can be read from the filesystem.
