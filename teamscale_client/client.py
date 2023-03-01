@@ -592,9 +592,7 @@ class TeamscaleClient:
             "finding_id": "findings"
         }
         try:
-            path_parameters = '/'.join(["{path_name}/{path_value}".format(
-                path_name=parameter_names[value_name], path_value=value) for value_name, value in kwargs.items()
-            ])
+            path_parameters = '/'.join([f"{parameter_names[value_name]}/{value}" for value_name, value in kwargs.items()])
             # The '/' is inserted with the parameters if they are not empty
             return "{url}/api/{version}{path_parameter}{service}".format(
                 url=self.url,
@@ -604,9 +602,8 @@ class TeamscaleClient:
             )
         except KeyError as e:
             raise ServiceError(
-                "The parameter {} cannot be placed inside the URI! The only allowed kwargs are: [{}]".format(
-                    e, ', '.join(parameter_names.keys())
-                )
+                f"The parameter {e} cannot be placed inside the URI! "
+                f"The only allowed kwargs are: [{', '.join(parameter_names.keys())}]"
             )
 
     @classmethod
