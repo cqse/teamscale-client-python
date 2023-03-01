@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import io
+import json as js
 import os
 import time
 
@@ -44,6 +45,9 @@ class TeamscaleClient:
         self.branch = branch
         self.check_api_version()
 
+        self._api_url = f"f{self.url}/api"
+        self._api_url_version = f"{self._api_url}/{TeamscaleClient.TEAMSCALE_API_VERSION}"
+
     @staticmethod
     def from_client_config(config, sslverify=True, timeout=30.0, branch=None):
         """Creates a new Teamscale client from a `TeamscaleClientConfig` object.
@@ -54,8 +58,8 @@ class TeamscaleClient:
             timeout (float): TTFB timeout in seconds, see http://docs.python-requests.org/en/master/user/quickstart/#timeouts
             branch (str): The branch name for which to upload/retrieve data
         """
-        return TeamscaleClient(config.url, config.username, config.access_token, config.project_id,
-                               sslverify, timeout, branch)
+        return TeamscaleClient(config.url, config.username, config.access_token, config.project_id, sslverify, timeout,
+                               branch)
 
     def set_project(self, project):
         """Sets the project id for subsequent calls made using the client."""
@@ -67,8 +71,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If the version does not match or the server cannot be found.
         """
-        url = "{url}/api/version".format(url=self.url)
-        response = self.get(url)
+        response = self.get(f"{self._api_url}/version")
         json_response = response.json()
         python_client_api = parse_version(TeamscaleClient.TEAMSCALE_API_VERSION)
 
@@ -76,17 +79,13 @@ class TeamscaleClient:
         if min_supported_api > python_client_api:
             raise ServiceError(
                 "The Server API minimally supports {min}, which is too high for this client running {current}".format(
-                    min=min_supported_api,
-                    current=python_client_api
-                ))
+                    min=min_supported_api, current=python_client_api))
 
         max_supported_api = parse_version(json_response["maxApiVersion"])
         if max_supported_api < python_client_api:
             raise ServiceError(
                 "The Server API maximally supports {max}, which is too low for this client running {current}".format(
-                    max=max_supported_api,
-                    current=python_client_api
-                ))
+                    max=max_supported_api, current=python_client_api))
 
     def get(self, url, parameters=None):
         """Sends a GET request to the given service url.
@@ -124,11 +123,8 @@ class TeamscaleClient:
             ServiceError: If anything goes wrong
         """
         headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
-        response = requests.put(
-            url, params=parameters, json=json, data=data,
-            headers=headers, auth=self.auth_header,
-            verify=self.sslverify, timeout=self.timeout
-        )
+        response = requests.put(url, params=parameters, json=json, data=data, headers=headers, auth=self.auth_header,
+                                verify=self.sslverify, timeout=self.timeout)
         if not response.ok:
             raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
@@ -149,11 +145,8 @@ class TeamscaleClient:
             ServiceError: If anything goes wrong
         """
         headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
-        response = requests.post(
-            url, params=parameters, json=json, data=data,
-            headers=headers, auth=self.auth_header,
-            verify=self.sslverify, timeout=self.timeout
-        )
+        response = requests.post(url, params=parameters, json=json, data=data, headers=headers, auth=self.auth_header,
+                                 verify=self.sslverify, timeout=self.timeout)
         if not response.ok:
             raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
@@ -186,8 +179,8 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
-        url = self.get_service_url("external-findings/group")
-        return self.put(url, {'groupName': name, 'mapping': mapping_pattern})
+        return self.put(f"{self._api_url_version}/external-findings/group",
+                        json={'groupName': name, 'mapping': mapping_pattern})
 
     def add_finding_descriptions(self, descriptions):
         """Adds descriptions of findings.
@@ -197,10 +190,10 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
-        url = self.get_service_url("external-findings/description")
         response = None
         for finding_description in descriptions:
-            response = self.post(url, vars(finding_description))
+            response = self.post(f"{self._api_url_version}/external-findings/description",
+                                 json=vars(finding_description))
             if response.text != "success":
                 return response
         return response
@@ -208,8 +201,7 @@ class TeamscaleClient:
     def update_findings_schema(self):
         """Triggers refresh of finding groups in analysis profiles."""
         # TODO Ensure that this is the correct replacement for 'update-findings-schema'
-        url = self.get_service_url("metric-update", omit_version=True, project_id=self.project)
-        return self.post(url, {"projects": self.project})
+        return self.post(f"{self._api_url}/projects/{self.project}/metric-update", {"projects": self.project})
 
     def upload_findings(self, findings, timestamp, message, partition):
         """Uploads a list of findings
@@ -228,6 +220,10 @@ class TeamscaleClient:
         """
         # TODO The server does not accept the JSON payload
         json_data = to_json(findings)
+        print(json_data)
+        with open("./my.json") as file:
+            json_data = js.load(file)
+            print(json_data)
         return self._upload_external_data("external-findings", json_data, timestamp, message, partition)
 
     def upload_metrics(self, metrics, timestamp, message, partition):
@@ -265,22 +261,16 @@ class TeamscaleClient:
         """
         session_id, session_base_url = None, None
         try:
-            session_base_url = self.get_service_url("external-analysis/session", project_id=self.project)
-            response = self.post(session_base_url, parameters={
-                "t": self._get_timestamp_parameter(timestamp),
-                "message": message,
-                "partition": partition
-            })
+            session_base_url = f"{self._api_url_version}/projects/{self.project}/external-analysis/session"
+            response = self.post(session_base_url,
+                                 parameters={"t": self._get_timestamp_parameter(timestamp), "message": message,
+                                             "partition": partition})
             session_id = response.json()
 
-            service_url = session_base_url + "{session_id}/{service_name}".format(
-                session_id=session_id,
-                service_name=service_name
-            )
-            response = self.post(service_url, json=json_data)
+            response = self.post(f"{session_base_url}/{session_id}/{service_name}", json=json_data)
             return response
         finally:
-            self.delete(session_base_url + session_id)
+            self.delete(f"{session_base_url}/{session_id}")
 
     def add_metric_descriptions(self, metric_descriptions):
         """Uploads metric definitions to Teamscale.
@@ -335,14 +325,9 @@ class TeamscaleClient:
             ServiceError: If anything goes wrong
         """
         service_url = self.get_project_service_url("external-report")
-        parameters = {
-            "t": self._get_timestamp_parameter(timestamp),
-            "message": message,
-            "partition": partition,
-            "format": report_format,
-            "adjusttimestamp": "true",
-            "movetolastcommit": str(move_to_last_commit).lower()
-        }
+        parameters = {"t": self._get_timestamp_parameter(timestamp), "message": message, "partition": partition,
+                      "format": report_format, "adjusttimestamp": "true",
+                      "movetolastcommit": str(move_to_last_commit).lower()}
         multiple_files = []
         for filename in report_files:
             with open(filename, 'rb') as inputfile:
@@ -369,11 +354,7 @@ class TeamscaleClient:
             ServiceError: If anything goes wrong
         """
         service_url = self.get_project_service_url("architecture-upload")
-        parameters = {
-            "t": self._get_timestamp_parameter(timestamp),
-            "adjusttimestamp": "true",
-            "message": message
-        }
+        parameters = {"t": self._get_timestamp_parameter(timestamp), "adjusttimestamp": "true", "message": message}
         architecture_files = [(path, open(filename, 'rb')) for path, filename in architectures.items()]
         response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                  files=architecture_files, timeout=self.timeout)
@@ -408,9 +389,7 @@ class TeamscaleClient:
             ServiceError: If anything goes wrong
         """
         service_url = self.get_project_service_url("baselines")
-        parameters = {
-            "detail": True
-        }
+        parameters = {"detail": True}
         headers = {'Accept': 'application/json'}
         response = requests.get(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                 headers=headers, timeout=self.timeout)
@@ -461,14 +440,11 @@ class TeamscaleClient:
         """
         service_url = self.get_service_url("projects", "v5.6.0")
 
-        parameters = {
-            "detail": True
-        }
+        parameters = {"detail": True}
         response = self.get(service_url, parameters)
-        return [
-            ProjectInfo(project_id=x['id'], name=x['name'], description=x.get('description'),
-                        creation_timestamp=x['creationTimestamp'], alias=x.get('alias'),
-                        deleting=x['deleting'], reanalyzing=x['reanalyzing']) for x in response.json()]
+        return [ProjectInfo(project_id=x['id'], name=x['name'], description=x.get('description'),
+                            creation_timestamp=x['creationTimestamp'], alias=x.get('alias'), deleting=x['deleting'],
+                            reanalyzing=x['reanalyzing']) for x in response.json()]
 
     def create_project(self, project_configuration, skip_project_validation=False):
         """Creates a project with the specified configuration in Teamscale. The parameter `skip_project_validation`
@@ -521,11 +497,10 @@ class TeamscaleClient:
             ServiceError: If anything goes wrong.
         """
         service_url = self.get_global_service_url("create-project")
-        parameters = {
-            "skip-project-validation": skip_project_validation,
-            "only-config-update": perform_update_call,
-            "reanalyze-if-required": True  # Otherwise, changes which require a reanalysis would silently be ignored
-        }
+        parameters = {"skip-project-validation": skip_project_validation, "only-config-update": perform_update_call,
+                      "reanalyze-if-required": True
+                      # Otherwise, changes which require a reanalysis would silently be ignored
+                      }
         response = self.put(service_url, parameters=parameters, data=to_json(project_configuration))
 
         response_message = TeamscaleClient._get_response_message(response)
@@ -569,13 +544,13 @@ class TeamscaleClient:
             return default_branch_name + ":" + timestamp_or_head
         return timestamp_or_head
 
-    def get_service_url(self, service_name, omit_version=False, **kwargs):
+    def get_service_url(self, service_name: str = "", omit_version: bool = False, **kwargs):
         """Returns the full URL pointing for a REST endpoint specifying the service itself,
         and parameters in the URL (see kwargs).
 
         Args:
-           service_name(str): the name of the service for which the URL should be generated
-           omit_version (bool): omits the version in the URL if True, useful for internal API (defaults to False)
+           service_name: the name of the service for which the URL should be generated
+           omit_version: omits the version in the URL if True, useful for internal API (defaults to False)
            **kwargs: see below, sorted in-order in which they are appended to the URL
 
         Keyword Args:
@@ -586,25 +561,19 @@ class TeamscaleClient:
         Returns:
             str: The full url
         """
-        parameter_names = {
-            "project_id": "projects",
-            "issue_id": "issues",
-            "finding_id": "findings"
-        }
+        parameter_names = {"project_id": "projects", "issue_id": "issues", "finding_id": "findings"}
         try:
-            path_parameters = '/'.join([f"{parameter_names[value_name]}/{value}" for value_name, value in kwargs.items()])
+            path_parameters = '/'.join(
+                [f"{parameter_names[value_name]}/{value}" for value_name, value in kwargs.items()])
             # The '/' is inserted with the parameters if they are not empty
-            return "{url}/api/{version}{path_parameter}{service}".format(
-                url=self.url,
-                version=TeamscaleClient.TEAMSCALE_API_VERSION + '/' if omit_version else "",
-                path_parameter=path_parameters + '/' if len(kwargs) != 0 else "",
-                service=service_name + '/' if service_name != "" else ""
-            )
+            return "{url}/api/{version}{path_parameter}{service}".format(url=self.url,
+                                                                         version=TeamscaleClient.TEAMSCALE_API_VERSION + '/' if omit_version else "",
+                                                                         path_parameter=path_parameters + '/' if len(
+                                                                             kwargs) != 0 else "",
+                                                                         service=service_name + '/' if service_name != "" else "")
         except KeyError as e:
-            raise ServiceError(
-                f"The parameter {e} cannot be placed inside the URI! "
-                f"The only allowed kwargs are: [{', '.join(parameter_names.keys())}]"
-            )
+            raise ServiceError(f"The parameter {e} cannot be placed inside the URI! "
+                               f"The only allowed kwargs are: [{', '.join(parameter_names.keys())}]")
 
     @classmethod
     def read_json_from_file(cls, file_path):
@@ -639,91 +608,25 @@ class TeamscaleClient:
         Returns:
             A tuple consisting of three lists: added findings, findings in changed code, and removed findings.
         """
-        service_url = self.get_project_service_url("pre-commit")
+        service_url = f"{self._api_url_version}/projects/{self.project}/pre-commit"
 
         while True:
             response = self.get(service_url)
             # We need to wait for 200 here to get the findings.
             # The service returns 204 while the pre-commit analysis is still in progress.
-            if response.status_code != 200:
+            if response.status_code != 204:
                 time.sleep(2)
+            elif response.status_code == 200:
+                json_data = response.json()
+                return tuple(map(
+                    lambda category: [Finding.from_json(json_findings) for json_findings in json_data[category]],
+                    ["addedFindings", "findingsInChangedCode", "removedFindings"]
+                ))
             else:
-                return self._parse_findings_response(service_url, response)
-
-    def _parse_findings_response(self, service_url, response):
-        """Parses findings retrieved from Teamscale.
-
-        Args:
-            service_url (str): The service url. Used for logging.
-            response (requests.Response): The response to parse for findings.
-
-        Returns:
-            A tuple consisting of three lists: added findings, findings in changed code, and removed findings.
-
-        Raises:
-            ServiceError: If anything goes wrong.
-        """
-        if not response.ok:
-            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
-
-        added_findings = self._findings_from_json(response.json()['addedFindings'])
-        findings_in_changed_code = self._findings_from_json(response.json()['findingsInChangedCode'])
-        removed_findings = self._findings_from_json(response.json()['removedFindings'])
-
-        return added_findings, removed_findings, findings_in_changed_code
-
-    def _findings_from_json(self, findings_json):
-        """Parses JSON encoded findings.
-
-        Args:
-            findings_json (List[object]): The json object encoding the list of findings.
-
-        Returns:
-            List[data.Finding]: The findings that were parsed from the JSON object
-        """
-        return [self._finding_from_json(finding)
-                for finding in findings_json]
-
-    def _finding_from_json(self, finding_json):
-        """Parses Ja single SON encoded finding.
-
-        Args:
-            finding_json (object): The json object encoding the finding.
-
-        Returns:
-            data.Finding: The finding that was parsed from the JSON object
-        """
-        return Finding(finding_type_id=finding_json['typeId'],
-                       message=finding_json['message'],
-                       assessment=finding_json['assessment'],
-                       start_offset=self._get_finding_location_entry(finding_json, 'rawStartOffset', 0),
-                       end_offset=self._get_finding_location_entry(finding_json, 'rawEndOffset', 0),
-                       start_line=self._get_finding_location_entry(finding_json, 'rawStartLine', 1),
-                       end_line=self._get_finding_location_entry(finding_json, 'rawEndLine', 1),
-                       uniform_path=finding_json['location']['uniformPath'],
-                       finding_id=finding_json['id'])
-
-    def _get_finding_location_entry(self, finding_json, key, defaultValue):
-        """Safely extracts a value from the location data of a JSON encoded finding.
-        Some findings don't have all the location data, in which case the given default value
-	is returned.
-
-        Args:
-            finding_json (object): The json object encoding the finding.
-            key (string): The key in the location data to look up.
-            defaultValue (object): The default value to return in case the key cannot be found.
-
-        Returns:
-            object: The value or the default value.
-        """
-        value = finding_json['location'].get(key)
-        if value is None:
-            return defaultValue
-
-        return value
+                raise ServiceError(f"ERROR: GET {service_url}: {response.status_code}:{response.text}")
 
     def get_findings(self, uniform_path, timestamp, recursive=True, revision_id=None, filter=None, invert=False,
-                     assessmentFilters=None):
+                     assessment_filters=None):
         """Retrieves the list of findings in the currently active project for the given uniform path
         at the provided timestamp on the given branch.
 
@@ -739,7 +642,7 @@ class TeamscaleClient:
                 If a category or group is given, all matching findings will be filtered out and not included in the result.
             invert: Whether to invert the category, group, type filters, 
                 i.e. including the elements given in the filters instead of excluding them.
-            assessmentFilters: The assessment filter. All mentioned assessment colors will be filtered out and not included in the result.
+            assessment_filters: The assessment filter. All mentioned assessment colors will be filtered out and not included in the result.
 
         Returns:
             List[:class:`data.Finding`]): The list of findings.
@@ -752,23 +655,22 @@ class TeamscaleClient:
         else:
             timestamp = self._get_timestamp_parameter(timestamp=timestamp)
 
-        service_url = self.get_project_service_url("findings") + uniform_path
         parameters = {
             "t": timestamp,
-            "recursive": recursive,
+            "invert": invert,
+            "uniform-path": uniform_path,
             "all": True
         }
-
         if filter:
             parameters["filter"] = filter
-        if invert:
-            parameters["invert"] = True
-        if assessmentFilters:
-            parameters["assessment-filters"] = assessmentFilters
-        response = self.get(service_url, parameters=parameters)
+        if assessment_filters:
+            parameters["assessment-filters"] = assessment_filters
+
+        service_url = f"{self._api_url_version}/projects/{self.project}/findings/list"
+        response = self.get(service_url, parameters)
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
-        return self._findings_from_json(response.json())
+        return [Finding.from_json(json_data) for json_data in response.json()]
 
     def get_commit_for_revision(self, revision_id):
         """Retrieves the Teamscale commit corresponding to a revision, raising an error if the commit is not known
@@ -806,30 +708,16 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        service_url = self.get_project_service_url("findings-by-id") + finding_id
-
-        parameters = {
-            "t": self._get_timestamp_parameter(timestamp=timestamp, branch=branch),
-        }
-        response = self.get(service_url, parameters=parameters)
+        service_url = f"{self._api_url_version}/projects/{self.project}/findings/{finding_id}"
+        response = self.get(
+            service_url,
+            parameters={
+                "t": self._get_timestamp_parameter(timestamp=timestamp, branch=branch)
+            }
+        )
         if not response.ok:
-            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
-        return self._finding_from_json(response.json())
-
-    def get_finding_url(self, finding):
-        """Returns the full url pointing to the specified finding in Teamscale,
-        or `None` if the finding does not have an id.
-
-        Args:
-           finding(data.Finding): the finding for which the url should be generated
-
-        Returns:
-            str: The full url
-        """
-        if not finding.finding_id:
-            return None
-        return "{client.url}/findings.html#details/{client.project}/?id={finding_id}" \
-            .format(client=self, finding_id=finding.finding_id)
+            raise ServiceError(f"ERROR: GET {service_url}: {response.status_code}:{response.text}")
+        return Finding.from_json(response.json())
 
     def get_tasks(self, status="OPEN", details=True, start=0, max=300):
         """Retrieves the tasks for the client's project from the server.
@@ -847,13 +735,7 @@ class TeamscaleClient:
             ServiceError: If anything goes wrong
             """
         service_url = self.get_project_service_url("tasks")
-        parameters = {
-            "status": status,
-            "details": details,
-            "start": start,
-            "max": max,
-            "with-count": False
-        }
+        parameters = {"status": status, "details": details, "start": start, "max": max, "with-count": False}
         response = self.get(service_url, parameters=parameters)
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
@@ -912,8 +794,8 @@ class TeamscaleClient:
         """
         service_url = self.get_global_service_url("dashboard-export")
         multiple_files = [('dashboardDescriptor', dashboard_descriptor)]
-        return requests.post(service_url, auth=self.auth_header, verify=self.sslverify,
-                             files=multiple_files, timeout=self.timeout)
+        return requests.post(service_url, auth=self.auth_header, verify=self.sslverify, files=multiple_files,
+                             timeout=self.timeout)
 
     def get_project_configuration(self, project_id):
         """Adds a new dashboard from the given template.
@@ -933,10 +815,9 @@ class TeamscaleClient:
                 List[str] The architecture names.
         """
         service_url = self.get_project_service_url("arch-assessment")
-        parameters = {
-            "list": True,
+        parameters = {"list": True,
 
-        }
+                      }
         response = self.get(service_url, parameters=parameters)
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))

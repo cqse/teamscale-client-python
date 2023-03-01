@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import datetime
 import time
+from typing import Dict
 
 from teamscale_client.constants import Assessment, MetricAggregation, MetricValueType, MetricProperties, \
     ConnectorType
@@ -51,6 +52,30 @@ class Finding(object):
         self.uniformPath = uniform_path
         self.findingProperties = finding_properties
         self.finding_id = finding_id
+
+    @classmethod
+    def from_json(cls, json_data: Dict) -> 'Finding':
+        """Parses a single JSON encoded finding.
+
+        Args:
+            json_data: The json object encoding the finding.
+
+        Returns:
+            data.Finding: The finding that was parsed from the JSON object
+        """
+        return cls(
+            finding_type_id=json_data['typeId'],
+            message=json_data['message'],
+            assessment=json_data['assessment'],
+            start_offset=json_data['location'].get('rawStartOffset', 0),
+            end_offset=json_data['location'].get('rawEndOffset', 0),
+            start_line=json_data['location'].get('rawStartLine', 1),
+            end_line=json_data['location'].get('rawEndLine', 1),
+            uniform_path=json_data['location'].get('uniformPath', None),
+            finding_id=json_data['id'],
+            finding_properties=json_data['properties']
+        )
+
 
     def __cmp__(self, other):
         """Compares this finding to another finding."""
@@ -492,7 +517,8 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
         path_suffix (Optional[str]): Path suffix that is to be appended to the repository's base path. Empty by default.
     """
 
-    def __init__(self, account, enable_externals=False, externals_includes="", externals_excludes="", path_suffix="", *args, **kwargs):
+    def __init__(self, account, enable_externals=False, externals_includes="", externals_excludes="", path_suffix="",
+                 *args, **kwargs):
         super(SubversionSourceCodeConnectorConfiguration, self).__init__(connector_type=ConnectorType.SVN, *args,
                                                                          **kwargs)
         self.options["Account"] = account
