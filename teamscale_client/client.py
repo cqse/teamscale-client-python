@@ -101,7 +101,7 @@ class TeamscaleClient:
         response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers,
                                 timeout=self.timeout)
         if not response.ok:
-            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+            raise ServiceError(f"ERROR: GET {url}: {response.status_code}:{response.text}")
         return response
 
     def put(self, url, json=None, parameters=None, data=None):
@@ -123,7 +123,7 @@ class TeamscaleClient:
         response = requests.put(url, params=parameters, json=json, data=data, headers=headers, auth=self.auth_header,
                                 verify=self.sslverify, timeout=self.timeout)
         if not response.ok:
-            raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+            raise ServiceError(f"ERROR: PUT {url}: {response.status_code}:{response.text}")
         return response
 
     def post(self, url, json=None, parameters=None, data=None):
@@ -145,7 +145,7 @@ class TeamscaleClient:
         response = requests.post(url, params=parameters, json=json, data=data, headers=headers, auth=self.auth_header,
                                  verify=self.sslverify, timeout=self.timeout)
         if not response.ok:
-            raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+            raise ServiceError(f"ERROR: POST {url}: {response.status_code}:{response.text}")
         return response
 
     def delete(self, url, parameters=None):
@@ -164,7 +164,7 @@ class TeamscaleClient:
         response = requests.delete(url, params=parameters, auth=self.auth_header, verify=self.sslverify,
                                    timeout=self.timeout)
         if not response.ok:
-            raise ServiceError("ERROR: PUT {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+            raise ServiceError(f"ERROR: DELETE {url}: {response.status_code}:{response.text}")
         return response
 
     def add_findings_group(self, name, mapping_pattern):
@@ -234,7 +234,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        return self._upload_external_data("add-external-metrics", metrics, timestamp, message, partition)
+        return self._upload_external_data("external-metrics", to_json_dict(metrics), timestamp, message, partition)
 
     def _upload_external_data(self, service_name, json_data, timestamp, message, partition):
         """Uploads externals data in json format
