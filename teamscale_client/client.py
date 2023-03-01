@@ -1,18 +1,14 @@
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import io
-import json as js
+import json
 import os
 import time
 
 import requests
-import simplejson as json
 from requests.auth import HTTPBasicAuth
 
 from teamscale_client.client_utils import parse_version
 from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task
-from teamscale_client.utils import to_json
+from teamscale_client.utils import to_json, to_json_dict
 
 
 class TeamscaleClient:
@@ -32,6 +28,7 @@ class TeamscaleClient:
     """
 
     TEAMSCALE_API_VERSION = "v8.0.0"
+
     def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
         """Constructor
         """
@@ -220,13 +217,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        # TODO The server does not accept the JSON payload
-        json_data2 = to_json(findings)
-        print(json_data2)
-        with open("./my.json") as file:
-            json_data = js.load(file)
-            print(json_data)
-        return self._upload_external_data("external-findings", json_data, timestamp, message, partition)
+        return self._upload_external_data("external-findings", to_json_dict(findings), timestamp, message, partition)
 
     def upload_metrics(self, metrics, timestamp, message, partition):
         """Uploads a list of metrics
@@ -264,9 +255,14 @@ class TeamscaleClient:
         session_id, session_base_url = None, None
         try:
             session_base_url = f"{self._api_url_version}/projects/{self.project}/external-analysis/session"
-            response = self.post(session_base_url,
-                                 parameters={"t": self._get_timestamp_parameter(timestamp), "message": message,
-                                             "partition": partition})
+            response = self.post(
+                session_base_url,
+                parameters={
+                    "t": self._get_timestamp_parameter(timestamp),
+                    "message": message,
+                    "partition": partition
+                }
+            )
             session_id = response.json()
 
             response = self.post(f"{session_base_url}/{session_id}/{service_name}", json=json_data)

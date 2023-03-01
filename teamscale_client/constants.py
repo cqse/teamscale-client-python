@@ -1,8 +1,6 @@
 """This module contains multiple constants collections typically used when
 communicating metrics and findings with Teamscale."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
 class Assessment:
     """Constants to be used as assessment levels."""
@@ -10,6 +8,7 @@ class Assessment:
     RED = "RED"
 
     YELLOW = "YELLOW"
+
 
 class AssessmentMetricColors:
     """Constants used for colors in assessment metrics. """
@@ -19,6 +18,7 @@ class AssessmentMetricColors:
     YELLOW = "YELLOW"
 
     GREEN = "GREEN"
+
 
 class Enablement:
     """The enablement describes which rating a finding should receive."""
@@ -35,6 +35,7 @@ class Enablement:
     OFF = "OFF"
     """The finding is disabled by default."""
 
+
 class MetricAggregation:
     """Class that contains valid aggregation strategies."""
 
@@ -44,6 +45,7 @@ class MetricAggregation:
 
     MIN = "MIN"
 
+
 class MetricValueType:
     """Metric value types."""
 
@@ -52,6 +54,7 @@ class MetricValueType:
     TIMESTAMP = "TIMESTAMP"
 
     ASSESSMENT = "ASSESSMENT"
+
 
 class MetricProperties:
     """Possible properties used in metric definitions."""
@@ -68,6 +71,7 @@ class MetricProperties:
     LOW_IS_BAD = "LOW_IS_BAD"
     """Normally high values are considered bad, use this to inverse."""
 
+
 class CoverageFormats:
     """Possible coverage formats that Teamscale can interpret."""
 
@@ -82,38 +86,39 @@ class CoverageFormats:
     XR_BABOON = "XR_BABOON"
 
     JACOCO = "JACOCO"
-    
+
     DOT_COVER = "DOT_COVER"
-    
+
     MS_COVERAGE = "MS_COVERAGE"
-    
+
     ROSLYN = "ROSLYN"
-    
+
     BULLSEYE = "BULLSEYE"
 
     SIMPLE = "SIMPLE"
-    
+
     OPEN_COVER = "OPEN_COVER"
-    
+
     IEC_COVERAGE = "IEC_COVERAGE"
-    
+
     LLVM = "LLVM"
-    
+
     CLOVER = "CLOVER"
-    
+
     XCODE = "XCODE"
-    
+
     TESTWISE_COVERAGE = "TESTWISE_COVERAGE"
-    
+
     SAP_COVERAGE = "SAP_COVERAGE"
-    
+
     ISTANBUL = "ISTANBUL"
+
 
 class ReportFormats:
     """Report formats that Teamscale understands."""
 
     PCLINT = "PCLINT"
-    
+
     CLANG = "CLANG"
 
     ASTREE = "ASTREE"
@@ -123,10 +128,11 @@ class ReportFormats:
     SPCOP = "SPCOP"
 
     CS_COMPILER_WARNING = "CS_COMPILER_WARNING"
-   
+
     PYLINT = "PYLINT"
 
     FINDBUGS = "FINDBUGS"
+
 
 class UnitTestReportFormats:
     """Reports for unit test results that Teamscale understands."""
@@ -134,6 +140,7 @@ class UnitTestReportFormats:
     JUNIT = "JUNIT"
 
     XUNIT = "XUNIT"
+
 
 class ConnectorType:
     """Connector types."""
@@ -150,6 +157,7 @@ class ConnectorType:
 
     GERRIT = "Gerrit"
 
+
 class TaskStatus:
     """Different statuses a task in Teamscale can have"""
 
@@ -160,6 +168,7 @@ class TaskStatus:
     VERIFIED = "VERIFIED"
 
     DISCARDED = "DISCARDED"
+
 
 class TaskResolution:
     """Different resolutions used in tasks"""
