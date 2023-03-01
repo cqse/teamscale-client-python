@@ -31,8 +31,7 @@ class TeamscaleClient:
         branch (str): The branch name for which to upload/retrieve data
     """
 
-    TEAMSCALE_API_VERSION = "8.0.0"
-
+    TEAMSCALE_API_VERSION = "v8.0.0"
     def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
         """Constructor
         """
@@ -43,10 +42,11 @@ class TeamscaleClient:
         self.sslverify = sslverify
         self.timeout = timeout
         self.branch = branch
-        self.check_api_version()
 
-        self._api_url = f"f{self.url}/api"
+        self._api_url = f"{self.url}/api"
         self._api_url_version = f"{self._api_url}/{TeamscaleClient.TEAMSCALE_API_VERSION}"
+
+        self.check_api_version()
 
     @staticmethod
     def from_client_config(config, sslverify=True, timeout=30.0, branch=None):
@@ -179,8 +179,10 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
-        return self.put(f"{self._api_url_version}/external-findings/group",
-                        json={'groupName': name, 'mapping': mapping_pattern})
+        return self.put(
+            f"{self._api_url_version}/external-findings/group",
+            json={'groupName': name, 'mapping': mapping_pattern}
+        )
 
     def add_finding_descriptions(self, descriptions):
         """Adds descriptions of findings.
@@ -192,10 +194,10 @@ class TeamscaleClient:
         """
         response = None
         for finding_description in descriptions:
-            response = self.post(f"{self._api_url_version}/external-findings/description",
-                                 json=vars(finding_description))
-            if response.text != "success":
-                return response
+            response = self.post(
+                f"{self._api_url_version}/external-findings/description",
+                json=vars(finding_description)
+            )
         return response
 
     def update_findings_schema(self):
@@ -219,8 +221,8 @@ class TeamscaleClient:
             ServiceError: If anything goes wrong
         """
         # TODO The server does not accept the JSON payload
-        json_data = to_json(findings)
-        print(json_data)
+        json_data2 = to_json(findings)
+        print(json_data2)
         with open("./my.json") as file:
             json_data = js.load(file)
             print(json_data)
@@ -544,37 +546,6 @@ class TeamscaleClient:
             return default_branch_name + ":" + timestamp_or_head
         return timestamp_or_head
 
-    def get_service_url(self, service_name: str = "", omit_version: bool = False, **kwargs):
-        """Returns the full URL pointing for a REST endpoint specifying the service itself,
-        and parameters in the URL (see kwargs).
-
-        Args:
-           service_name: the name of the service for which the URL should be generated
-           omit_version: omits the version in the URL if True, useful for internal API (defaults to False)
-           **kwargs: see below, sorted in-order in which they are appended to the URL
-
-        Keyword Args:
-            project_id (str): specifies the project, required for services with operating on a single project
-            issue_id (str): specifies the issue_id, required for services operating with a specific issue
-            finding_id (str): specifies a finding, required for services operating with a specific finding
-
-        Returns:
-            str: The full url
-        """
-        parameter_names = {"project_id": "projects", "issue_id": "issues", "finding_id": "findings"}
-        try:
-            path_parameters = '/'.join(
-                [f"{parameter_names[value_name]}/{value}" for value_name, value in kwargs.items()])
-            # The '/' is inserted with the parameters if they are not empty
-            return "{url}/api/{version}{path_parameter}{service}".format(url=self.url,
-                                                                         version=TeamscaleClient.TEAMSCALE_API_VERSION + '/' if omit_version else "",
-                                                                         path_parameter=path_parameters + '/' if len(
-                                                                             kwargs) != 0 else "",
-                                                                         service=service_name + '/' if service_name != "" else "")
-        except KeyError as e:
-            raise ServiceError(f"The parameter {e} cannot be placed inside the URI! "
-                               f"The only allowed kwargs are: [{', '.join(parameter_names.keys())}]")
-
     @classmethod
     def read_json_from_file(cls, file_path):
         """Reads JSON content from a file and parses it to ensure basic integrity.
@@ -668,8 +639,6 @@ class TeamscaleClient:
 
         service_url = f"{self._api_url_version}/projects/{self.project}/findings/list"
         response = self.get(service_url, parameters)
-        if not response.ok:
-            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return [Finding.from_json(json_data) for json_data in response.json()]
 
     def get_commit_for_revision(self, revision_id):
@@ -715,8 +684,6 @@ class TeamscaleClient:
                 "t": self._get_timestamp_parameter(timestamp=timestamp, branch=branch)
             }
         )
-        if not response.ok:
-            raise ServiceError(f"ERROR: GET {service_url}: {response.status_code}:{response.text}")
         return Finding.from_json(response.json())
 
     def get_tasks(self, status="OPEN", details=True, start=0, max=300):
