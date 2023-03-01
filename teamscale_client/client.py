@@ -11,6 +11,7 @@ from requests.auth import HTTPBasicAuth
 from teamscale_client.client_utils import parse_version
 from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task, MetricEntry, FileFindings, \
     FindingDescription, MetricDescription
+from teamscale_client.teamscale_session import TeamscaleSession
 from teamscale_client.utils import to_json, to_json_dict
 
 
@@ -269,23 +270,10 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        session_id, session_base_url = None, None
-        try:
-            session_base_url = f"{self._api_url_version}/projects/{self.project}/external-analysis/session"
-            response = self.post(
-                session_base_url,
-                parameters={
-                    "t": self._get_timestamp_parameter(timestamp),
-                    "message": message,
-                    "partition": partition
-                }
-            )
-            session_id = response.json()
-
-            response = self.post(f"{session_base_url}/{session_id}/{service_name}", data=json_data)
+        base_url = f"{self._api_url_version}/projects/{self.project}/external-analysis/session"
+        with TeamscaleSession(base_url, self._get_timestamp_parameter(timestamp), message, partition) as session_id:
+            response = self.post(f"{base_url}/{session_id}/{service_name}", data=json_data)
             return response
-        finally:
-            self.delete(f"{session_base_url}/{session_id}")
 
     def add_metric_descriptions(self, metric_descriptions: List[MetricDescription]) -> requests.Response:
         """Uploads metric definitions to Teamscale.
@@ -341,7 +329,11 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        service_url = self.get_project_service_url("external-report")
+        # TODO Header needs to be adapted!
+        # TODO Unify approach with _upload_external_data?
+
+        session_id = None
+        service_url = f"{self._api_url_version}/projects/{self.project}/external-analysis/session/{session_id}/report"
         parameters = {"t": self._get_timestamp_parameter(timestamp), "message": message, "partition": partition,
                       "format": report_format, "adjusttimestamp": "true",
                       "movetolastcommit": str(move_to_last_commit).lower()}
