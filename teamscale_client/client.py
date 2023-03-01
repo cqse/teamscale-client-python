@@ -115,7 +115,8 @@ class TeamscaleClient:
 
         Args:
             url:  The URL for which to execute a PUT request
-            json: The Object to attach as content, will be serialized to json (only for object that can be serialized by default)
+            json: The Object to attach as content, will be serialized to json
+                (only for object that can be serialized by default)
             parameters: parameters to attach to the url
             data: The data object to be attached to the request
 
@@ -140,7 +141,8 @@ class TeamscaleClient:
 
         Args:
             url:  The URL for which to execute a POST request
-            json: The Object to attach as content, will be serialized to json (only for object that can be serialized by default)
+            json: The Object to attach as content, will be serialized to json
+                (only for object that can be serialized by default)
             parameters: parameters to attach to the url
             data: The data object to be attached to the request
 
@@ -185,8 +187,8 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
-        return self.put(
-            f"{self._api_url_version}/external-findings/group",
+        return self.post(
+            f"{self._api_url_version}/external-findings/groups",
             json={'groupName': name, 'mapping': mapping_pattern}
         )
 
@@ -280,8 +282,6 @@ class TeamscaleClient:
             )
             session_id = response.json()
 
-            # The data argument takes any object, the json argument just a dict
-            # If we would use json=json_data then, we would need to use in the parent method: to_json_dict(..)!
             response = self.post(f"{session_base_url}/{session_id}/{service_name}", data=json_data)
             return response
         finally:
