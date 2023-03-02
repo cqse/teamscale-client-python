@@ -73,7 +73,6 @@ class Finding(object):
             finding_properties=json_data['properties']
         )
 
-
     def __cmp__(self, other):
         """Compares this finding to another finding."""
         if self.uniformPath == other.uniformPath:
@@ -237,6 +236,22 @@ class Baseline(object):
         self.timestamp = timestamp
         if date is not None:
             self._set_date(date)
+
+    @classmethod
+    def from_json(cls, json_data: Dict) -> 'Baseline':
+        """Parses a single JSON encoded baseline.
+
+        Args:
+            json_data: The json object encoding the baseline.
+
+        Returns:
+            data.Baseline: The baseline that was parsed from the JSON object
+        """
+        return cls(
+            json_data['name'],
+            json_data['description'],
+            timestamp=json_data['timestamp']
+        )
 
     def __hash__(self):
         return hash((self.name, self.description, self.timestamp))
