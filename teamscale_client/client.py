@@ -735,17 +735,22 @@ class TeamscaleClient:
             data=to_json(comment)
         )
 
-    def add_issue_metric(self, name, issue_query):
+    def add_issue_metric(self, name: str, issue_query: str) -> requests.Response:
         """Adds group of findings.
 
         Args:
-            name (str): Name of issue metric
-            issue_query (str): The issue query to add
+            name: Name of issue metric
+            issue_query: The issue query to add
         Returns:
             requests.Response: request's response
         """
-        url = "%s/%s" % (self.get_project_service_url('issue-metrics'), name)
-        return self.put(url, {'name': name, 'query': issue_query})
+        return self.post(
+            f"{self._api_url_version}/projects/{self.project}/issues/queries",
+            params={
+                "name": name,
+                "query": issue_query
+            }
+        )
 
     def create_dashboard(self, dashboard_descriptor):
         """Adds a new dashboard from the given template.
