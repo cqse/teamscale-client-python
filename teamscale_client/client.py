@@ -563,18 +563,19 @@ class TeamscaleClient:
             json_data = json.load(json_file)
             return json_data
 
-    def upload_files_for_precommit_analysis(self, timestamp, precommit_data):
+    def upload_files_for_precommit_analysis(
+            self, timestamp: datetime.datetime, precommit_data: Dict) -> requests.Response:
         """Uploads the provided files for precommit analysis.
 
         Args:
-            timestamp (datetime.datetime): The timestamp of the parent commit.
-            precommit_data (data.PreCommitUploadData): The precommit data to upload.
+            timestamp: The timestamp of the parent commit.
+            precommit_data: The content and paths of added, modified and removed files. The dictionary should contain
+                a key "deletedUniformPaths" mapping to str and "uniformPathToContentMap" mapping to an object
         """
-        service_url = self.get_project_service_url("pre-commit") + self._get_timestamp_parameter(timestamp)
-
-        response = self.put(service_url, data=to_json(precommit_data))
-        if not response.ok:
-            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return self.post(
+            f"{self._api_url_version}/projects/{self.project}/pre-commit/{self._get_timestamp_parameter(timestamp)}",
+            json=precommit_data
+        )
 
     def get_precommit_analysis_results(self):
         """Gets precommit analysis results.
