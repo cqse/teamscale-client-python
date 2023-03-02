@@ -3,13 +3,13 @@ import io
 import json
 import os
 import time
-from typing import Dict, Union, List, Optional, Any
+from typing import Dict, Union, List, Optional, Any, Tuple
 
 import requests
 from requests.auth import HTTPBasicAuth
 
 from teamscale_client.client_utils import parse_version
-from teamscale_client.constants import ReportFormats, CoverageFormats, ArchitectureFormats
+from teamscale_client.constants import ReportFormats, CoverageFormats, ArchitectureFormats, Assessment
 from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task, MetricEntry, FileFindings, \
     FindingDescription, MetricDescription, NonCodeMetricEntry, ProjectConfiguration
 from teamscale_client.utils import to_json, to_json_dict
@@ -577,7 +577,7 @@ class TeamscaleClient:
             json=precommit_data
         )
 
-    def get_precommit_analysis_results(self):
+    def get_precommit_analysis_results(self) -> Tuple[List[Finding], ...]:
         """Gets precommit analysis results.
 
         Returns:
@@ -600,22 +600,27 @@ class TeamscaleClient:
             else:
                 raise ServiceError(f"ERROR: GET {service_url}: {response.status_code}:{response.text}")
 
-    def get_findings(self, uniform_path, timestamp, revision_id=None, filter=None, invert=False,
-                     assessment_filters=None):
+    def get_findings(
+            self, uniform_path: str, timestamp: datetime.datetime, revision_id: Optional[str] = None,
+            filter: Optional[FileFindings] = None, invert: bool = False,
+            assessment_filters: Optional[List[Assessment]] = None
+    ) -> List[Finding]:
         """Retrieves the list of findings in the currently active project for the given uniform path
         at the provided timestamp on the given branch.
 
         Args:
-            uniform_path (str): The uniform path to get findings for.
-            timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
-            revision_id (str): If provided, the client will first resolve the ID (e.g., commit hash) to a Teamscale
+            uniform_path: The uniform path to get findings for.
+            timestamp: timestamp (unix format) for which to upload the data
+            revision_id: If provided, the client will first resolve the ID (e.g., commit hash) to a Teamscale
                commit and retrieve the findings for the corresponding branch.
             filter: The finding category, group, and type filters. 
                 Every string must be either a single category, a combination category/group, or a type ID. 
-                If a category or group is given, all matching findings will be filtered out and not included in the result.
+                If a category or group is given, all matching findings
+                will be filtered out and not included in the result.
             invert: Whether to invert the category, group, type filters, 
                 i.e. including the elements given in the filters instead of excluding them.
-            assessment_filters: The assessment filter. All mentioned assessment colors will be filtered out and not included in the result.
+            assessment_filters: The assessment filter. All mentioned assessment colors
+                will be filtered out and not included in the result.
 
         Returns:
             List[:class:`data.Finding`]): The list of findings.
@@ -637,33 +642,29 @@ class TeamscaleClient:
         if filter:
             parameters["filter"] = filter
         if assessment_filters:
-            parameters["assessment-filters"] = assessment_filters
+            parameters["assessment-filters"] = list(map(lambda assessment: assessment.value, assessment_filters))
 
         service_url = f"{self._api_url_version}/projects/{self.project}/findings/list"
         response = self.get(service_url, parameters)
         return [Finding.from_json(json_data) for json_data in response.json()]
 
-    def get_commit_for_revision(self, revision_id):
+    def get_commit_for_revision(self, revision_id: str) -> str:
         """Retrieves the Teamscale commit corresponding to a revision, raising an error if the commit is not known
         to Teamscale.
 
         Args:
-            revision_id (str) The revision ID (e.g., commit SHA)
+            revision_id: The revision ID (e.g., commit SHA)
 
         Returns:
             str: The teamscale commit
         """
-        service_url = self.get_project_service_url("repository-timestamp-by-revision") + revision_id
-        response = self.get(service_url)
-        if not response.ok:
-            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        response = self.get(f"{self._api_url_version}/projects/{self.project}/revision/{revision_id}/commits")
+        commit_list = response.json()
 
-        response_json = response.json()
+        if not commit_list:
+            raise ServiceError(f"Could not find commit in Teamscale for given revision: {revision_id}")
 
-        if not response_json:
-            raise ServiceError("Could not find commit in Teamscale for given revision: {rev}".format(rev=revision_id))
-
-        return response_json[0]["branchName"] + ":" + str(response_json[0]["timestamp"])
+        return commit_list[0]["branchName"] + ":" + str(commit_list[0]["timestamp"])
 
     def get_finding_by_id(self, finding_id, branch=None, timestamp=None):
         """Retrieves the finding with the given id.

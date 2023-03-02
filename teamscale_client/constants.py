@@ -8,7 +8,15 @@ class Assessment(Enum):
 
     RED = "RED"
 
+    ORANGE = "ORANGE"
+
     YELLOW = "YELLOW"
+
+    GREEN = "GREEN"
+
+    BASELINE = "BASELINE"
+
+    UNKNOWN = "UNKNOWN"
 
 
 class AssessmentMetricColors(Enum):
