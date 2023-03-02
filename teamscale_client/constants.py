@@ -91,6 +91,8 @@ class CoverageFormats:
 
     MS_COVERAGE = "MS_COVERAGE"
 
+    VS_COVERAGE = "VS_COVERAGE"
+
     ROSLYN = "ROSLYN"
 
     BULLSEYE = "BULLSEYE"
@@ -113,6 +115,12 @@ class CoverageFormats:
 
     ISTANBUL = "ISTANBUL"
 
+    GOLANG_COVERAGE = "GOLANG_COVERAGE"
+
+    LAUTERBACH_TRACE32 = "LAUTERBACH_TRACE32"
+
+    TEAMSCALE_COMPACT_COVERAGE = "TEAMSCALE_COMPACT_COVERAGE"
+
 
 class ReportFormats:
     """Report formats that Teamscale understands."""
@@ -133,6 +141,20 @@ class ReportFormats:
 
     FINDBUGS = "FINDBUGS"
 
+    CPPCHECK = "CPPCHECK"
+
+    MODEL_ADVISOR = "MODEL_ADVISOR"
+
+    SAP_CODE_INSPECTOR = "SAP_CODE_INSPECTOR"
+
+    PARASOFT_CPP_TEST = "PARASOFT_CPP_TEST"
+
+    MYPY = "MYPY"
+
+    JQASSISTANT = "JQASSISTANT"
+
+    GENERIC_FINDINGS = "GENERIC_FINDINGS"
+
 
 class UnitTestReportFormats:
     """Reports for unit test results that Teamscale understands."""
@@ -140,6 +162,14 @@ class UnitTestReportFormats:
     JUNIT = "JUNIT"
 
     XUNIT = "XUNIT"
+
+    MS_TEST = "MS_TEST"
+
+    TESTWISE_COVERAGE = "TESTWISE_COVERAGE"
+
+    NUNIT = "NUNIT"
+
+    XCRESULT_JSON = "XCRESULT_JSON"
 
 
 class ConnectorType:

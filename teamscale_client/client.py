@@ -108,18 +108,19 @@ class TeamscaleClient:
             raise ServiceError(f"ERROR: GET {url}: {response.status_code}:{response.text}")
         return response
 
-    def put(
-            self, url: str, json: Union[None, Dict] = None,
-            parameters: Union[None, Dict] = None, data: Union[None, any] = None
-    ) -> requests.Response:
+    def put(self, url: str, **kwargs) -> requests.Response:
         """Sends a PUT request to the given service url with the json payload as content.
 
         Args:
             url:  The URL for which to execute a PUT request
+            **kwargs: passed to requests library (examples see below)
+
+        Keyword Args:
             json: The Object to attach as content, will be serialized to json
                 (only for object that can be serialized by default)
-            parameters: parameters to attach to the url
+            params: parameters to attach to the url
             data: The data object to be attached to the request
+
 
         Returns:
             requests.Response: request's response
@@ -127,24 +128,25 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
-        response = requests.put(url, params=parameters, json=json, data=data, headers=headers, auth=self.auth_header,
-                                verify=self.sslverify, timeout=self.timeout)
+        headers = kwargs.get("headers", {'Accept': 'application/json', 'Content-Type': 'application/json'})
+        response = requests.put(
+            url, headers=headers, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout, **kwargs
+        )
         if not response.ok:
             raise ServiceError(f"ERROR: PUT {url}: {response.status_code}:{response.text}")
         return response
 
-    def post(
-            self, url: str, json: Union[None, Dict] = None,
-            parameters: Union[None, Dict] = None, data: Union[None, any] = None
-    ) -> requests.Response:
+    def post(self, url: str, **kwargs) -> requests.Response:
         """Sends a POST request to the given service url with the json payload as content.
 
         Args:
             url:  The URL for which to execute a POST request
+            **kwargs: passed to requests library (examples see below)
+
+        Keyword Args:
             json: The Object to attach as content, will be serialized to json
                 (only for object that can be serialized by default)
-            parameters: parameters to attach to the url
+            params: parameters to attach to the url
             data: The data object to be attached to the request
 
         Returns:
@@ -153,9 +155,10 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
-        response = requests.post(url, params=parameters, json=json, data=data, headers=headers, auth=self.auth_header,
-                                 verify=self.sslverify, timeout=self.timeout)
+        headers = kwargs.pop("headers", {'Accept': 'application/json', 'Content-Type': 'application/json'})
+        response = requests.post(
+            url, headers=headers, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout, **kwargs
+        )
         if not response.ok:
             raise ServiceError(f"ERROR: POST {url}: {response.status_code}:{response.text}")
         return response
@@ -270,10 +273,16 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        base_url = f"{self._api_url_version}/projects/{self.project}/external-analysis/session"
-        with TeamscaleSession(base_url, self._get_timestamp_parameter(timestamp), message, partition) as session_id:
-            response = self.post(f"{base_url}/{session_id}/{service_name}", data=json_data)
-            return response
+        response = self.post(
+            f"{self._api_url_version}/projects/{self.project}/external-analysis/session/auto-create/{service_name}",
+            params={
+                "t": self._get_timestamp_parameter(timestamp),
+                "message": message,
+                "partition": partition
+            },
+            data=json_data
+        )
+        return response
 
     def add_metric_descriptions(self, metric_descriptions: List[MetricDescription]) -> requests.Response:
         """Uploads metric definitions to Teamscale.
@@ -293,14 +302,16 @@ class TeamscaleClient:
         )
 
     def upload_coverage_data(self, coverage_files, coverage_format, timestamp, message, partition):
-        """Upload coverage reports to Teamscale. It is expected that the given coverage report files can be read from the filesystem.
+        """Upload coverage reports to Teamscale. It is expected that the given coverage report
+        files can be read from the filesystem.
 
         Args:
             coverage_files (list): list of coverage filenames (strings!) that should be uploaded. Files must be readable.
             coverage_format  (constants.CoverageFormats): the format to use
             timestamp (datetime.datetime): timestamp (unix format) for which to upload the data
             message (str): The message to use for the generated upload commit
-            partition (str): The partition's id into which the data should be added (See also: :ref:`FAQ - Partitions<faq-partition>`).
+            partition (str): The partition's id into which the data should be added
+                (See also: :ref:`FAQ - Partitions<faq-partition>`).
 
         Returns:
             requests.Response: object generated by the request
@@ -329,23 +340,23 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        # TODO Header needs to be adapted!
-        # TODO Unify approach with _upload_external_data?
-
-        session_id = None
-        service_url = f"{self._api_url_version}/projects/{self.project}/external-analysis/session/{session_id}/report"
-        parameters = {"t": self._get_timestamp_parameter(timestamp), "message": message, "partition": partition,
-                      "format": report_format, "adjusttimestamp": "true",
-                      "movetolastcommit": str(move_to_last_commit).lower()}
         multiple_files = []
         for filename in report_files:
-            with open(filename, 'rb') as inputfile:
-                dataobj = io.BytesIO(inputfile.read())
-                multiple_files.append(('report', (os.path.basename(filename), dataobj)))
-        response = requests.post(service_url, params=parameters, auth=self.auth_header, verify=self.sslverify,
-                                 files=multiple_files, timeout=self.timeout)
-        if not response.ok:
-            raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+            with open(filename, 'rb') as input_file:
+                data_obj = io.BytesIO(input_file.read())
+                multiple_files.append(('report', (os.path.basename(filename), data_obj)))
+        response = self.post(
+            f"{self._api_url_version}/projects/{self.project}/external-analysis/session/auto-create/report",
+            params={
+                "t": self._get_timestamp_parameter(timestamp),
+                "message": message,
+                "partition": partition,
+                "format": report_format,
+                "movetolastcommit": move_to_last_commit
+            },
+            files=multiple_files,
+            headers={"Content-Type": "multipart/form-data"}
+        )
         return response
 
     def upload_architectures(self, architectures, timestamp, message):

@@ -6,7 +6,8 @@ from teamscale_client.data import ServiceError
 class TeamscaleSession:
     """
     Syntactic sugar for easier session management with the with clause for uploading external data.
-    This opens a session, returns a session_id and commits the session afterwards.
+    This opens a session, returns a session_id and commits the session afterwards. Useful if one wants to upload
+    multiple items in the same session. Otherwise, use 'auto-create' rather than this class.
 
     Examples:
         Use it in combination with the with statement:
