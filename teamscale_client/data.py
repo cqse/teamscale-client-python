@@ -297,6 +297,26 @@ class ProjectInfo(object):
         self.deleting = deleting
         self.reanalyzing = reanalyzing
 
+    @classmethod
+    def from_json(cls, json_data: Dict) -> 'ProjectInfo':
+        """Parses a single JSON encoded baseline.
+
+        Args:
+            json_data: The json object encoding the baseline.
+
+        Returns:
+            data.Baseline: The baseline that was parsed from the JSON object
+        """
+        return cls(
+            project_id=json_data['id'],
+            name=json_data['name'],
+            description=json_data.get('description'),
+            creation_timestamp=json_data['creationTimestamp'],
+            alias=json_data.get('alias'),
+            deleting=json_data['deleting'],
+            reanalyzing=json_data['reanalyzing']
+        )
+
 
 @auto_str
 class ProjectConfiguration(object):

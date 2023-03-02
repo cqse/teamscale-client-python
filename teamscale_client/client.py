@@ -460,7 +460,7 @@ class TeamscaleClient:
             data=to_json(baseline)
         )
 
-    def get_projects(self):
+    def get_projects(self) -> List[ProjectInfo]:
         """Retrieves a list of projects from the server.
 
         Returns:
@@ -469,13 +469,14 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        service_url = self.get_service_url("projects", "v5.6.0")
-
-        parameters = {"detail": True}
-        response = self.get(service_url, parameters)
-        return [ProjectInfo(project_id=x['id'], name=x['name'], description=x.get('description'),
-                            creation_timestamp=x['creationTimestamp'], alias=x.get('alias'), deleting=x['deleting'],
-                            reanalyzing=x['reanalyzing']) for x in response.json()]
+        response = self.get(
+            f"{self._api_url_version}/projects",
+            parameters={
+                "include-deleting": True,
+                "include-reanalyzing": True
+            }
+        )
+        return [ProjectInfo.from_json(json_data) for json_data in response.json()]
 
     def create_project(self, project_configuration, skip_project_validation=False):
         """Creates a project with the specified configuration in Teamscale. The parameter `skip_project_validation`
