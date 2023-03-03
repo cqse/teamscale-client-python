@@ -3,7 +3,7 @@ communicating metrics and findings with Teamscale."""
 from enum import Enum
 
 
-class Assessment(Enum):
+class Assessment(str, Enum):
     """Constants to be used as assessment levels."""
 
     RED = "RED"
@@ -19,7 +19,7 @@ class Assessment(Enum):
     UNKNOWN = "UNKNOWN"
 
 
-class AssessmentMetricColors(Enum):
+class AssessmentMetricColors(str, Enum):
     """Constants used for colors in assessment metrics. """
 
     RED = "RED"
@@ -29,7 +29,7 @@ class AssessmentMetricColors(Enum):
     GREEN = "GREEN"
 
 
-class Enablement(Enum):
+class Enablement(str, Enum):
     """The enablement describes which rating a finding should receive."""
 
     RED = "RED"
@@ -45,7 +45,7 @@ class Enablement(Enum):
     """The finding is disabled by default."""
 
 
-class MetricAggregation(Enum):
+class MetricAggregation(str, Enum):
     """Class that contains valid aggregation strategies."""
 
     SUM = "SUM"
@@ -55,7 +55,7 @@ class MetricAggregation(Enum):
     MIN = "MIN"
 
 
-class MetricValueType(Enum):
+class MetricValueType(str, Enum):
     """Metric value types."""
 
     NUMERIC = "NUMERIC"
@@ -65,7 +65,7 @@ class MetricValueType(Enum):
     ASSESSMENT = "ASSESSMENT"
 
 
-class MetricProperties(Enum):
+class MetricProperties(str, Enum):
     """Possible properties used in metric definitions."""
 
     SIZE_METRIC = "SIZE_METRIC"
@@ -81,7 +81,7 @@ class MetricProperties(Enum):
     """Normally high values are considered bad, use this to inverse."""
 
 
-class CoverageFormats(Enum):
+class CoverageFormats(str, Enum):
     """Possible coverage formats that Teamscale can interpret."""
 
     CTC = "CTC"
@@ -131,7 +131,7 @@ class CoverageFormats(Enum):
     TEAMSCALE_COMPACT_COVERAGE = "TEAMSCALE_COMPACT_COVERAGE"
 
 
-class ReportFormats(Enum):
+class ReportFormats(str, Enum):
     """Report formats that Teamscale understands."""
 
     PCLINT = "PCLINT"
@@ -165,7 +165,7 @@ class ReportFormats(Enum):
     GENERIC_FINDINGS = "GENERIC_FINDINGS"
 
 
-class UnitTestReportFormats(Enum):
+class UnitTestReportFormats(str, Enum):
     """Reports for unit test results that Teamscale understands."""
 
     JUNIT = "JUNIT"
@@ -181,7 +181,7 @@ class UnitTestReportFormats(Enum):
     XCRESULT_JSON = "XCRESULT_JSON"
 
 
-class ArchitectureFormats(Enum):
+class ArchitectureFormats(str, Enum):
     """Architecture formats that Teamscale understands."""
 
     TEAMSCALE_ARCHITECTURE = "TEAMSCALE_ARCHITECTURE"
@@ -189,7 +189,7 @@ class ArchitectureFormats(Enum):
     FILE_LIST = "FILE_LIST"
 
 
-class ConnectorType(Enum):
+class ConnectorType(str, Enum):
     """Connector types."""
 
     TFS = "Azure DevOps TFVC (TFS)"
@@ -205,7 +205,7 @@ class ConnectorType(Enum):
     GERRIT = "Gerrit"
 
 
-class TaskStatus(Enum):
+class TaskStatus(str, Enum):
     """Different statuses a task in Teamscale can have"""
 
     OPEN = "OPEN"
@@ -217,7 +217,7 @@ class TaskStatus(Enum):
     DISCARDED = "DISCARDED"
 
 
-class TaskResolution(Enum):
+class TaskResolution(str, Enum):
     """Different resolutions used in tasks"""
     NONE = "NONE"
 
