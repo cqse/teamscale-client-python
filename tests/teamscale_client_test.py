@@ -93,7 +93,8 @@ def test_add_findings_descriptions():
     """
     findings_descriptions = [FindingDescription('type1', 'desc1', Enablement.RED, 'name1'),
                              FindingDescription('type2', 'desc2', Enablement.YELLOW, 'name 2')]
-    responses.add(responses.POST, f"{BASE_API_VERSIONED_URL}/external-findings/description", body=SUCCESS_TEXT, status=200)
+    responses.add(responses.POST, f"{BASE_API_VERSIONED_URL}/external-findings/description",
+                  body=SUCCESS_TEXT, status=200)
     resp = get_client().add_finding_descriptions(findings_descriptions)
     assert resp.text == SUCCESS_TEXT
 
@@ -101,8 +102,11 @@ def test_add_findings_descriptions():
 @responses.activate
 def test_upload_findings():
     """Tests uploading of findings"""
-    responses.add(responses.PUT, get_project_service_mock('add-external-findings'),
-                  body=SUCCESS_TEXT, status=200)
+    responses.add(
+        responses.POST,
+        f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/external-analysis/session/auto-create/external-findings",
+        body=SUCCESS_TEXT, status=200
+    )
     resp = get_client().upload_findings(_get_test_findings(), datetime.datetime.now(), "Test message", "partition-name")
     assert "content" in responses.calls[1].request.body
     assert "test-id" in responses.calls[1].request.body
@@ -113,11 +117,14 @@ def test_upload_findings():
 def test_upload_metrics():
     """Tests uploading of metrics"""
     metric = MetricEntry("test/path", {"metric-1": 1, "metric-2": [1, 3, 4]})
-    responses.add(responses.PUT, get_project_service_mock('add-external-metrics'),
-                  body=SUCCESS_TEXT, status=200)
+    responses.add(
+        responses.POST,
+        f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/external-analysis/session/auto-create/external-metrics",
+        body=SUCCESS_TEXT, status=200
+    )
     resp = get_client().upload_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
-    assert '[{"metrics": {"metric-1": 1, "metric-2": [1, 3, 4]}, "path": "test/path"}]' == responses.calls[
-        1].request.body
+    assert '[{"metrics": {"metric-1": 1, "metric-2": [1, 3, 4]}, "path": "test/path"}]' == \
+           responses.calls[1].request.body
     assert resp.text == SUCCESS_TEXT
 
 
@@ -126,10 +133,14 @@ def test_upload_non_code_metrics():
     """Tests uploading of non code metrics"""
     metric = NonCodeMetricEntry("metric1/non/code/metric/path", "This is a test content", 2,
                                 {AssessmentMetricColors.RED: 2, AssessmentMetricColors.GREEN: 1}, 25.0)
-    responses.add(responses.PUT, get_project_service_mock("add-non-code-metrics"),
-                  body=SUCCESS_TEXT, status=200)
+    responses.add(
+        responses.POST,
+        f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/external-analysis/session/auto-create/non-code-metrics",
+        body=SUCCESS_TEXT, status=200
+    )
     resp = get_client().upload_non_code_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
-    assert '[{"assessment": {"GREEN": 1, "RED": 2}, "content": "This is a test content", "count": 2, "path": "metric1/non/code/metric/path", "time": 25.0}]' == \
+    assert '[{"assessment": {"GREEN": 1, "RED": 2}, "content": "This is a test content", "count": 2, ' \
+           '"path": "metric1/non/code/metric/path", "time": 25.0}]' == \
            responses.calls[1].request.body
     assert resp.text == SUCCESS_TEXT
 
@@ -138,11 +149,15 @@ def test_upload_non_code_metrics():
 def test_upload_metric_description():
     """Tests uploading of metric descriptions"""
     description = MetricDescription("metric_i,", "Metric Name", "Great Description", "awesome group")
-    responses.add(responses.PUT, get_global_service_mock('external-metric'),
-                  body=SUCCESS_TEXT, status=200)
+    responses.add(
+        responses.POST,
+        f"{BASE_API_VERSIONED_URL}/external-metrics",
+        body=SUCCESS_TEXT, status=200
+    )
     resp = get_client().add_metric_descriptions([description])
-    assert '{"analysisGroup": "awesome group", "metricDefinition": {"aggregation": "SUM", "description": "Great Description", "name": "Metric Name", "properties": ["SIZE_METRIC"], "valueType": "NUMERIC"}, "metricId": "metric_i,"}' == to_json(
-        description)
+    assert '{"analysisGroup": "awesome group", "metricDefinition": {"aggregation": "SUM", "description": "Great ' \
+           'Description", "name": "Metric Name", "properties": ["SIZE_METRIC"], "valueType": "NUMERIC"}, "metricId": ' \
+           '"metric_i,"}' == to_json(description)
     assert resp.text == SUCCESS_TEXT
 
 
