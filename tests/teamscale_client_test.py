@@ -13,48 +13,78 @@ from teamscale_client.data import Finding, FileFindings, MetricDescription, Metr
     FileSystemSourceCodeConnectorConfiguration, ProjectConfiguration, FindingDescription
 from teamscale_client.utils import to_json
 
-URL = "http://localhost:8080"
-SUCCESS = 'success'
+TEAMSCALE_TEST_VERSION = "v8.0.0"
+PROJECT = "foo"
+USER = "admin"
+ACCESS_TOKEN = USER
+SUCCESS_TEXT = "success"
+
+
+BASE_URL = "http://localhost:8080"
+BASE_API_URL = f"{BASE_URL}/api"
+BASE_API_VERSIONED_URL = f"{BASE_API_URL}/{TEAMSCALE_TEST_VERSION}"
 
 
 def get_client(branch=None):
     """Returns Teamscale client object for requesting servers"""
-    responses.add(responses.GET, get_global_service_mock('service-api-info'), status=200,
-                  content_type="application/json", body='{ "apiVersion": 6}')
-    return TeamscaleClient(URL, "admin", "admin", "foo", branch=branch)
+    responses.add(
+        responses.GET, f"{BASE_API_URL}/version", status=200, content_type="application/json", json={
+            "maxApiVersion": {
+                "major": 8,
+                "minor": 6,
+                "patch": 5
+            },
+            "minApiVersion": {
+                "major": 5,
+                "minor": 7,
+                "patch": 0
+            }
+        }
+    )
+    return TeamscaleClient(BASE_URL, USER, ACCESS_TOKEN, PROJECT, branch=branch)
 
 
 def get_project_service_mock(service_id):
     """Returns mock project service url"""
-    return re.compile(r'%s/p/foo/%s/.*' % (URL, service_id))
+    return re.compile(r'%s/p/foo/%s/.*' % (BASE_URL, service_id))
 
 
 def get_global_service_mock(service_id):
     """Returns mock global service url"""
-    return re.compile(r'%s/%s/.*' % (URL, service_id))
+    return re.compile(r'%s/%s/.*' % (BASE_URL, service_id))
 
 
 def get_global_service_mock_with_api_version(service_id, api_version):
     """Returns mock global service url for a specific api version"""
-    return re.compile(r'%s/api/%s/%s/.*' % (URL, api_version, service_id))
+    return re.compile(r'%s/api/%s/%s/.*' % (BASE_URL, api_version, service_id))
+
+
+@responses.activate
+def test_client_creation():
+    """Test that a client is created with the requested parameters and ensures that at least one test fails if the
+    version number changes"""
+    assert TeamscaleClient.TEAMSCALE_API_VERSION == TEAMSCALE_TEST_VERSION
+    client = get_client()
+    assert client.url == BASE_URL
+    assert client.project == PROJECT
+    assert client.username == USER
 
 
 @responses.activate
 def test_put():
     """Tests PUT requests to server"""
-    responses.add(responses.PUT, 'http://localhost:8080',
-                  body=SUCCESS, status=200)
-    resp = get_client().put("http://localhost:8080", "[]", {})
-    assert resp.text == SUCCESS
+    responses.add(responses.PUT, BASE_URL, body=SUCCESS_TEXT, status=200)
+    resp = get_client().put(BASE_URL)
+    assert resp.text == SUCCESS_TEXT
 
 
 @responses.activate
 def test_add_findings_group():
     """ Tests uploading of findings groups into Teamscale server.
     """
-    responses.add(responses.PUT, get_global_service_mock('external-findings-group'), body=SUCCESS, status=200)
+    responses.add(responses.POST, f"{BASE_API_VERSIONED_URL}/external-findings/groups", body=SUCCESS_TEXT, status=200)
     resp = get_client().add_findings_group('name', 'map.*')
-    assert resp.text == SUCCESS
+    assert resp.text == SUCCESS_TEXT
 
 
 @responses.activate
@@ -63,20 +93,20 @@ def test_add_findings_descriptions():
     """
     findings_descriptions = [FindingDescription('type1', 'desc1', Enablement.RED, 'name1'),
                              FindingDescription('type2', 'desc2', Enablement.YELLOW, 'name 2')]
-    responses.add(responses.PUT, get_global_service_mock('external-findings-description'), body=SUCCESS, status=200)
+    responses.add(responses.POST, f"{BASE_API_VERSIONED_URL}/external-findings/description", body=SUCCESS_TEXT, status=200)
     resp = get_client().add_finding_descriptions(findings_descriptions)
-    assert resp.text == SUCCESS
+    assert resp.text == SUCCESS_TEXT
 
 
 @responses.activate
 def test_upload_findings():
     """Tests uploading of findings"""
     responses.add(responses.PUT, get_project_service_mock('add-external-findings'),
-                  body=SUCCESS, status=200)
+                  body=SUCCESS_TEXT, status=200)
     resp = get_client().upload_findings(_get_test_findings(), datetime.datetime.now(), "Test message", "partition-name")
     assert "content" in responses.calls[1].request.body
     assert "test-id" in responses.calls[1].request.body
-    assert resp.text == SUCCESS
+    assert resp.text == SUCCESS_TEXT
 
 
 @responses.activate
@@ -84,11 +114,11 @@ def test_upload_metrics():
     """Tests uploading of metrics"""
     metric = MetricEntry("test/path", {"metric-1": 1, "metric-2": [1, 3, 4]})
     responses.add(responses.PUT, get_project_service_mock('add-external-metrics'),
-                  body=SUCCESS, status=200)
+                  body=SUCCESS_TEXT, status=200)
     resp = get_client().upload_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
     assert '[{"metrics": {"metric-1": 1, "metric-2": [1, 3, 4]}, "path": "test/path"}]' == responses.calls[
         1].request.body
-    assert resp.text == SUCCESS
+    assert resp.text == SUCCESS_TEXT
 
 
 @responses.activate
@@ -97,11 +127,11 @@ def test_upload_non_code_metrics():
     metric = NonCodeMetricEntry("metric1/non/code/metric/path", "This is a test content", 2,
                                 {AssessmentMetricColors.RED: 2, AssessmentMetricColors.GREEN: 1}, 25.0)
     responses.add(responses.PUT, get_project_service_mock("add-non-code-metrics"),
-                  body=SUCCESS, status=200)
+                  body=SUCCESS_TEXT, status=200)
     resp = get_client().upload_non_code_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
     assert '[{"assessment": {"GREEN": 1, "RED": 2}, "content": "This is a test content", "count": 2, "path": "metric1/non/code/metric/path", "time": 25.0}]' == \
            responses.calls[1].request.body
-    assert resp.text == SUCCESS
+    assert resp.text == SUCCESS_TEXT
 
 
 @responses.activate
@@ -109,11 +139,11 @@ def test_upload_metric_description():
     """Tests uploading of metric descriptions"""
     description = MetricDescription("metric_i,", "Metric Name", "Great Description", "awesome group")
     responses.add(responses.PUT, get_global_service_mock('external-metric'),
-                  body=SUCCESS, status=200)
+                  body=SUCCESS_TEXT, status=200)
     resp = get_client().add_metric_descriptions([description])
     assert '{"analysisGroup": "awesome group", "metricDefinition": {"aggregation": "SUM", "description": "Great Description", "name": "Metric Name", "properties": ["SIZE_METRIC"], "valueType": "NUMERIC"}, "metricId": "metric_i,"}' == to_json(
         description)
-    assert resp.text == SUCCESS
+    assert resp.text == SUCCESS_TEXT
 
 
 @responses.activate
@@ -121,10 +151,10 @@ def test_coverage_upload():
     """Tests uploading of test coverage"""
     files = ["tests/data/file1.txt", "tests/data/file2.txt"]
     responses.add(responses.POST, get_project_service_mock('external-report'),
-                  body=SUCCESS, status=200)
+                  body=SUCCESS_TEXT, status=200)
     resp = get_client().upload_coverage_data(files, CoverageFormats.CTC, datetime.datetime.now(), "Test Message",
                                              "partition-name")
-    assert resp.text == SUCCESS
+    assert resp.text == SUCCESS_TEXT
     assert "file1.txt" in responses.calls[1].request.body.decode()
     assert "file2.txt" in responses.calls[1].request.body.decode()
 
@@ -145,9 +175,9 @@ def test_add_baseline():
     """Test uploading of baselines"""
     baseline = Baseline("Baseline 1", "Test description", datetime.datetime.now())
     responses.add(responses.PUT, get_project_service_mock('baselines'),
-                  body=SUCCESS, status=200)
+                  body=SUCCESS_TEXT, status=200)
     resp = get_client().add_baseline(baseline)
-    assert resp.text == SUCCESS
+    assert resp.text == SUCCESS_TEXT
     assert "Baseline 1" in responses.calls[1].request.body
 
 
@@ -155,9 +185,9 @@ def test_add_baseline():
 def test_delete_baseline():
     """Test deletion of baselines"""
     responses.add(responses.DELETE, get_project_service_mock('baselines'),
-                  body=SUCCESS, status=200)
+                  body=SUCCESS_TEXT, status=200)
     resp = get_client().delete_baseline("Baseline 1")
-    assert resp.text == SUCCESS
+    assert resp.text == SUCCESS_TEXT
 
 
 @responses.activate
@@ -166,9 +196,9 @@ def test_architecture_upload():
     # Just reuse text files for testing, it's just a mock anyway
     paths = {"archs/first.architecture": "tests/data/file1.txt", "archs/second.architecture": "tests/data/file2.txt"}
     responses.add(responses.POST, get_project_service_mock('architecture-upload'),
-                  body=SUCCESS, status=200)
+                  body=SUCCESS_TEXT, status=200)
     resp = get_client().upload_architectures(paths, datetime.datetime.now(), "Test Message")
-    assert resp.text == SUCCESS
+    assert resp.text == SUCCESS_TEXT
     assert "file1.txt" in responses.calls[1].request.body.decode()
     assert "file2.txt" in responses.calls[1].request.body.decode()
 
@@ -209,7 +239,7 @@ def test_add_project():
     responses.add(responses.PUT, get_global_service_mock('create-project'),
                   body='{"message": "success"}', status=200)
     resp = get_client().create_project(project_configuration)
-    assert resp.status_code == 200 and resp.json().get('message') == SUCCESS
+    assert resp.status_code == 200 and resp.json().get('message') == SUCCESS_TEXT
 
 
 @responses.activate
@@ -224,7 +254,7 @@ def test_add_project_without_validation():
     responses.add(responses.PUT, get_global_service_mock('create-project'),
                   body='{"message": "success"}', status=200)
     resp = get_client().create_project(project_configuration, True)
-    assert resp.status_code == 200 and resp.json().get('message') == SUCCESS
+    assert resp.status_code == 200 and resp.json().get('message') == SUCCESS_TEXT
 
 
 def test_compare_findings():
