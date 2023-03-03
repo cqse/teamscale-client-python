@@ -35,6 +35,7 @@ class TeamscaleClient:
     """
 
     TEAMSCALE_API_VERSION = "v8.0.0"
+    """The Teamscale API Version for which the current implementation is designed"""
 
     def __init__(self, url: str, username: str, access_token: str, project: str, sslverify: bool = True,
                  timeout: float = 30.0, branch: Optional[str] = None):
@@ -226,8 +227,11 @@ class TeamscaleClient:
         return response
 
     def update_findings_schema(self):
-        """Triggers refresh of finding groups in analysis profiles."""
-        # TODO Ensure that this is the correct replacement for 'update-findings-schema'
+        """Triggers refresh of finding groups in analysis profiles.
+
+        Warnings:
+            Uses Teamscale's internal API and not the versioned API!
+        """
         return self.post(
             f"{self._api_url}/projects/{self.project}/metric-update",
             params={"projects": self.project}
@@ -723,6 +727,9 @@ class TeamscaleClient:
 
         Raises:
             ServiceError: If anything goes wrong
+
+        Warnings:
+            Uses Teamscale's internal API and not the versioned API!
         """
         response = self.get(
             f"{self._api_url}/projects/{self.project}/tasks",
@@ -747,6 +754,9 @@ class TeamscaleClient:
 
         Raises:
             ServiceError: If anything goes wrong
+
+        Warnings:
+            Uses Teamscale's internal API and not the versioned API!
         """
         return self.post(
             f"{self._api_url}/projects/{self.project}/tasks/{task_id}/comments",
