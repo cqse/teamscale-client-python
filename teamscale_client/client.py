@@ -12,6 +12,7 @@ from teamscale_client.client_utils import parse_version
 from teamscale_client.constants import ReportFormats, CoverageFormats, ArchitectureFormats, Assessment, TaskStatus
 from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task, MetricEntry, FileFindings, \
     FindingDescription, MetricDescription, NonCodeMetricEntry, ProjectConfiguration
+from teamscale_client.teamscale_client_config import TeamscaleClientConfig
 from teamscale_client.utils import to_json, to_json_dict
 
 
@@ -22,20 +23,21 @@ class TeamscaleClient:
     https://docs.python-requests.org/en/latest/
 
     Args:
-        url (str): The url to Teamscale (including the port)
-        username (str): The username to use for authentication
-        access_token (str): The IDE access token to use for authentication
-        project (str): The id of the project on which to work
+        url: The url to Teamscale (including the port)
+        username: The username to use for authentication
+        access_token: The IDE access token to use for authentication
+        project: The id of the project on which to work
         sslverify: See requests' verify parameter
             in https://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
-        timeout (float): TTFB timeout in seconds,
+        timeout: TTFB timeout in seconds,
             see https://docs.python-requests.org/en/master/user/quickstart/#timeouts
-        branch (str): The branch name for which to upload/retrieve data
+        branch: The branch name for which to upload/retrieve data
     """
 
     TEAMSCALE_API_VERSION = "v8.0.0"
 
-    def __init__(self, url, username, access_token, project, sslverify=True, timeout=30.0, branch=None):
+    def __init__(self, url: str, username: str, access_token: str, project: str, sslverify: bool = True,
+                 timeout: float = 30.0, branch: Optional[str] = None):
         """Constructor
         """
         self.url = url
@@ -52,21 +54,23 @@ class TeamscaleClient:
         self.check_api_version()
 
     @staticmethod
-    def from_client_config(config, sslverify=True, timeout=30.0, branch=None):
+    def from_client_config(
+            config: TeamscaleClientConfig, sslverify: bool = True, timeout: float = 30.0, branch: Optional[str] = None
+    ) -> 'TeamscaleClient':
         """Creates a new Teamscale client from a `TeamscaleClientConfig` object.
 
         Args:
-            config (teamscale_client_config.TeamscaleClientConfig): The client configuration to use.
+            config: The client configuration to use.
             sslverify: See requests' verify parameter
                 in https://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
-            timeout (float): TTFB timeout in seconds,
+            timeout: TTFB timeout in seconds,
                 see https://docs.python-requests.org/en/master/user/quickstart/#timeouts
-            branch (str): The branch name for which to upload/retrieve data
+            branch: The branch name for which to upload/retrieve data
         """
         return TeamscaleClient(config.url, config.username, config.access_token, config.project_id, sslverify, timeout,
                                branch)
 
-    def set_project(self, project):
+    def set_project(self, project: str) -> None:
         """Sets the project id for subsequent calls made using the client."""
         self.project = project
 
@@ -92,12 +96,15 @@ class TeamscaleClient:
                 "The Server API maximally supports {max}, which is too low for this client running {current}".format(
                     max=max_supported_api, current=python_client_api))
 
-    def get(self, url: str, parameters: Optional[Dict] = None) -> requests.Response:
+    def get(self, url: str, **kwargs) -> requests.Response:
         """Sends a GET request to the given service url.
 
         Args:
-            url:  The URL for which to execute a GET request
-            parameters: parameters to attach to the url
+            url: The URL for which to execute a GET request
+            **kwargs: passed to requests library (examples see below)
+
+        Keyword Args:
+            params: parameters to attach to the url
 
         Returns:
             requests.Response: request's response
@@ -105,9 +112,10 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        headers = {'Accept': 'application/json'}
-        response = requests.get(url, params=parameters, auth=self.auth_header, verify=self.sslverify, headers=headers,
-                                timeout=self.timeout)
+        headers = kwargs.pop("headers", {'Accept': 'application/json'})
+        response = requests.get(
+            url, auth=self.auth_header, verify=self.sslverify, headers=headers, timeout=self.timeout, **kwargs
+        )
         if not response.ok:
             raise ServiceError(f"ERROR: GET {url}: {response.status_code}:{response.text}")
         return response
@@ -116,7 +124,7 @@ class TeamscaleClient:
         """Sends a PUT request to the given service url with the json payload as content.
 
         Args:
-            url:  The URL for which to execute a PUT request
+            url: The URL for which to execute a PUT request
             **kwargs: passed to requests library (examples see below)
 
         Keyword Args:
@@ -125,14 +133,13 @@ class TeamscaleClient:
             params: parameters to attach to the url
             data: The data object to be attached to the request
 
-
         Returns:
             requests.Response: request's response
 
         Raises:
             ServiceError: If anything goes wrong
         """
-        headers = kwargs.get("headers", {'Accept': 'application/json', 'Content-Type': 'application/json'})
+        headers = kwargs.pop("headers", {'Accept': 'application/json', 'Content-Type': 'application/json'})
         response = requests.put(
             url, headers=headers, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout, **kwargs
         )
@@ -144,7 +151,7 @@ class TeamscaleClient:
         """Sends a POST request to the given service url with the json payload as content.
 
         Args:
-            url:  The URL for which to execute a POST request
+            url: The URL for which to execute a POST request
             **kwargs: passed to requests library (examples see below)
 
         Keyword Args:
@@ -167,12 +174,15 @@ class TeamscaleClient:
             raise ServiceError(f"ERROR: POST {url}: {response.status_code}:{response.text}")
         return response
 
-    def delete(self, url: str, parameters: Optional[Dict] = None) -> requests.Response:
+    def delete(self, url: str, **kwargs) -> requests.Response:
         """Sends a DELETE request to the given service url.
 
         Args:
-            url (str):  The URL for which to execute a DELETE request
-            parameters (dict): parameters to attach to the url
+            url:  The URL for which to execute a DELETE request
+            **kwargs: passed to requests library (examples see below)
+
+        Keyword Args:
+            params: parameters to attach to the url
 
         Returns:
             requests.Response: request's response
@@ -180,8 +190,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        response = requests.delete(url, params=parameters, auth=self.auth_header, verify=self.sslverify,
-                                   timeout=self.timeout)
+        response = requests.delete(url, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout, **kwargs)
         if not response.ok:
             raise ServiceError(f"ERROR: DELETE {url}: {response.status_code}:{response.text}")
         return response
@@ -480,7 +489,7 @@ class TeamscaleClient:
         """
         response = self.get(
             f"{self._api_url_version}/projects",
-            parameters={
+            params={
                 "include-deleting": True,
                 "include-reanalyzing": True
             }
@@ -654,7 +663,7 @@ class TeamscaleClient:
             parameters["assessment-filters"] = list(map(lambda assessment: assessment.value, assessment_filters))
 
         service_url = f"{self._api_url_version}/projects/{self.project}/findings/list"
-        response = self.get(service_url, parameters)
+        response = self.get(service_url, params=parameters)
         return [Finding.from_json(json_data) for json_data in response.json()]
 
     def get_commit_for_revision(self, revision_id: str) -> str:
@@ -692,7 +701,7 @@ class TeamscaleClient:
         service_url = f"{self._api_url_version}/projects/{self.project}/findings/{finding_id}"
         response = self.get(
             service_url,
-            parameters={
+            params={
                 "t": self._get_timestamp_parameter(timestamp=timestamp, branch=branch)
             }
         )
@@ -717,7 +726,7 @@ class TeamscaleClient:
         """
         response = self.get(
             f"{self._api_url}/projects/{self.project}/tasks",
-            parameters={
+            params={
                 "status": status.value,
                 "details": details,
                 "start": start,

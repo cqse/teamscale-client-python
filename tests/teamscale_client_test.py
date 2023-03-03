@@ -2,12 +2,9 @@
 
 https://github.com/getsentry/responses
 """
-
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import datetime
 import re
+
 import responses
 
 from teamscale_client import TeamscaleClient
@@ -305,8 +302,9 @@ def test_get_finding_by_id():
                   status=200, content_type="application/json",
                   body='{"typeId": "%s", "categoryName": "Code Anomalies", "analysisTimestamp": -1, "groupName": "Bad practice", "location": {"rawStartOffset": %i, "@class": "org.conqat.engine.commons.findings.location.TextRegionLocation", "rawEndLine": %i, "rawEndOffset": %i, "location": "%s", "rawStartLine": %i, "uniformPath": "%s"}, "birth": {"timestamp": 1487577242000, "branchName": "master"}, "id": "%s", "message": "%s", "assessment": "%s", "properties": {"Check": "Assignment of a variable to itself"}}'
                        % (
-                       findingTypeId, startOffset, endLine, endOffset, uniformPath, startLine, uniformPath, finding_id,
-                       message, assessment))
+                           findingTypeId, startOffset, endLine, endOffset, uniformPath, startLine, uniformPath,
+                           finding_id,
+                           message, assessment))
     finding = get_client().get_finding_by_id(finding_id)
     assert finding.uniformPath == uniformPath
     assert finding.startLine == startLine
