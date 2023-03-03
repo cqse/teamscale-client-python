@@ -761,7 +761,7 @@ class TeamscaleClient:
             }
         )
 
-    def create_dashboard(self, dashboard_descriptor):
+    def create_dashboard(self, dashboard_descriptor: str) -> requests.Response:
         """Adds a new dashboard from the given template.
 
         Args:
@@ -769,33 +769,29 @@ class TeamscaleClient:
         Returns:
             requests.Response: request's response
         """
-        service_url = self.get_global_service_url("dashboard-export")
         multiple_files = [('dashboardDescriptor', dashboard_descriptor)]
-        return requests.post(service_url, auth=self.auth_header, verify=self.sslverify, files=multiple_files,
-                             timeout=self.timeout)
+        return self.post(
+            f"{self._api_url_version}/dashboards",
+            files=multiple_files,
+            headers={"Content-Type": "multipart/form-data"}
+        )
 
-    def get_project_configuration(self, project_id):
-        """Adds a new dashboard from the given template.
+    def get_project_configuration(self, project_id: str) -> Dict:
+        """Returns the configuration for a given project.
 
-                Args:
-                    project_id (str): The id for which the project configuration should be retrieved
-                Returns:
-                    str: The project configuration as json
-                """
-        url = "%s%s" % (self.get_global_service_url("create-project"), project_id)
-        return self.get(url).json()
+        Args:
+            project_id: The id for which the project configuration should be retrieved
+        Returns:
+            dict: The project configuration as json dictionary
+        """
+        response = self.get(f"{self._api_url_version}/projects/{project_id}/configuration")
+        return response.json()
 
-    def get_architectures(self):
+    def get_architectures(self) -> List[str]:
         """Returns the paths of all architecture in the project.
 
             Returns:
-                List[str] The architecture names.
+                The architecture names.
         """
-        service_url = self.get_project_service_url("arch-assessment")
-        parameters = {"list": True,
-
-                      }
-        response = self.get(service_url, parameters=parameters)
-        if not response.ok:
-            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
-        return [architecture_overview['uniformPath'] for architecture_overview in response.json()]
+        response = self.get(f"{self._api_url_version}/projects/{self.project}/architectures/assessments")
+        return [architecture_overview["uniformPath"] for architecture_overview in response.json()]
