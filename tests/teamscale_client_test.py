@@ -3,7 +3,6 @@
 https://github.com/getsentry/responses
 """
 import datetime
-import re
 
 import responses
 
@@ -18,7 +17,6 @@ PROJECT = "foo"
 USER = "admin"
 ACCESS_TOKEN = USER
 SUCCESS_TEXT = "success"
-
 
 BASE_URL = "http://localhost:8080"
 BASE_API_URL = f"{BASE_URL}/api"
@@ -42,21 +40,6 @@ def get_client(branch=None):
         }
     )
     return TeamscaleClient(BASE_URL, USER, ACCESS_TOKEN, PROJECT, branch=branch)
-
-
-def get_project_service_mock(service_id):
-    """Returns mock project service url"""
-    return re.compile(r'%s/p/foo/%s/.*' % (BASE_URL, service_id))
-
-
-def get_global_service_mock(service_id):
-    """Returns mock global service url"""
-    return re.compile(r'%s/%s/.*' % (BASE_URL, service_id))
-
-
-def get_global_service_mock_with_api_version(service_id, api_version):
-    """Returns mock global service url for a specific api version"""
-    return re.compile(r'%s/api/%s/%s/.*' % (BASE_URL, api_version, service_id))
 
 
 @responses.activate
@@ -155,6 +138,7 @@ def test_upload_metric_description():
         body=SUCCESS_TEXT, status=200
     )
     resp = get_client().add_metric_descriptions([description])
+    # TODO
     assert '{"analysisGroup": "awesome group", "metricDefinition": {"aggregation": "SUM", "description": "Great ' \
            'Description", "name": "Metric Name", "properties": ["SIZE_METRIC"], "valueType": "NUMERIC"}, "metricId": ' \
            '"metric_i,"}' == to_json(description)
@@ -165,8 +149,11 @@ def test_upload_metric_description():
 def test_coverage_upload():
     """Tests uploading of test coverage"""
     files = ["tests/data/file1.txt", "tests/data/file2.txt"]
-    responses.add(responses.POST, get_project_service_mock('external-report'),
-                  body=SUCCESS_TEXT, status=200)
+    responses.add(
+        responses.POST,
+        f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/external-analysis/session/auto-create/report",
+        body=SUCCESS_TEXT, status=200
+    )
     resp = get_client().upload_coverage_data(files, CoverageFormats.CTC, datetime.datetime.now(), "Test Message",
                                              "partition-name")
     assert resp.text == SUCCESS_TEXT
@@ -177,7 +164,7 @@ def test_coverage_upload():
 @responses.activate
 def test_get_baseline():
     """Tests retrieving of baselines"""
-    responses.add(responses.GET, get_project_service_mock('baselines'),
+    responses.add(responses.GET, f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/baselines",
                   status=200, content_type="application/json",
                   body='[{ "name": "Baseline 1", "description": "Test description", "timestamp": 123192873091 }]')
     resp = get_client().get_baselines()
@@ -189,8 +176,11 @@ def test_get_baseline():
 def test_add_baseline():
     """Test uploading of baselines"""
     baseline = Baseline("Baseline 1", "Test description", datetime.datetime.now())
-    responses.add(responses.PUT, get_project_service_mock('baselines'),
-                  body=SUCCESS_TEXT, status=200)
+    responses.add(
+        responses.PUT,
+        f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/baselines/baselines/{baseline.name}",
+        body=SUCCESS_TEXT, status=200
+    )
     resp = get_client().add_baseline(baseline)
     assert resp.text == SUCCESS_TEXT
     assert "Baseline 1" in responses.calls[1].request.body
@@ -199,9 +189,13 @@ def test_add_baseline():
 @responses.activate
 def test_delete_baseline():
     """Test deletion of baselines"""
-    responses.add(responses.DELETE, get_project_service_mock('baselines'),
-                  body=SUCCESS_TEXT, status=200)
-    resp = get_client().delete_baseline("Baseline 1")
+    baseline_name = "Baseline 1"
+    responses.add(
+        responses.DELETE,
+        f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/baselines/baselines/{baseline_name}",
+        body=SUCCESS_TEXT, status=200
+    )
+    resp = get_client().delete_baseline(baseline_name)
     assert resp.text == SUCCESS_TEXT
 
 
@@ -210,8 +204,11 @@ def test_architecture_upload():
     """Tests uploading of architectures"""
     # Just reuse text files for testing, it's just a mock anyway
     paths = {"archs/first.architecture": "tests/data/file1.txt", "archs/second.architecture": "tests/data/file2.txt"}
-    responses.add(responses.POST, get_project_service_mock('architecture-upload'),
-                  body=SUCCESS_TEXT, status=200)
+    responses.add(
+        responses.POST,
+        f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/architectures",
+        body=SUCCESS_TEXT, status=200
+    )
     resp = get_client().upload_architectures(paths, datetime.datetime.now(), "Test Message")
     assert resp.text == SUCCESS_TEXT
     assert "file1.txt" in responses.calls[1].request.body.decode()
@@ -227,16 +224,23 @@ def _get_test_findings():
 def test_finding_json_serialization():
     """Tests that findings json is correctly serialized"""
     findings = _get_test_findings()
-    assert '[{"content": null, "findings": [{"assessment": "YELLOW", "endLine": null, "endOffset": null, "findingProperties": null, "findingTypeId": "test-id", "finding_id": null, "identifier": null, "message": "message", "startLine": null, "startOffset": null, "uniformPath": null}], "path": "path/to/file"}]' == to_json(
+    # TODO
+    assert '[{"content": null, "findings": [{"assessment": "YELLOW", "endLine": null, "endOffset": null, ' \
+           '"findingProperties": null, "findingTypeId": "test-id", "finding_id": null, "identifier": null, ' \
+           '"message": "message", "startLine": null, "startOffset": null, "uniformPath": null}], ' \
+           '"path": "path/to/file"}]' == to_json(
         findings)
 
 
 @responses.activate
 def test_get_projects():
     """Tests retrieving of projects"""
-    responses.add(responses.GET, get_global_service_mock_with_api_version('projects', 'v5.6.0'),
-                  status=200, content_type="application/json",
-                  body='[{"description": "", "creationTimestamp": 1487534523817, "alias": "My Test Project", "reanalyzing": false, "deleting": false, "id": "test-project", "name": "Test Project"}]')
+    responses.add(
+        responses.GET,
+        f"{BASE_API_VERSIONED_URL}/projects",
+        status=200, content_type="application/json",
+        body='[{"description": "", "creationTimestamp": 1487534523817, "alias": "My Test Project", "reanalyzing": '
+             'false, "deleting": false, "id": "test-project", "name": "Test Project"}]')
     resp = get_client().get_projects()
     assert len(resp) == 1
     assert resp[0].name == "Test Project"
@@ -250,9 +254,11 @@ def test_add_project():
                                                                     included_file_names="**.py")
     project_configuration = ProjectConfiguration(name="Test Project", project_id="test-project",
                                                  profile="Python (default)", connectors=[file_system_config])
-
-    responses.add(responses.PUT, get_global_service_mock('create-project'),
-                  body='{"message": "success"}', status=200)
+    responses.add(
+        responses.POST,
+        f"{BASE_API_VERSIONED_URL}/projects",
+        body='{"message": "success"}', status=200
+    )
     resp = get_client().create_project(project_configuration)
     assert resp.status_code == 200 and resp.json().get('message') == SUCCESS_TEXT
 
@@ -265,9 +271,11 @@ def test_add_project_without_validation():
                                                                     included_file_names="**.py")
     project_configuration = ProjectConfiguration(name="Test Project", project_id="test-project",
                                                  profile="Python (default)", connectors=[file_system_config])
-
-    responses.add(responses.PUT, get_global_service_mock('create-project'),
-                  body='{"message": "success"}', status=200)
+    responses.add(
+        responses.POST,
+        f"{BASE_API_VERSIONED_URL}/projects",
+        body='{"message": "success"}', status=200
+    )
     resp = get_client().create_project(project_configuration, True)
     assert resp.status_code == 200 and resp.json().get('message') == SUCCESS_TEXT
 
@@ -277,7 +285,7 @@ def test_compare_findings():
     first_finding = Finding("1a", "first message a", uniform_path='path/to/a', start_line=10, end_line=30)
     second_finding = Finding("2", "second message", uniform_path='path/to/a', start_line=20, end_line=25)
     third_finding = Finding("3", "third message", uniform_path='path/to/b', start_line=20, end_line=25)
-
+    # TODO
     assert first_finding < second_finding
     assert second_finding < third_finding
     assert first_finding == first_finding
@@ -290,9 +298,23 @@ def test_compare_findings():
 @responses.activate
 def test_get_tasks():
     """Tests retrieving of tasks"""
-    responses.add(responses.GET, get_project_service_mock('tasks'),
-                  status=200, content_type="application/json",
-                  body='[{"id": 1, "subject": "uiae", "author": "admin", "description": "", "assignee": "", "created": 1536581194732, "updated": 1536583991791, "updatedBy": "admin", "status": "OPEN", "resolution": "NONE", "findings": [{"findingId": "40315BE118FE08044FBF605325445250"}], "comments": [{"author": "admin", "date": 1536583991791, "text": "Added finding: 40315BE118FE08044FBF605325445250", "changeComment": true, "resolvedAuthor": {"username": "admin", "firstName": "Default", "lastName": "Administrator", "emailAddress": "", "gravatarHash": "dummy", "useGravatar": false, "aliases": [], "authenticator": "HashedStored:anonymized", "groupIds": ["Administrators"]}}], "tags": [], "resolvedAuthor": {"username": "admin", "firstName": "Default", "lastName": "Administrator", "emailAddress": "", "gravatarHash": "dummy", "useGravatar": false, "aliases": [], "authenticator": "HashedStored:anonymized", "groupIds": ["Administrators"]}, "resolvedUpdatedBy": {"username": "admin", "firstName": "Default", "lastName": "Administrator", "emailAddress": "", "gravatarHash": "dummy", "useGravatar": false, "aliases": [], "authenticator": "HashedStored:anonymized", "groupIds": ["Administrators"]}}]')
+    responses.add(
+        responses.GET,
+        f"{BASE_API_URL}/projects/{PROJECT}/tasks",
+        status=200, content_type="application/json",
+        body='[{"id": 1, "subject": "uiae", "author": "admin", "description": "", "assignee": "", "created": '
+             '1536581194732, "updated": 1536583991791, "updatedBy": "admin", "status": "OPEN", "resolution": "NONE", '
+             '"findings": [{"findingId": "40315BE118FE08044FBF605325445250"}], "comments": [{"author": "admin", '
+             '"date": 1536583991791, "text": "Added finding: 40315BE118FE08044FBF605325445250", "changeComment": '
+             'true, "resolvedAuthor": {"username": "admin", "firstName": "Default", "lastName": "Administrator", '
+             '"emailAddress": "", "gravatarHash": "dummy", "useGravatar": false, "aliases": [], "authenticator": '
+             '"HashedStored:anonymized", "groupIds": ["Administrators"]}}], "tags": [], "resolvedAuthor": {'
+             '"username": "admin", "firstName": "Default", "lastName": "Administrator", "emailAddress": "", '
+             '"gravatarHash": "dummy", "useGravatar": false, "aliases": [], "authenticator": '
+             '"HashedStored:anonymized", "groupIds": ["Administrators"]}, "resolvedUpdatedBy": {"username": "admin", '
+             '"firstName": "Default", "lastName": "Administrator", "emailAddress": "", "gravatarHash": "dummy", '
+             '"useGravatar": false, "aliases": [], "authenticator": "HashedStored:anonymized", "groupIds": ['
+             '"Administrators"]}}]')
     resp = get_client().get_tasks(TaskStatus.OPEN)
     assert len(resp) == 1
     assert resp[0].id == 1
@@ -301,11 +323,15 @@ def test_get_tasks():
 
 @responses.activate
 def test_add_issue_metric():
-    """Tests the addition of a issue metric"""
-    responses.add(responses.PUT, get_project_service_mock('issue-metrics'),
-                  body='{"message": "success"}', status=200)
-    get_client().add_issue_metric("example/foo", "instate(status=YELLOW) > 2d")
-    assert "YELLOW" in responses.calls[1].request.body.decode()
+    """Tests the addition of an issue metric"""
+    responses.add(
+        responses.POST,
+        f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/issues/queries",
+        body='{"message": "success"}', status=200
+    )
+    resp = get_client().add_issue_metric("example/foo", "instate(status=YELLOW) > 2d")
+    assert "YELLOW" in responses.calls[1].request.params["query"]
+    assert resp.status_code == 200 and resp.json().get('message') == SUCCESS_TEXT
 
 
 @responses.activate
@@ -342,14 +368,23 @@ def test_get_finding_by_id():
     findingTypeId = 'Code Anomalies/Assignment of a variable to itself'
     message = '`parameters` is assigned to itself'
     assessment = AssessmentMetricColors.YELLOW
+    finding_properties = {
+        "Check": "Assignment of a variable to itself"
+    }
 
-    responses.add(responses.GET, get_project_service_mock('findings-by-id'),
-                  status=200, content_type="application/json",
-                  body='{"typeId": "%s", "categoryName": "Code Anomalies", "analysisTimestamp": -1, "groupName": "Bad practice", "location": {"rawStartOffset": %i, "@class": "org.conqat.engine.commons.findings.location.TextRegionLocation", "rawEndLine": %i, "rawEndOffset": %i, "location": "%s", "rawStartLine": %i, "uniformPath": "%s"}, "birth": {"timestamp": 1487577242000, "branchName": "master"}, "id": "%s", "message": "%s", "assessment": "%s", "properties": {"Check": "Assignment of a variable to itself"}}'
-                       % (
-                           findingTypeId, startOffset, endLine, endOffset, uniformPath, startLine, uniformPath,
-                           finding_id,
-                           message, assessment))
+    responses.add(
+        responses.GET,
+        f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/findings/{finding_id}",
+        status=200, content_type="application/json",
+        body=(f'{{"typeId": "{findingTypeId}", "categoryName": "Code Anomalies", "analysisTimestamp": -1, '
+              f'"groupName": "Bad practice", "location": {{"rawStartOffset": {startOffset}, "@class": '
+              f'"org.conqat.engine.commons.findings.location.TextRegionLocation", "rawEndLine": {endLine}, '
+              f'"rawEndOffset": {endOffset}, "location": "{uniformPath}", "rawStartLine": {startLine}, '
+              f'"uniformPath": "{uniformPath}"}}, "birth": {{"timestamp": 1487577242000,'
+              f'"branchName": "master"}}, "id": "{finding_id}", "message": "{message}", '
+              f'"assessment": "{assessment.name}", "properties": {to_json(finding_properties)}}}'
+              )
+    )
     finding = get_client().get_finding_by_id(finding_id)
     assert finding.uniformPath == uniformPath
     assert finding.startLine == startLine
@@ -358,6 +393,6 @@ def test_get_finding_by_id():
     assert finding.endOffset == endOffset
     assert finding.findingTypeId == findingTypeId
     assert finding.message == message
-    assert finding.assessment == AssessmentMetricColors.YELLOW
+    assert finding.assessment == assessment
     assert finding.identifier is None
-    assert finding.findingProperties is None
+    assert finding.findingProperties == finding_properties
