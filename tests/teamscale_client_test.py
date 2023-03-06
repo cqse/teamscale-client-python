@@ -228,8 +228,7 @@ def test_finding_json_serialization():
     assert '[{"content": null, "findings": [{"assessment": "YELLOW", "endLine": null, "endOffset": null, ' \
            '"findingProperties": null, "findingTypeId": "test-id", "finding_id": null, "identifier": null, ' \
            '"message": "message", "startLine": null, "startOffset": null, "uniformPath": null}], ' \
-           '"path": "path/to/file"}]' == to_json(
-        findings)
+           '"path": "path/to/file"}]' == to_json(findings)
 
 
 @responses.activate

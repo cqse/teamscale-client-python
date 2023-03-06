@@ -13,7 +13,7 @@ from teamscale_client.constants import ReportFormats, CoverageFormats, Architect
 from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task, MetricEntry, FileFindings, \
     FindingDescription, MetricDescription, NonCodeMetricEntry, ProjectConfiguration
 from teamscale_client.teamscale_client_config import TeamscaleClientConfig
-from teamscale_client.utils import to_json, to_json_dict
+from teamscale_client.utils import to_json
 
 
 class TeamscaleClient:
@@ -320,7 +320,7 @@ class TeamscaleClient:
         """
         return self.post(
             f"{self._api_url_version}/external-metrics",
-            json=to_json_dict(metric_descriptions)
+            data=to_json(metric_descriptions)
         )
 
     def upload_coverage_data(
