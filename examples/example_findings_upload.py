@@ -9,23 +9,23 @@ TEAMSCALE_URL = "http://localhost:8080"
 USERNAME = "admin"
 ACCESS_TOKEN = "ide-access-token"
 
-PROJECT_ID = "junit4"
+PROJECT_ID = "test"
 
 if __name__ == '__main__':
     client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_ID)
 
     # Add a new group that will contain findings
     response = client.add_findings_group("Group 1", "externals-.*")
-    print(f"Request result: {response.text}")
+    print(f"Request result: {response.status_code}")
 
     # Make Teamscale aware of a new findings type, which mappes to the previously
     # created group
     descriptions = [
-        FindingDescription("externals-1", "A test finding description", Enablement.RED),
+        FindingDescription("externals-1", "A test finding description", Enablement.RED, "externals-1"),
         FindingDescription("externals-2", "Another finding description", Enablement.YELLOW, "externals-2")
     ]
     response = client.add_finding_descriptions(descriptions)
-    print(f"Request result: {response.text}")
+    print(f"Request result: {response.status_code}")
 
     # A manual step to add the new groups to existing analysis profiles has to be done.
     input("Please create the project or update the analysis profile used by the project to contain the new groups. "
@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     # Update existing project to use new findings
     response = client.update_findings_schema()
-    print(f"Request result: {response.text}")
+    print(f"Request result: {response.status_code}")
 
     # Upload findings to Teamscale
     findings = [
@@ -44,4 +44,4 @@ if __name__ == '__main__':
             "src/Foo.java")
     ]
     response = client.upload_findings(findings, datetime.datetime.now(), "TestCommit", "test-partition")
-    print(f"Request result: {response.text}")
+    print(f"Request result: {response.status_code}")

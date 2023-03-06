@@ -221,8 +221,8 @@ class TeamscaleClient:
         response = None
         for finding_description in descriptions:
             response = self.post(
-                f"{self._api_url_version}/external-findings/description",
-                json=vars(finding_description)
+                f"{self._api_url_version}/external-findings/descriptions",
+                data=to_json(finding_description)
             )
         return response
 

@@ -117,7 +117,7 @@ class FindingDescription:
     """
 
     def __init__(self, typeid, description, enablement, name=None):
-        self.typeid = typeid
+        self.typeId = typeid
         self.description = description
         self.enablement = enablement
         self.name = name
