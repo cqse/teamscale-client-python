@@ -10,7 +10,7 @@ from teamscale_client.utils import auto_str
 
 @auto_str
 @functools.total_ordering
-class Finding(object):
+class Finding:
     """Representation of a finding in Teamscale.
     
     Args:
@@ -90,7 +90,7 @@ class Finding(object):
 
 
 @auto_str
-class FileFindings(object):
+class FileFindings:
     """Representation of a file and its findings.
     
     Args:
@@ -106,7 +106,7 @@ class FileFindings(object):
 
 
 @auto_str
-class FindingDescription(object):
+class FindingDescription:
     """Description of a finding type to be added at configuration time.
 
         Args:
@@ -124,7 +124,7 @@ class FindingDescription(object):
 
 
 @auto_str
-class MetricDescription(object):
+class MetricDescription:
     """Description of a metric type to be addded at configuration time.
     
     Args:
@@ -154,7 +154,7 @@ class MetricDescription(object):
 
 
 @auto_str
-class MetricEntry(object):
+class MetricEntry:
     """A container for adding metric values to a file.
     
     Args:
@@ -172,7 +172,7 @@ class MetricEntry(object):
 
 
 @auto_str
-class NonCodeMetricEntry(object):
+class NonCodeMetricEntry:
     """A container for adding non-code metrics to a project.
     
     Args:
@@ -192,7 +192,7 @@ class NonCodeMetricEntry(object):
 
 
 @auto_str
-class Baseline(object):
+class Baseline:
     """Represents a Teamscale baseline. Either the date or the timestamp must be given
 
     Args:
@@ -248,7 +248,7 @@ class ServiceError(Exception):
 
 
 @auto_str
-class ProjectInfo(object):
+class ProjectInfo:
     """Represents information about a Teamscale project. When querying information about a project in Teamscale,
     the result is an instance of this class.
 
@@ -293,7 +293,7 @@ class ProjectInfo(object):
 
 
 @auto_str
-class ProjectConfiguration(object):
+class ProjectConfiguration:
     """Represents a Teamscale project configuration. This is used to create new and update existing projects in
     Teamscale.
 
@@ -314,7 +314,7 @@ class ProjectConfiguration(object):
 
 
 @auto_str
-class ConnectorConfiguration(object):
+class ConnectorConfiguration:
     """Represents a Teamscale connector configuration. Connectors allow to attach external tools such as source code
     repositories.
 
@@ -535,7 +535,7 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
 
 
 @auto_str
-class Task(object):
+class Task:
     """Represents a task in Teamscale
 
     Args:
@@ -580,7 +580,7 @@ class Task(object):
 
 
 @auto_str
-class Comment(object):
+class Comment:
     """Represents a comment on a Task in Teamscale
 
     Args:
