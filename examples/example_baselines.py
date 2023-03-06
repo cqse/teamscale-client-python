@@ -6,9 +6,9 @@ from teamscale_client.data import Baseline
 TEAMSCALE_URL = "http://localhost:8080"
 
 USERNAME = "admin"
-ACCESS_TOKEN = "ide-access-token"
+ACCESS_TOKEN = "niyPYbsUyfi40YemIApypEv0YHpy0UOg"
 
-PROJECT_ID = "test"
+PROJECT_ID = "junit4"
 
 
 def show_baselines(client):
