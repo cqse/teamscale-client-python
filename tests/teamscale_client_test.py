@@ -138,7 +138,6 @@ def test_upload_metric_description():
         body=SUCCESS_TEXT, status=200
     )
     resp = get_client().add_metric_descriptions([description])
-    # TODO
     assert '{"analysisGroup": "awesome group", "metricDefinition": {"aggregation": "SUM", "description": "Great ' \
            'Description", "name": "Metric Name", "properties": ["SIZE_METRIC"], "valueType": "NUMERIC"}, "metricId": ' \
            '"metric_i,"}' == to_json(description)
@@ -224,7 +223,6 @@ def _get_test_findings():
 def test_finding_json_serialization():
     """Tests that findings json is correctly serialized"""
     findings = _get_test_findings()
-    # TODO
     assert '[{"content": null, "findings": [{"assessment": "YELLOW", "endLine": null, "endOffset": null, ' \
            '"findingProperties": null, "findingTypeId": "test-id", "finding_id": null, "identifier": null, ' \
            '"message": "message", "startLine": null, "startOffset": null, "uniformPath": null}], ' \
@@ -284,7 +282,6 @@ def test_compare_findings():
     first_finding = Finding("1a", "first message a", uniform_path='path/to/a', start_line=10, end_line=30)
     second_finding = Finding("2", "second message", uniform_path='path/to/a', start_line=20, end_line=25)
     third_finding = Finding("3", "third message", uniform_path='path/to/b', start_line=20, end_line=25)
-    # TODO
     assert first_finding < second_finding
     assert second_finding < third_finding
     assert first_finding == first_finding
