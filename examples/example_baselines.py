@@ -1,14 +1,7 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import datetime
 
 from teamscale_client import TeamscaleClient
-from teamscale_client.constants import AssessmentMetricColors
 from teamscale_client.data import Baseline
-
 
 TEAMSCALE_URL = "http://localhost:8080"
 
@@ -17,9 +10,11 @@ ACCESS_TOKEN = "ide-access-token"
 
 PROJECT_ID = "test"
 
+
 def show_baselines(client):
     baselines = client.get_baselines()
     print([str(baseline) for baseline in baselines])
+
 
 if __name__ == '__main__':
     client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_ID)
@@ -41,6 +36,3 @@ if __name__ == '__main__':
     client.delete_baseline(baseline2.name)
 
     show_baselines(client)
-
-
-

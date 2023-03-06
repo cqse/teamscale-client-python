@@ -1,11 +1,6 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 from teamscale_client import TeamscaleClient
 from teamscale_client.data import ProjectConfiguration, FileSystemSourceCodeConnectorConfiguration, \
-    GitSourceCodeConnectorConfiguration,  MultiVersionFileSystemSourceCodeConnectorConfiguration, \
+    GitSourceCodeConnectorConfiguration, MultiVersionFileSystemSourceCodeConnectorConfiguration, \
     TFSSourceCodeConnectorConfiguration, SubversionSourceCodeConnectorConfiguration
 
 TEAMSCALE_URL = "http://localhost:8080"

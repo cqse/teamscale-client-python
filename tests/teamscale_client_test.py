@@ -382,7 +382,7 @@ def test_get_finding_by_id():
               f'"rawEndOffset": {endOffset}, "location": "{uniformPath}", "rawStartLine": {startLine}, '
               f'"uniformPath": "{uniformPath}"}}, "birth": {{"timestamp": 1487577242000,'
               f'"branchName": "master"}}, "id": "{finding_id}", "message": "{message}", '
-              f'"assessment": "{assessment.name}", "properties": {to_json(finding_properties)}}}'
+              f'"assessment": "{assessment.value}", "properties": {to_json(finding_properties)}}}'
               )
     )
     finding = get_client().get_finding_by_id(finding_id)

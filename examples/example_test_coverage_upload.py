@@ -1,10 +1,5 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
-import glob
 import datetime
+import glob
 
 from teamscale_client import TeamscaleClient
 from teamscale_client.constants import CoverageFormats
@@ -19,6 +14,7 @@ PROJECT_ID = "test"
 if __name__ == '__main__':
     client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_ID)
 
-    files = [ file for file in glob.glob("/path/to/coverage/files/*.xml")]
+    files = [file for file in glob.glob("/path/to/coverage/files/*.xml")]
 
-    client.upload_coverage_data(files, CoverageFormats.CTC , datetime.datetime.now(), "Upload coverage", "test-partition")
+    client.upload_coverage_data(files, CoverageFormats.CTC, datetime.datetime.now(), "Upload coverage",
+                                "test-partition")
