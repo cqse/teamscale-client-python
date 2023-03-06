@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Any
 
 import jsonpickle
 from jsonpickle.pickler import Pickler
@@ -29,13 +29,13 @@ def auto_str(cls):
     return cls
 
 
-def to_json(obj):
+def to_json(obj: Any) -> str:
     """Utility method for converting an object to a json encoded string. 
     
     Takes care of all the necessary setup.
     
     Args:
-        obj (object): The object that should be encoded.
+        obj: The object that should be encoded.
         
     Returns:
         str: The encoded version of the given object.
@@ -44,7 +44,7 @@ def to_json(obj):
     return jsonpickle.encode(obj, unpicklable=False)
 
 
-def to_json_dict(obj: any) -> Dict:
+def to_json_dict(obj: Any) -> Dict:
     """Converts any object to a JSON dictionary which can be sent as payload of a request.
 
     Args:
