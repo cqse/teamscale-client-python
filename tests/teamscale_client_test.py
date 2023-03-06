@@ -177,7 +177,7 @@ def test_add_baseline():
     baseline = Baseline("Baseline 1", "Test description", datetime.datetime.now())
     responses.add(
         responses.PUT,
-        f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/baselines/baselines/{baseline.name}",
+        f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/baselines/{baseline.name}",
         body=SUCCESS_TEXT, status=200
     )
     resp = get_client().add_baseline(baseline)
@@ -191,7 +191,7 @@ def test_delete_baseline():
     baseline_name = "Baseline 1"
     responses.add(
         responses.DELETE,
-        f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/baselines/baselines/{baseline_name}",
+        f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/baselines/{baseline_name}",
         body=SUCCESS_TEXT, status=200
     )
     resp = get_client().delete_baseline(baseline_name)
