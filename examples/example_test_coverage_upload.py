@@ -1,5 +1,4 @@
 import datetime
-import glob
 
 from teamscale_client import TeamscaleClient
 from teamscale_client.constants import CoverageFormats
@@ -14,7 +13,7 @@ PROJECT_ID = "test"
 if __name__ == '__main__':
     client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_ID)
 
-    files = [file for file in glob.glob("/path/to/coverage/files/*.xml")]
+    files = ["./simple-coverage.txt"]
 
-    client.upload_coverage_data(files, CoverageFormats.CTC, datetime.datetime.now(), "Upload coverage",
+    client.upload_coverage_data(files, CoverageFormats.SIMPLE, datetime.datetime.now(), "Upload coverage",
                                 "test-partition")

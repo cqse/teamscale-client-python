@@ -169,7 +169,7 @@ class TeamscaleClient:
         """
         headers = kwargs.pop("headers", {'Accept': 'application/json', 'Content-Type': 'application/json'})
         response = requests.post(
-            url, headers=headers, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout, **kwargs
+            url, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout, **kwargs
         )
         if not response.ok:
             raise ServiceError(f"ERROR: POST {url}: {response.status_code}:{response.text}")
