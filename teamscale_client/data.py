@@ -282,7 +282,7 @@ class ProjectInfo:
             data.Baseline: The baseline that was parsed from the JSON object
         """
         return cls(
-            project_id=json_data['id'],
+            project_id=json_data['publicIds'][0],
             name=json_data['name'],
             description=json_data.get('description'),
             creation_timestamp=json_data['creationTimestamp'],
@@ -299,7 +299,7 @@ class ProjectConfiguration:
 
     Args:
         name (str): The project's name
-        project_id (str): The project's id
+        project_id (List[str]): The project's public id
         profile (str): The name of the profile used to analyse the project
         connectors (List[:class:`ConnectorConfiguration`]): List of all connectors used in the project configuration
         alias (Optional[str]): The project's alias
@@ -307,7 +307,7 @@ class ProjectConfiguration:
 
     def __init__(self, name, project_id, profile, connectors, alias=None):
         self.name = name
-        self.id = project_id
+        self.publicIds = project_id if isinstance(project_id, list) else [project_id]
         self.profile = profile
         self.connectors = connectors
         self.alias = alias

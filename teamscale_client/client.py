@@ -501,7 +501,7 @@ class TeamscaleClient:
         return [ProjectInfo.from_json(json_data) for json_data in response.json()]
 
     def create_project(
-            self, project_configuration: ProjectConfiguration, skip_project_validation: bool = False
+            self, project_configuration: ProjectConfiguration, skip_project_validation: bool = True
     ) -> requests.Response:
         """Creates a project with the specified configuration in Teamscale. The parameter `skip_project_validation`
         specifies, whether to skip the validation of the project.
@@ -540,8 +540,12 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong.
         """
+        # For the update, we'll need the internal ID
+        internal_uuid = self.get_project_configuration(project_configuration.publicIds[0])["internalId"]
+        # TODO! This does not work as expected. The server complains about re-setting the ID being not allowed (
+        #  without ID in ProjectConfig too)
         return self.put(
-            f"{self._api_url_version}/projects/{project_configuration.id}",
+            f"{self._api_url_version}/projects/{internal_uuid}",
             params={
                 "skip-project-validation": skip_project_validation,
                 "reanalyze-if-required": True
