@@ -382,8 +382,7 @@ class TeamscaleClient:
                 "format": report_format.value,
                 "movetolastcommit": move_to_last_commit
             },
-            files=multiple_files,
-            headers={"Content-Type": "multipart/form-data"}
+            files=multiple_files
         )
 
     def upload_architectures(
@@ -414,8 +413,7 @@ class TeamscaleClient:
                 "message": message,
                 "format": architecture_format.value
             },
-            files=architecture_files,
-            headers={"Content-Type": "multipart/form-data"}
+            files=architecture_files
         )
 
     def upload_non_code_metrics(
@@ -795,8 +793,7 @@ class TeamscaleClient:
         multiple_files = [('dashboardDescriptor', dashboard_descriptor)]
         return self.post(
             f"{self._api_url_version}/dashboards",
-            files=multiple_files,
-            headers={"Content-Type": "multipart/form-data"}
+            files=multiple_files
         )
 
     def get_project_configuration(self, project_id: str) -> Dict:
