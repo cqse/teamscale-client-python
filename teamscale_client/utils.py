@@ -39,4 +39,4 @@ def to_json(obj: Any) -> str:
     Returns:
         str: The encoded version of the given object.
     """
-    return json.dumps(obj, sort_keys=True, default=lambda x: x.__dict__)
+    return json.dumps(obj, sort_keys=True, default=lambda x: vars(x))
