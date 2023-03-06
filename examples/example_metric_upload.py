@@ -13,7 +13,11 @@ PROJECT_ID = "foo"
 if __name__ == '__main__':
     client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_ID)
 
-    entry = MetricEntry("src/Foo.java", {"sample_metric_id": 10})
-    entry2 = MetricEntry("-architectures-/system.architecture/src/empty/", {"sample_metric_id": 6})
+    # These seem to be old examples, not working anymore
+    # entry = MetricEntry("src/Foo.java", {"sample_metric_id": 10})
+    # entry2 = MetricEntry("-architectures-/system.architecture/src/empty/", {"sample_metric_id": 6})
+
+    entry = MetricEntry("src/Foo.java", {})
+    entry2 = MetricEntry("-architectures-/system.architecture/src/empty/", {"complexity": 6})
 
     client.upload_metrics([entry2], datetime.datetime.now(), "Upload metrics", "test-partition")
