@@ -462,7 +462,7 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        return self.delete(f"{self._api_url_version}/projects/{self.project}/baselines/baselines/{baseline_name}")
+        return self.delete(f"{self._api_url_version}/projects/{self.project}/baselines/{baseline_name}")
 
     def add_baseline(self, baseline: Baseline) -> requests.Response:
         """Adds a baseline to the currently active project.
@@ -478,7 +478,7 @@ class TeamscaleClient:
             ServiceError: If anything goes wrong
         """
         return self.put(
-            f"{self._api_url_version}/projects/{self.project}/baselines/baselines/{baseline.name}",
+            f"{self._api_url_version}/projects/{self.project}/baselines/{baseline.name}",
             data=to_json(baseline)
         )
 
