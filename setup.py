@@ -15,7 +15,6 @@ setup(
         "Topic :: Utilities",
     ],
     install_requires=[
-        'simplejson',
         'requests>=2.0',
         'configparser',
         'packaging'
