@@ -508,7 +508,7 @@ class TeamscaleClient:
         return [ProjectInfo.from_json(json_data) for json_data in response.json()]
 
     def create_project(
-            self, project_configuration: ProjectConfiguration, skip_project_validation: bool = True
+            self, project_configuration: ProjectConfiguration, skip_project_validation: bool = False
     ) -> requests.Response:
         """Creates a project with the specified configuration in Teamscale. The parameter `skip_project_validation`
         specifies, whether to skip the validation of the project.
