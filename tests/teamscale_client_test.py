@@ -76,7 +76,7 @@ def test_add_findings_descriptions():
     """
     findings_descriptions = [FindingDescription('type1', 'desc1', Enablement.RED, 'name1'),
                              FindingDescription('type2', 'desc2', Enablement.YELLOW, 'name 2')]
-    responses.add(responses.POST, f"{BASE_API_VERSIONED_URL}/external-findings/description",
+    responses.add(responses.POST, f"{BASE_API_VERSIONED_URL}/external-findings/descriptions",
                   body=SUCCESS_TEXT, status=200)
     resp = get_client().add_finding_descriptions(findings_descriptions)
     assert resp.text == SUCCESS_TEXT
@@ -237,7 +237,8 @@ def test_get_projects():
         f"{BASE_API_VERSIONED_URL}/projects",
         status=200, content_type="application/json",
         body='[{"description": "", "creationTimestamp": 1487534523817, "alias": "My Test Project", "reanalyzing": '
-             'false, "deleting": false, "id": "test-project", "name": "Test Project"}]')
+             'false, "deleting": false, "publicIds": ["test-project"], "internalId": "test-project", "name": "Test '
+             'Project"}]')
     resp = get_client().get_projects()
     assert len(resp) == 1
     assert resp[0].name == "Test Project"
