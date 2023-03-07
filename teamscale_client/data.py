@@ -253,7 +253,8 @@ class ProjectInfo:
     the result is an instance of this class.
 
     Args:
-        project_id (str): The project's id
+        internal_project_id (str): The project's id
+        public_project_ids (List[str]): The project's id
         name (str): The project's name
         description (Optional[str]): The project's description
         creation_timestamp (Optional[long]): The project's creation timestamp (in ms)
@@ -261,9 +262,10 @@ class ProjectInfo:
         reanalyzing (Optional[bool]): Whether the project is currently being reanalyzed
     """
 
-    def __init__(self, project_id, name, description=None, creation_timestamp=None, alias=None, deleting=False,
-                 reanalyzing=False):
-        self.id = project_id
+    def __init__(self, internal_project_id, public_project_ids, name, description=None, creation_timestamp=None,
+                 alias=None, deleting=False, reanalyzing=False):
+        self.internalId = internal_project_id
+        self.publicIds = public_project_ids
         self.name = name
         self.description = description
         self.creationTimestamp = creation_timestamp
@@ -282,7 +284,8 @@ class ProjectInfo:
             data.Baseline: The baseline that was parsed from the JSON object
         """
         return cls(
-            project_id=json_data['publicIds'][0],
+            internal_project_id=json_data['internalId'],
+            public_project_ids=json_data['publicIds'],
             name=json_data['name'],
             description=json_data.get('description'),
             creation_timestamp=json_data['creationTimestamp'],
@@ -302,7 +305,6 @@ class ProjectConfiguration:
         project_id (List[str]): The project's public id
         profile (str): The name of the profile used to analyse the project
         connectors (List[:class:`ConnectorConfiguration`]): List of all connectors used in the project configuration
-        alias (Optional[str]): The project's alias
     """
 
     def __init__(self, name, project_id, profile, connectors, alias=None):

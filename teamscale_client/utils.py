@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, Dict
 
 
 def auto_str(cls):
@@ -29,9 +29,7 @@ def auto_str(cls):
 
 
 def to_json(obj: Any) -> str:
-    """Utility method for converting an object to a json encoded string. 
-    
-    Takes care of all the necessary setup.
+    """Utility method for converting an object to a json encoded string.
     
     Args:
         obj: The object that should be encoded.
@@ -40,3 +38,16 @@ def to_json(obj: Any) -> str:
         str: The encoded version of the given object.
     """
     return json.dumps(obj, sort_keys=True, default=lambda x: vars(x))
+
+
+def to_dict(obj: Any) -> Dict:
+    """Utility method for converting any (nested!) object to a dict. This can be conveniently modified and e.g.
+    given to the json parameters of a requests call.
+
+    Args:
+        obj: The object that should be encoded.
+
+    Returns:
+        dict: The dict version of the given object.
+    """
+    return json.loads(to_json(obj))

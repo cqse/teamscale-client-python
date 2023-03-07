@@ -38,7 +38,7 @@ def update_project_with_file_system_connector():
     file_system_config = FileSystemSourceCodeConnectorConfiguration(input_directory=LOCAL_PATH,
                                                                     repository_identifier="Local",
                                                                     included_file_names=INCLUDE_PATTERN)
-    project_configuration = ProjectConfiguration(name="Test Project", project_id="test-project",
+    project_configuration = ProjectConfiguration(name="Test Project Renamed", project_id="test-project",
                                                  profile=ANALYSIS_PROFILE, connectors=[file_system_config],
                                                  alias="teamscale_python_client")
     client.update_project(project_configuration)

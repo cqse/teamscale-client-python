@@ -13,7 +13,7 @@ from teamscale_client.constants import ReportFormats, CoverageFormats, Architect
 from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task, MetricEntry, FileFindings, \
     FindingDescription, MetricDescription, NonCodeMetricEntry, ProjectConfiguration
 from teamscale_client.teamscale_client_config import TeamscaleClientConfig
-from teamscale_client.utils import to_json
+from teamscale_client.utils import to_json, to_dict
 
 
 class TeamscaleClient:
@@ -548,18 +548,18 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong.
         """
-        # For the update, we'll need the internal ID
+        # For the update, we'll need the internal ID (a UUID)
+        # It's required to be in the URI, as well, as in the json payload
         internal_uuid = self.get_project_configuration(project_configuration.publicIds[0])["internalId"]
-        # TODO! This does not work as expected. The server complains about re-setting the ID being not allowed (
-        #  without ID in ProjectConfig too)
+        json_payload = to_dict(project_configuration)
+        json_payload["internalId"] = internal_uuid
         return self.put(
             f"{self._api_url_version}/projects/{internal_uuid}",
             params={
                 "skip-project-validation": skip_project_validation,
                 "reanalyze-if-required": True
             },
-            data=to_json(project_configuration),
-            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
+            json=json_payload
         )
 
     def _get_timestamp_parameter(self, timestamp: datetime.datetime, branch: Optional[str] = None) -> str:
