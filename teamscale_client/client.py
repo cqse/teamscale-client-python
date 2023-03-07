@@ -81,7 +81,10 @@ class TeamscaleClient:
         Raises:
             ServiceError: If the version does not match or the server cannot be found.
         """
-        response = self.get(f"{self._api_url}/version")
+        response = self.get(
+            f"{self._api_url}/version",
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
+        )
         json_response = response.json()
         python_client_api = parse_version(TeamscaleClient.TEAMSCALE_API_VERSION)
 
@@ -113,9 +116,8 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        headers = kwargs.pop("headers", {'Accept': 'application/json'})
         response = requests.get(
-            url, auth=self.auth_header, verify=self.sslverify, headers=headers, timeout=self.timeout, **kwargs
+            url, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout, **kwargs
         )
         if not response.ok:
             raise ServiceError(f"ERROR: GET {url}: {response.status_code}:{response.text}")
@@ -140,9 +142,8 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        headers = kwargs.pop("headers", {'Accept': 'application/json', 'Content-Type': 'application/json'})
         response = requests.put(
-            url, headers=headers, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout, **kwargs
+            url, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout, **kwargs
         )
         if not response.ok:
             raise ServiceError(f"ERROR: PUT {url}: {response.status_code}:{response.text}")
@@ -167,7 +168,6 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        headers = kwargs.pop("headers", {'Accept': 'application/json', 'Content-Type': 'application/json'})
         response = requests.post(
             url, auth=self.auth_header, verify=self.sslverify, timeout=self.timeout, **kwargs
         )
@@ -222,7 +222,8 @@ class TeamscaleClient:
         for finding_description in descriptions:
             response = self.post(
                 f"{self._api_url_version}/external-findings/descriptions",
-                data=to_json(finding_description)
+                data=to_json(finding_description),
+                headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
             )
         return response
 
@@ -234,7 +235,8 @@ class TeamscaleClient:
         """
         return self.post(
             f"{self._api_url}/projects/{self.project}/metric-update",
-            params={"projects": self.project}
+            params={"projects": self.project},
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
         )
 
     def upload_findings(
@@ -303,7 +305,8 @@ class TeamscaleClient:
                 "message": message,
                 "partition": partition
             },
-            data=json_data
+            data=json_data,
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
         )
 
     def add_metric_descriptions(self, metric_descriptions: List[MetricDescription]) -> requests.Response:
@@ -320,7 +323,8 @@ class TeamscaleClient:
         """
         return self.post(
             f"{self._api_url_version}/external-metrics",
-            data=to_json(metric_descriptions)
+            data=to_json(metric_descriptions),
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
         )
 
     def upload_coverage_data(
@@ -445,7 +449,10 @@ class TeamscaleClient:
         Raises:
             ServiceError: If anything goes wrong
         """
-        response = self.get(f"{self._api_url_version}/projects/{self.project}/baselines")
+        response = self.get(
+            f"{self._api_url_version}/projects/{self.project}/baselines",
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
+        )
         return [Baseline.from_json(json_data) for json_data in response.json()]
 
     def delete_baseline(self, baseline_name: str) -> requests.Response:
@@ -477,7 +484,8 @@ class TeamscaleClient:
         """
         return self.put(
             f"{self._api_url_version}/projects/{self.project}/baselines/{baseline.name}",
-            data=to_json(baseline)
+            data=to_json(baseline),
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
         )
 
     def get_projects(self) -> List[ProjectInfo]:
@@ -494,7 +502,8 @@ class TeamscaleClient:
             params={
                 "include-deleting": True,
                 "include-reanalyzing": True
-            }
+            },
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
         )
         return [ProjectInfo.from_json(json_data) for json_data in response.json()]
 
@@ -519,7 +528,8 @@ class TeamscaleClient:
                 "skip-project-validation": skip_project_validation,
                 "reanalyze-if-required": True
             },
-            data=to_json(project_configuration)
+            data=to_json(project_configuration),
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
         )
 
     def update_project(
@@ -548,7 +558,8 @@ class TeamscaleClient:
                 "skip-project-validation": skip_project_validation,
                 "reanalyze-if-required": True
             },
-            data=to_json(project_configuration)
+            data=to_json(project_configuration),
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
         )
 
     def _get_timestamp_parameter(self, timestamp: datetime.datetime, branch: Optional[str] = None) -> str:
@@ -610,7 +621,10 @@ class TeamscaleClient:
         service_url = f"{self._api_url_version}/projects/{self.project}/pre-commit"
 
         while True:
-            response = self.get(service_url)
+            response = self.get(
+                service_url,
+                headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
+            )
             # We need to wait for 200 here to get the findings.
             # The service returns 204 while the pre-commit analysis is still in progress.
             if response.status_code != 204:
@@ -668,8 +682,11 @@ class TeamscaleClient:
         if assessment_filters:
             parameters["assessment-filters"] = list(map(lambda assessment: assessment.value, assessment_filters))
 
-        service_url = f"{self._api_url_version}/projects/{self.project}/findings/list"
-        response = self.get(service_url, params=parameters)
+        response = self.get(
+            f"{self._api_url_version}/projects/{self.project}/findings/list",
+            params=parameters,
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
+        )
         return [Finding.from_json(json_data) for json_data in response.json()]
 
     def get_commit_for_revision(self, revision_id: str) -> str:
@@ -682,7 +699,10 @@ class TeamscaleClient:
         Returns:
             str: The teamscale commit
         """
-        response = self.get(f"{self._api_url_version}/projects/{self.project}/revision/{revision_id}/commits")
+        response = self.get(
+            f"{self._api_url_version}/projects/{self.project}/revision/{revision_id}/commits",
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
+        )
         commit_list = response.json()
 
         if not commit_list:
@@ -709,7 +729,8 @@ class TeamscaleClient:
             service_url,
             params={
                 "t": self._get_timestamp_parameter(timestamp=timestamp, branch=branch)
-            }
+            },
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
         )
         return Finding.from_json(response.json())
 
@@ -740,7 +761,8 @@ class TeamscaleClient:
                 "details": details,
                 "start": start,
                 "max": max
-            }
+            },
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
         )
         return [Task.from_json(json_data) for json_data in response.json()]
 
@@ -762,7 +784,8 @@ class TeamscaleClient:
         """
         return self.post(
             f"{self._api_url}/projects/{self.project}/tasks/{task_id}/comments",
-            data=to_json(comment)
+            data=to_json(comment),
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
         )
 
     def add_issue_metric(self, name: str, issue_query: str) -> requests.Response:
@@ -804,7 +827,10 @@ class TeamscaleClient:
         Returns:
             dict: The project configuration as json dictionary
         """
-        response = self.get(f"{self._api_url_version}/projects/{project_id}/configuration")
+        response = self.get(
+            f"{self._api_url_version}/projects/{project_id}/configuration",
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
+        )
         return response.json()
 
     def get_architectures(self) -> List[str]:
@@ -813,5 +839,8 @@ class TeamscaleClient:
             Returns:
                 The architecture names.
         """
-        response = self.get(f"{self._api_url_version}/projects/{self.project}/architectures/assessments")
+        response = self.get(
+            f"{self._api_url_version}/projects/{self.project}/architectures/assessments",
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
+        )
         return [architecture_overview["uniformPath"] for architecture_overview in response.json()]
