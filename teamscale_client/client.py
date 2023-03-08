@@ -234,9 +234,7 @@ class TeamscaleClient:
             Uses Teamscale's internal API and not the versioned API!
         """
         return self.post(
-            f"{self._api_url}/projects/{self.project}/metric-update",
-            params={"projects": self.project},
-            headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
+            f"{self._api_url}/projects/{self.project}/metric-update"
         )
 
     def upload_findings(
