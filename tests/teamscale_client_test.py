@@ -16,7 +16,6 @@ TEAMSCALE_TEST_VERSION = "v8.0.0"
 PROJECT = "foo"
 USER = "admin"
 ACCESS_TOKEN = USER
-SUCCESS_TEXT = "success"
 
 BASE_URL = "http://localhost:8080"
 BASE_API_URL = f"{BASE_URL}/api"
@@ -56,18 +55,18 @@ def test_client_creation():
 @responses.activate
 def test_put():
     """Tests PUT requests to server"""
-    responses.add(responses.PUT, BASE_URL, body=SUCCESS_TEXT, status=200)
+    responses.add(responses.PUT, BASE_URL, status=200)
     resp = get_client().put(BASE_URL)
-    assert resp.text == SUCCESS_TEXT
+    assert resp.ok
 
 
 @responses.activate
 def test_add_findings_group():
     """ Tests uploading of findings groups into Teamscale server.
     """
-    responses.add(responses.POST, f"{BASE_API_VERSIONED_URL}/external-findings/groups", body=SUCCESS_TEXT, status=200)
+    responses.add(responses.POST, f"{BASE_API_VERSIONED_URL}/external-findings/groups", status=200)
     resp = get_client().add_findings_group('name', 'map.*')
-    assert resp.text == SUCCESS_TEXT
+    assert resp.ok
 
 
 @responses.activate
@@ -76,10 +75,9 @@ def test_add_findings_descriptions():
     """
     findings_descriptions = [FindingDescription('type1', 'desc1', Enablement.RED, 'name1'),
                              FindingDescription('type2', 'desc2', Enablement.YELLOW, 'name 2')]
-    responses.add(responses.POST, f"{BASE_API_VERSIONED_URL}/external-findings/descriptions",
-                  body=SUCCESS_TEXT, status=200)
+    responses.add(responses.POST, f"{BASE_API_VERSIONED_URL}/external-findings/descriptions", status=200)
     resp = get_client().add_finding_descriptions(findings_descriptions)
-    assert resp.text == SUCCESS_TEXT
+    assert resp.ok
 
 
 @responses.activate
@@ -88,12 +86,12 @@ def test_upload_findings():
     responses.add(
         responses.POST,
         f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/external-analysis/session/auto-create/external-findings",
-        body=SUCCESS_TEXT, status=200
+        status=200
     )
     resp = get_client().upload_findings(_get_test_findings(), datetime.datetime.now(), "Test message", "partition-name")
     assert "content" in responses.calls[1].request.body
     assert "test-id" in responses.calls[1].request.body
-    assert resp.text == SUCCESS_TEXT
+    assert resp.ok
 
 
 @responses.activate
@@ -103,12 +101,12 @@ def test_upload_metrics():
     responses.add(
         responses.POST,
         f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/external-analysis/session/auto-create/external-metrics",
-        body=SUCCESS_TEXT, status=200
+        status=200
     )
     resp = get_client().upload_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
     assert '[{"metrics": {"metric-1": 1, "metric-2": [1, 3, 4]}, "path": "test/path"}]' == \
            responses.calls[1].request.body
-    assert resp.text == SUCCESS_TEXT
+    assert resp.ok
 
 
 @responses.activate
@@ -119,13 +117,13 @@ def test_upload_non_code_metrics():
     responses.add(
         responses.POST,
         f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/external-analysis/session/auto-create/non-code-metrics",
-        body=SUCCESS_TEXT, status=200
+        status=200
     )
     resp = get_client().upload_non_code_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
     assert '[{"assessment": {"GREEN": 1, "RED": 2}, "content": "This is a test content", "count": 2, ' \
            '"path": "metric1/non/code/metric/path", "time": 25.0}]' == \
            responses.calls[1].request.body
-    assert resp.text == SUCCESS_TEXT
+    assert resp.ok
 
 
 @responses.activate
@@ -135,13 +133,13 @@ def test_upload_metric_description():
     responses.add(
         responses.POST,
         f"{BASE_API_VERSIONED_URL}/external-metrics",
-        body=SUCCESS_TEXT, status=200
+        status=200
     )
     resp = get_client().add_metric_descriptions([description])
     assert '{"analysisGroup": "awesome group", "metricDefinition": {"aggregation": "SUM", "description": "Great ' \
            'Description", "name": "Metric Name", "properties": ["SIZE_METRIC"], "valueType": "NUMERIC"}, "metricId": ' \
            '"metric_i,"}' == to_json(description)
-    assert resp.text == SUCCESS_TEXT
+    assert resp.ok
 
 
 @responses.activate
@@ -151,11 +149,11 @@ def test_coverage_upload():
     responses.add(
         responses.POST,
         f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/external-analysis/session/auto-create/report",
-        body=SUCCESS_TEXT, status=200
+        status=200
     )
     resp = get_client().upload_coverage_data(files, CoverageFormats.CTC, datetime.datetime.now(), "Test Message",
                                              "partition-name")
-    assert resp.text == SUCCESS_TEXT
+    assert resp.ok
     assert "file1.txt" in responses.calls[1].request.body.decode()
     assert "file2.txt" in responses.calls[1].request.body.decode()
 
@@ -178,10 +176,10 @@ def test_add_baseline():
     responses.add(
         responses.PUT,
         f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/baselines/{baseline.name}",
-        body=SUCCESS_TEXT, status=200
+        status=200
     )
     resp = get_client().add_baseline(baseline)
-    assert resp.text == SUCCESS_TEXT
+    assert resp.ok
     assert "Baseline 1" in responses.calls[1].request.body
 
 
@@ -192,10 +190,10 @@ def test_delete_baseline():
     responses.add(
         responses.DELETE,
         f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/baselines/{baseline_name}",
-        body=SUCCESS_TEXT, status=200
+        status=200
     )
     resp = get_client().delete_baseline(baseline_name)
-    assert resp.text == SUCCESS_TEXT
+    assert resp.ok
 
 
 @responses.activate
@@ -206,10 +204,10 @@ def test_architecture_upload():
     responses.add(
         responses.POST,
         f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/architectures",
-        body=SUCCESS_TEXT, status=200
+        status=200
     )
     resp = get_client().upload_architectures(paths, datetime.datetime.now(), "Test Message")
-    assert resp.text == SUCCESS_TEXT
+    assert resp.ok
     assert "file1.txt" in responses.calls[1].request.body.decode()
     assert "file2.txt" in responses.calls[1].request.body.decode()
 
@@ -258,7 +256,8 @@ def test_add_project():
         body='{"message": "success"}', status=200
     )
     resp = get_client().create_project(project_configuration)
-    assert resp.status_code == 200 and resp.json().get('message') == SUCCESS_TEXT
+    assert resp.ok
+    assert resp.json().get('message') == "success"
 
 
 @responses.activate
@@ -275,7 +274,8 @@ def test_add_project_without_validation():
         body='{"message": "success"}', status=200
     )
     resp = get_client().create_project(project_configuration, True)
-    assert resp.status_code == 200 and resp.json().get('message') == SUCCESS_TEXT
+    assert resp.ok
+    assert resp.json().get('message') == "success"
 
 
 def test_compare_findings():
@@ -327,8 +327,9 @@ def test_add_issue_metric():
         body='{"message": "success"}', status=200
     )
     resp = get_client().add_issue_metric("example/foo", "instate(status=YELLOW) > 2d")
+    assert resp.ok
     assert "YELLOW" in responses.calls[1].request.params["query"]
-    assert resp.status_code == 200 and resp.json().get('message') == SUCCESS_TEXT
+    assert resp.json().get('message') == "success"
 
 
 @responses.activate
