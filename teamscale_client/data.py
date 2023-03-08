@@ -199,7 +199,7 @@ class Baseline:
         name (str): The baseline's name
         description (str): The baseline's description
         date (Optional[datetime.datetime]): The date for which the baseline is set
-        date (Optional[long]): The timestamp (in ms) for which the baseline is set
+        date (Optional[int]): The timestamp (in ms) for which the baseline is set
     """
 
     def __init__(self, name, description, date=None, timestamp=None):
