@@ -246,7 +246,7 @@ class TeamscaleClient:
             findings: the findings data
             timestamp: timestamp for which to upload the findings
             message: The message to use for the generated upload commit
-            partition: The partition's id into which the findings should be added
+            partition: The partition's names into which the findings should be added
                 (See also: :ref:`FAQ - Partitions<faq-partition>`).
 
         Returns:
