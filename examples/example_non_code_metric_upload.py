@@ -19,5 +19,6 @@ if __name__ == '__main__':
     entry2 = NonCodeMetricEntry("/non/code/metric/path2", "This is a test content 2", 5,
                                 {AssessmentMetricColors.RED: 1, AssessmentMetricColors.GREEN: 4}, 40.)
 
-    client.upload_non_code_metrics([entry, entry2], datetime.datetime.now(), "Upload non-code metrics",
-                                   "test-partition")
+    client.upload_non_code_metrics(
+        [entry, entry2], "Upload non-code metrics", "test-partition", timestamp=datetime.datetime.now()
+    )

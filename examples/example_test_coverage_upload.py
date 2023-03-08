@@ -8,12 +8,13 @@ TEAMSCALE_URL = "http://localhost:8080"
 USERNAME = "admin"
 ACCESS_TOKEN = "ide-access-token"
 
-PROJECT_ID = "test"
+PROJECT_ID = "junit4"
 
 if __name__ == '__main__':
     client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_ID)
 
     files = ["./simple-coverage.txt"]
 
-    client.upload_coverage_data(files, CoverageFormats.SIMPLE, datetime.datetime.now(), "Upload coverage",
-                                "test-partition")
+    client.upload_coverage_data(
+        files, CoverageFormats.SIMPLE, "Upload coverage", "test-partition", timestamp=datetime.datetime.now()
+    )

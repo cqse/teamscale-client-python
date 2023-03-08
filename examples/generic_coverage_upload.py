@@ -32,8 +32,10 @@ def main(coverage_folder):
             coverage_path = os.path.join(project_path, coverage_file)
             format = CoverageFormats[os.path.splitext(coverage_file)[1]]
             print("uploading coverage to %s from %s" % (project, coverage_file))
-            client.upload_coverage_data([coverage_path], format, datetime.datetime.now(), "Unit Test Coverage Upload",
-                                        "Unit Test Coverage")
+            client.upload_coverage_data(
+                [coverage_path], format, "Unit Test Coverage Upload", "Unit Test Coverage",
+                timestamp=datetime.datetime.now()
+            )
             os.remove(coverage_path)
 
 

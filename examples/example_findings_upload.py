@@ -43,5 +43,5 @@ if __name__ == '__main__':
         ],
             "src/Foo.java")
     ]
-    response = client.upload_findings(findings, datetime.datetime.now(), "TestCommit", "test-partition")
+    response = client.upload_findings(findings, "TestCommit", "test-partition", timestamp=datetime.datetime.now())
     print(f"Request result: {response.status_code}")

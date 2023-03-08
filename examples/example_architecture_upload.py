@@ -13,4 +13,4 @@ if __name__ == '__main__':
     client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_ID)
 
     client.upload_architectures({"architectures/system.architecture": "/path/to/system.architecture"},
-                                datetime.datetime.now(), "Upload architecture")
+                                "Upload architecture", timestamp=datetime.datetime.now())

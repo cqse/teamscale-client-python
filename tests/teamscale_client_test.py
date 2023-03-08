@@ -88,7 +88,8 @@ def test_upload_findings():
         f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/external-analysis/session/auto-create/external-findings",
         status=200
     )
-    resp = get_client().upload_findings(_get_test_findings(), datetime.datetime.now(), "Test message", "partition-name")
+    resp = get_client().upload_findings(_get_test_findings(), "Test message", "partition-name",
+                                        timestamp=datetime.datetime.now())
     assert "content" in responses.calls[1].request.body
     assert "test-id" in responses.calls[1].request.body
     assert resp.ok
@@ -103,7 +104,7 @@ def test_upload_metrics():
         f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/external-analysis/session/auto-create/external-metrics",
         status=200
     )
-    resp = get_client().upload_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
+    resp = get_client().upload_metrics([metric], "Test message", "partition-name", timestamp=datetime.datetime.now())
     assert '[{"metrics": {"metric-1": 1, "metric-2": [1, 3, 4]}, "path": "test/path"}]' == \
            responses.calls[1].request.body
     assert resp.ok
@@ -119,7 +120,9 @@ def test_upload_non_code_metrics():
         f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/external-analysis/session/auto-create/non-code-metrics",
         status=200
     )
-    resp = get_client().upload_non_code_metrics([metric], datetime.datetime.now(), "Test message", "partition-name")
+    resp = get_client().upload_non_code_metrics(
+        [metric], "Test message", "partition-name", timestamp=datetime.datetime.now()
+    )
     assert '[{"assessment": {"GREEN": 1, "RED": 2}, "content": "This is a test content", "count": 2, ' \
            '"path": "metric1/non/code/metric/path", "time": 25.0}]' == \
            responses.calls[1].request.body
@@ -151,8 +154,8 @@ def test_coverage_upload():
         f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/external-analysis/session/auto-create/report",
         status=200
     )
-    resp = get_client().upload_coverage_data(files, CoverageFormats.CTC, datetime.datetime.now(), "Test Message",
-                                             "partition-name")
+    resp = get_client().upload_coverage_data(files, CoverageFormats.CTC, "Test Message",
+                                             "partition-name", timestamp=datetime.datetime.now())
     assert resp.ok
     assert "file1.txt" in responses.calls[1].request.body.decode()
     assert "file2.txt" in responses.calls[1].request.body.decode()
@@ -206,7 +209,7 @@ def test_architecture_upload():
         f"{BASE_API_VERSIONED_URL}/projects/{PROJECT}/architectures",
         status=200
     )
-    resp = get_client().upload_architectures(paths, datetime.datetime.now(), "Test Message")
+    resp = get_client().upload_architectures(paths, "Test Message", timestamp=datetime.datetime.now())
     assert resp.ok
     assert "file1.txt" in responses.calls[1].request.body.decode()
     assert "file2.txt" in responses.calls[1].request.body.decode()

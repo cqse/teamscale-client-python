@@ -20,4 +20,4 @@ if __name__ == '__main__':
     entry = MetricEntry("src/Foo.java", {})
     entry2 = MetricEntry("-architectures-/system.architecture/src/empty/", {"complexity": 6})
 
-    client.upload_metrics([entry2], datetime.datetime.now(), "Upload metrics", "test-partition")
+    client.upload_metrics([entry2], "Upload metrics", "test-partition", timestamp=datetime.datetime.now())

@@ -16,5 +16,6 @@ if __name__ == '__main__':
 
     files = [file for file in glob.glob("/path/to/report.xml")]
 
-    client.upload_report(files, ReportFormats.PCLINT, datetime.datetime.now(), "Upload PCLint results",
-                         "test-partition")
+    client.upload_report(
+        files, ReportFormats.PCLINT, "Upload PCLint results", "test-partition", timestamp=datetime.datetime.now()
+    )
