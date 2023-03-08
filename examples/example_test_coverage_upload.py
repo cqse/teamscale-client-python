@@ -8,7 +8,7 @@ TEAMSCALE_URL = "http://localhost:8080"
 USERNAME = "admin"
 ACCESS_TOKEN = "ide-access-token"
 
-PROJECT_ID = "junit4"
+PROJECT_ID = "test"
 
 if __name__ == '__main__':
     client = TeamscaleClient(TEAMSCALE_URL, USERNAME, ACCESS_TOKEN, PROJECT_ID)
