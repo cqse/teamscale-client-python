@@ -267,7 +267,7 @@ class TeamscaleClient:
             metrics: metrics data
             timestamp: timestamp for which to upload the metrics
             message: The message to use for the generated upload commit
-            partition: The partition's id into which the metrics should be added
+            partition: The partition's name into which the metrics should be added
                 (See also: :ref:`FAQ - Partitions<faq-partition>`).
 
         Returns:
@@ -288,7 +288,7 @@ class TeamscaleClient:
             json_data: data in json format
             timestamp: timestamp (unix format) for which to upload the data
             message: The message to use for the generated upload commit
-            partition: The partition's id into which the data should be added
+            partition: The partition's name into which the data should be added
                 (See also: :ref:`FAQ - Partitions<faq-partition>`).
 
         Returns:
@@ -339,7 +339,7 @@ class TeamscaleClient:
             coverage_format: the format to use
             timestamp_or_revision: timestamp (unix format) for which to upload the data or a revision (str)
             message: The message to use for the generated upload commit
-            partition: The partition's id into which the data should be added
+            partition: The partition's name into which the data should be added
                 (See also: :ref:`FAQ - Partitions<faq-partition>`).
             repository: When using the revision parameter, this parameter allows to pass a repository name which is used
                 to identify the correct commit in situations where the same revision exists in multiple repositories.
@@ -370,7 +370,7 @@ class TeamscaleClient:
             report_format: the format to use
             timestamp_or_revision: timestamp (unix format) for which to upload the data or a revision (str)
             message: The message to use for the generated upload commit
-            partition: The partition's id into which the data should be added
+            partition: The partition's name into which the data should be added
                 (See also: :ref:`FAQ - Partitions<faq-partition>`).
             move_to_last_commit: True to automatically adjust this commit to be the latest otherwise False.
                 Default is True
@@ -449,7 +449,7 @@ class TeamscaleClient:
             metrics: metrics data
             timestamp: timestamp for which to upload the metrics
             message: The message to use for the generated upload commit
-            partition: The partition's id into which the metrics should be added
+            partition: The partition's name into which the metrics should be added
                 (See also: :ref:`FAQ - Partitions<faq-partition>`).
 
         Returns:
