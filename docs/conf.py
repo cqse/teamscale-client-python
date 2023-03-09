@@ -52,16 +52,6 @@ html_theme_options = {
 
 }
 
-html_sidebars = {
-    '**': [
-        'about.html',
-        'navigation.html',
-        'relations.html',
-        'searchbox.html',
-        'donate.html',
-    ]
-}
-
 
 # -- Options for Python ------------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-the-python-domain
