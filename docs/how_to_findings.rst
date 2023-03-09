@@ -11,9 +11,11 @@ Steps 1-3 are one-time setup tasks, whereas 4 will be repeated every time new fi
 Add a new findings group
 ------------------------
 First a new group has to be created. A group contains multiple different types of (usually related) 
-finding types. A group can be created like this::
+finding types. A group can be created like this:
 
-  client.add_findings_group("Finding Group 1", "external-findings-.*")
+..  code-block:: python
+
+    client.add_findings_group("Finding Group 1", "external-findings-.*")
 
 The Group has a name that will be visible in the Teamscale UI (for example as a filter in the Findings View). The regex will be used to find all matching finding descriptions that shall be grouped under the given name.
 
@@ -25,12 +27,15 @@ For each type of finding that is to be uploaded, a new :any:`FindingDescription`
 that is used to identify the type of finding, a description that is displayed whenever a finding of this type
 is shown in detail and a default enablement/severity.
 
-Finding descriptions can be added like this::
+Finding descriptions can be added like this:
 
-  descriptions = [
-     FindingDescription("external-finding-1", "A test finding description", Enablement.RED)
-  ]
-  client.add_finding_descriptions(descriptions)
+..  code-block:: python
+
+    descriptions = [
+        FindingDescription("externals-1", "A test finding description", Enablement.RED, "externals-1"),
+        FindingDescription("externals-2", "Another finding description", Enablement.YELLOW, "externals-2")
+    ]
+    response = client.add_finding_descriptions(descriptions)
 
 
 Update the analysis profile
@@ -54,12 +59,18 @@ and enable ``Only Schema update`` for the required projects.
 
 Upload the findings
 -------------------
-In the last step, you upload any number of concrete :any:`Finding` instances for each file (see also :any:`FileFindings`) using ids from the previously created finding descriptions::
+In the last step, you upload any number of concrete :any:`Finding` instances for each file (see also :any:`FileFindings`) using ids from the previously created finding descriptions:
 
-  findings = [
-      FileFindings([Finding("external-finding-1", "Test finding message", start_line=1)], "src/Foo.java")
-  ]
-  client.upload_findings(findings, datetime.datetime.now(), "TestCommit", "test-partition")
+..  code-block:: python
+
+    findings = [
+        FileFindings([
+            Finding("externals-1", "test2", start_line=3,
+                    finding_properties={"someStringProperty": "severe", "someNumericProperty": 42.0})
+        ],
+            "src/Foo.java")
+    ]
+    response = client.upload_findings(findings, "TestCommit", "test-partition", timestamp=datetime.datetime.now())
 
 If everything worked you should be able to see the new finding and the details will be shown:
 
