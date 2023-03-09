@@ -9,6 +9,11 @@ Functions & Decorators
     :undoc-members:
     :show-inheritance:
 
+.. automodule:: teamscale_client.client_utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Teamscale Session Management
 ----------------------------
