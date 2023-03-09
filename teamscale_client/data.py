@@ -1,8 +1,7 @@
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import datetime
 import time
+import functools
+from typing import Dict
 
 from teamscale_client.constants import Assessment, MetricAggregation, MetricValueType, MetricProperties, \
     ConnectorType
@@ -10,7 +9,8 @@ from teamscale_client.utils import auto_str
 
 
 @auto_str
-class Finding(object):
+@functools.total_ordering
+class Finding:
     """Representation of a finding in Teamscale.
     
     Args:
@@ -52,15 +52,28 @@ class Finding(object):
         self.findingProperties = finding_properties
         self.finding_id = finding_id
 
-    def __cmp__(self, other):
-        """Compares this finding to another finding."""
-        if self.uniformPath == other.uniformPath:
-            return self.startLine.__cmp__(other.startLine)
-        else:
-            if self.uniformPath < other.uniformPath:
-                return -1
-            else:
-                return 1
+    @classmethod
+    def from_json(cls, json_data: Dict) -> 'Finding':
+        """Parses a single JSON encoded finding.
+
+        Args:
+            json_data: The json object encoding the finding.
+
+        Returns:
+            data.Finding: The finding that was parsed from the JSON object
+        """
+        return cls(
+            finding_type_id=json_data['typeId'],
+            message=json_data['message'],
+            assessment=json_data['assessment'],
+            start_offset=json_data['location'].get('rawStartOffset', 0),
+            end_offset=json_data['location'].get('rawEndOffset', 0),
+            start_line=json_data['location'].get('rawStartLine', 1),
+            end_line=json_data['location'].get('rawEndLine', 1),
+            uniform_path=json_data['location'].get('uniformPath', None),
+            finding_id=json_data['id'],
+            finding_properties=json_data['properties']
+        )
 
     def __eq__(self, other):
         """Checks if this finding is equal to the given finding."""
@@ -71,31 +84,13 @@ class Finding(object):
                 (other.uniformPath, other.startLine, other.assessment, other.message, other.endLine, other.endOffset,
                  other.findingTypeId, other.identifier, other.startOffset))
 
-    def __ne__(self, other):
-        """Checks if this finding is not equal to the given finding."""
-        return not (self == other)
-
     def __lt__(self, other):
         """Checks if this finding is less than the given finding."""
         return (self.uniformPath, self.startLine, self.endLine) < (other.uniformPath, other.startLine, other.endLine)
 
-    def __gt__(self, other):
-        """Checks if this finding is greater than the given finding."""
-        return (self.uniformPath, self.startLine, self.endLine) > (other.uniformPath, other.startLine, other.endLine)
-
-    def __le__(self, other):
-        """Checks if this finding is less than or equal the given finding."""
-        return (self == other) or ((self.uniformPath, self.startLine, self.endLine) <
-                                   (other.uniformPath, other.startLine, other.endLine))
-
-    def __ge__(self, other):
-        """Checks if this finding is greater than or equal the given finding."""
-        return (self == other) or ((self.uniformPath, self.startLine, self.endLine) >
-                                   (other.uniformPath, other.startLine, other.endLine))
-
 
 @auto_str
-class FileFindings(object):
+class FileFindings:
     """Representation of a file and its findings.
     
     Args:
@@ -111,7 +106,7 @@ class FileFindings(object):
 
 
 @auto_str
-class FindingDescription(object):
+class FindingDescription:
     """Description of a finding type to be added at configuration time.
 
         Args:
@@ -122,14 +117,14 @@ class FindingDescription(object):
     """
 
     def __init__(self, typeid, description, enablement, name=None):
-        self.typeid = typeid
+        self.typeId = typeid
         self.description = description
         self.enablement = enablement
         self.name = name
 
 
 @auto_str
-class MetricDescription(object):
+class MetricDescription:
     """Description of a metric type to be addded at configuration time.
     
     Args:
@@ -159,7 +154,7 @@ class MetricDescription(object):
 
 
 @auto_str
-class MetricEntry(object):
+class MetricEntry:
     """A container for adding metric values to a file.
     
     Args:
@@ -177,7 +172,7 @@ class MetricEntry(object):
 
 
 @auto_str
-class NonCodeMetricEntry(object):
+class NonCodeMetricEntry:
     """A container for adding non-code metrics to a project.
     
     Args:
@@ -197,14 +192,14 @@ class NonCodeMetricEntry(object):
 
 
 @auto_str
-class Baseline(object):
+class Baseline:
     """Represents a Teamscale baseline. Either the date or the timestamp must be given
 
     Args:
         name (str): The baseline's name
         description (str): The baseline's description
         date (Optional[datetime.datetime]): The date for which the baseline is set
-        date (Optional[long]): The timestamp (in ms) for which the baseline is set
+        date (Optional[int]): The timestamp (in ms) for which the baseline is set
     """
 
     def __init__(self, name, description, date=None, timestamp=None):
@@ -216,6 +211,22 @@ class Baseline(object):
         if date is not None:
             self._set_date(date)
 
+    @classmethod
+    def from_json(cls, json_data: Dict) -> 'Baseline':
+        """Parses a single JSON encoded baseline.
+
+        Args:
+            json_data: The json object encoding the baseline.
+
+        Returns:
+            data.Baseline: The baseline that was parsed from the JSON object
+        """
+        return cls(
+            json_data['name'],
+            json_data['description'],
+            timestamp=json_data['timestamp']
+        )
+
     def __hash__(self):
         return hash((self.name, self.description, self.timestamp))
 
@@ -226,12 +237,7 @@ class Baseline(object):
         return datetime.datetime.fromtimestamp(float(self._timestamp))
 
     def _set_date(self, date_object):
-        import sys
-        if sys.version_info > (3,):
-            long_type = int
-        else:
-            long_type = long
-        self.timestamp = long_type(time.mktime(date_object.timetuple()) * 1000)
+        self.timestamp = int(time.mktime(date_object.timetuple()) * 1000)
 
     date = property(_get_date, _set_date)
 
@@ -242,12 +248,13 @@ class ServiceError(Exception):
 
 
 @auto_str
-class ProjectInfo(object):
+class ProjectInfo:
     """Represents information about a Teamscale project. When querying information about a project in Teamscale,
     the result is an instance of this class.
 
     Args:
-        project_id (str): The project's id
+        internal_project_id (str): The project's id
+        public_project_ids (List[str]): The project's id
         name (str): The project's name
         description (Optional[str]): The project's description
         creation_timestamp (Optional[long]): The project's creation timestamp (in ms)
@@ -255,9 +262,10 @@ class ProjectInfo(object):
         reanalyzing (Optional[bool]): Whether the project is currently being reanalyzed
     """
 
-    def __init__(self, project_id, name, description=None, creation_timestamp=None, alias=None, deleting=False,
-                 reanalyzing=False):
-        self.id = project_id
+    def __init__(self, internal_project_id, public_project_ids, name, description=None, creation_timestamp=None,
+                 alias=None, deleting=False, reanalyzing=False):
+        self.internalId = internal_project_id
+        self.publicIds = public_project_ids
         self.name = name
         self.description = description
         self.creationTimestamp = creation_timestamp
@@ -265,30 +273,50 @@ class ProjectInfo(object):
         self.deleting = deleting
         self.reanalyzing = reanalyzing
 
+    @classmethod
+    def from_json(cls, json_data: Dict) -> 'ProjectInfo':
+        """Parses a single JSON encoded baseline.
+
+        Args:
+            json_data: The json object encoding the baseline.
+
+        Returns:
+            data.Baseline: The baseline that was parsed from the JSON object
+        """
+        return cls(
+            internal_project_id=json_data['internalId'],
+            public_project_ids=json_data['publicIds'],
+            name=json_data['name'],
+            description=json_data.get('description'),
+            creation_timestamp=json_data['creationTimestamp'],
+            alias=json_data.get('alias'),
+            deleting=json_data['deleting'],
+            reanalyzing=json_data['reanalyzing']
+        )
+
 
 @auto_str
-class ProjectConfiguration(object):
+class ProjectConfiguration:
     """Represents a Teamscale project configuration. This is used to create new and update existing projects in
     Teamscale.
 
     Args:
         name (str): The project's name
-        project_id (str): The project's id
+        project_id (List[str]): The project's public id
         profile (str): The name of the profile used to analyse the project
         connectors (List[:class:`ConnectorConfiguration`]): List of all connectors used in the project configuration
-        alias (Optional[str]): The project's alias
     """
 
     def __init__(self, name, project_id, profile, connectors, alias=None):
         self.name = name
-        self.id = project_id
+        self.publicIds = project_id if isinstance(project_id, list) else [project_id]
         self.profile = profile
         self.connectors = connectors
         self.alias = alias
 
 
 @auto_str
-class ConnectorConfiguration(object):
+class ConnectorConfiguration:
     """Represents a Teamscale connector configuration. Connectors allow to attach external tools such as source code
     repositories.
 
@@ -497,7 +525,8 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
         path_suffix (Optional[str]): Path suffix that is to be appended to the repository's base path. Empty by default.
     """
 
-    def __init__(self, account, enable_externals=False, externals_includes="", externals_excludes="", path_suffix="", *args, **kwargs):
+    def __init__(self, account, enable_externals=False, externals_includes="", externals_excludes="", path_suffix="",
+                 *args, **kwargs):
         super(SubversionSourceCodeConnectorConfiguration, self).__init__(connector_type=ConnectorType.SVN, *args,
                                                                          **kwargs)
         self.options["Account"] = account
@@ -508,7 +537,7 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
 
 
 @auto_str
-class Task(object):
+class Task:
     """Represents a task in Teamscale
 
     Args:
@@ -553,7 +582,7 @@ class Task(object):
 
 
 @auto_str
-class Comment(object):
+class Comment:
     """Represents a comment on a Task in Teamscale
 
     Args:

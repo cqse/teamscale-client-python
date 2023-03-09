@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="teamscale-client",
-    version="8.5",
+    version="9.0",
     author="Thomas Kinnen - CQSE GmbH",
     author_email="kinnen@cqse.eu",
     description=("A simple service client to interact with Teamscale's REST API."),
@@ -15,15 +15,14 @@ setup(
         "Topic :: Utilities",
     ],
     install_requires=[
-          'simplejson',
-          'requests>=2.0',
-          'jsonpickle',
-          'configparser'
+        'requests>=2.0',
+        'configparser',
+        'packaging'
     ],
 
     tests_require=[
-          'pytest',
-          'responses'
+        'pytest',
+        'responses'
     ],
     setup_requires=["pytest-runner"]
 )

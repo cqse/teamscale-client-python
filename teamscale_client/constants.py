@@ -1,17 +1,25 @@
 """This module contains multiple constants collections typically used when
 communicating metrics and findings with Teamscale."""
+from enum import Enum
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
-class Assessment:
+class Assessment(str, Enum):
     """Constants to be used as assessment levels."""
 
     RED = "RED"
 
+    ORANGE = "ORANGE"
+
     YELLOW = "YELLOW"
 
-class AssessmentMetricColors:
+    GREEN = "GREEN"
+
+    BASELINE = "BASELINE"
+
+    UNKNOWN = "UNKNOWN"
+
+
+class AssessmentMetricColors(str, Enum):
     """Constants used for colors in assessment metrics. """
 
     RED = "RED"
@@ -20,7 +28,8 @@ class AssessmentMetricColors:
 
     GREEN = "GREEN"
 
-class Enablement:
+
+class Enablement(str, Enum):
     """The enablement describes which rating a finding should receive."""
 
     RED = "RED"
@@ -35,7 +44,8 @@ class Enablement:
     OFF = "OFF"
     """The finding is disabled by default."""
 
-class MetricAggregation:
+
+class MetricAggregation(str, Enum):
     """Class that contains valid aggregation strategies."""
 
     SUM = "SUM"
@@ -44,7 +54,8 @@ class MetricAggregation:
 
     MIN = "MIN"
 
-class MetricValueType:
+
+class MetricValueType(str, Enum):
     """Metric value types."""
 
     NUMERIC = "NUMERIC"
@@ -53,7 +64,8 @@ class MetricValueType:
 
     ASSESSMENT = "ASSESSMENT"
 
-class MetricProperties:
+
+class MetricProperties(str, Enum):
     """Possible properties used in metric definitions."""
 
     SIZE_METRIC = "SIZE_METRIC"
@@ -68,7 +80,8 @@ class MetricProperties:
     LOW_IS_BAD = "LOW_IS_BAD"
     """Normally high values are considered bad, use this to inverse."""
 
-class CoverageFormats:
+
+class CoverageFormats(str, Enum):
     """Possible coverage formats that Teamscale can interpret."""
 
     CTC = "CTC"
@@ -82,38 +95,47 @@ class CoverageFormats:
     XR_BABOON = "XR_BABOON"
 
     JACOCO = "JACOCO"
-    
+
     DOT_COVER = "DOT_COVER"
-    
+
     MS_COVERAGE = "MS_COVERAGE"
-    
+
+    VS_COVERAGE = "VS_COVERAGE"
+
     ROSLYN = "ROSLYN"
-    
+
     BULLSEYE = "BULLSEYE"
 
     SIMPLE = "SIMPLE"
-    
+
     OPEN_COVER = "OPEN_COVER"
-    
+
     IEC_COVERAGE = "IEC_COVERAGE"
-    
+
     LLVM = "LLVM"
-    
+
     CLOVER = "CLOVER"
-    
+
     XCODE = "XCODE"
-    
+
     TESTWISE_COVERAGE = "TESTWISE_COVERAGE"
-    
+
     SAP_COVERAGE = "SAP_COVERAGE"
-    
+
     ISTANBUL = "ISTANBUL"
 
-class ReportFormats:
+    GOLANG_COVERAGE = "GOLANG_COVERAGE"
+
+    LAUTERBACH_TRACE32 = "LAUTERBACH_TRACE32"
+
+    TEAMSCALE_COMPACT_COVERAGE = "TEAMSCALE_COMPACT_COVERAGE"
+
+
+class ReportFormats(str, Enum):
     """Report formats that Teamscale understands."""
 
     PCLINT = "PCLINT"
-    
+
     CLANG = "CLANG"
 
     ASTREE = "ASTREE"
@@ -123,19 +145,51 @@ class ReportFormats:
     SPCOP = "SPCOP"
 
     CS_COMPILER_WARNING = "CS_COMPILER_WARNING"
-   
+
     PYLINT = "PYLINT"
 
     FINDBUGS = "FINDBUGS"
 
-class UnitTestReportFormats:
+    CPPCHECK = "CPPCHECK"
+
+    MODEL_ADVISOR = "MODEL_ADVISOR"
+
+    SAP_CODE_INSPECTOR = "SAP_CODE_INSPECTOR"
+
+    PARASOFT_CPP_TEST = "PARASOFT_CPP_TEST"
+
+    MYPY = "MYPY"
+
+    JQASSISTANT = "JQASSISTANT"
+
+    GENERIC_FINDINGS = "GENERIC_FINDINGS"
+
+
+class UnitTestReportFormats(str, Enum):
     """Reports for unit test results that Teamscale understands."""
 
     JUNIT = "JUNIT"
 
     XUNIT = "XUNIT"
 
-class ConnectorType:
+    MS_TEST = "MS_TEST"
+
+    TESTWISE_COVERAGE = "TESTWISE_COVERAGE"
+
+    NUNIT = "NUNIT"
+
+    XCRESULT_JSON = "XCRESULT_JSON"
+
+
+class ArchitectureFormats(str, Enum):
+    """Architecture formats that Teamscale understands."""
+
+    TEAMSCALE_ARCHITECTURE = "TEAMSCALE_ARCHITECTURE"
+
+    FILE_LIST = "FILE_LIST"
+
+
+class ConnectorType(str, Enum):
     """Connector types."""
 
     TFS = "Azure DevOps TFVC (TFS)"
@@ -150,7 +204,8 @@ class ConnectorType:
 
     GERRIT = "Gerrit"
 
-class TaskStatus:
+
+class TaskStatus(str, Enum):
     """Different statuses a task in Teamscale can have"""
 
     OPEN = "OPEN"
@@ -161,7 +216,8 @@ class TaskStatus:
 
     DISCARDED = "DISCARDED"
 
-class TaskResolution:
+
+class TaskResolution(str, Enum):
     """Different resolutions used in tasks"""
     NONE = "NONE"
 

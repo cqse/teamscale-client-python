@@ -1,11 +1,6 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 from teamscale_client import TeamscaleClient
 from teamscale_client.data import ProjectConfiguration, FileSystemSourceCodeConnectorConfiguration, \
-    GitSourceCodeConnectorConfiguration,  MultiVersionFileSystemSourceCodeConnectorConfiguration, \
+    GitSourceCodeConnectorConfiguration, MultiVersionFileSystemSourceCodeConnectorConfiguration, \
     TFSSourceCodeConnectorConfiguration, SubversionSourceCodeConnectorConfiguration
 
 TEAMSCALE_URL = "http://localhost:8080"
@@ -43,7 +38,7 @@ def update_project_with_file_system_connector():
     file_system_config = FileSystemSourceCodeConnectorConfiguration(input_directory=LOCAL_PATH,
                                                                     repository_identifier="Local",
                                                                     included_file_names=INCLUDE_PATTERN)
-    project_configuration = ProjectConfiguration(name="Test Project", project_id="test-project",
+    project_configuration = ProjectConfiguration(name="Test Project Renamed", project_id="test-project",
                                                  profile=ANALYSIS_PROFILE, connectors=[file_system_config],
                                                  alias="teamscale_python_client")
     client.update_project(project_configuration)

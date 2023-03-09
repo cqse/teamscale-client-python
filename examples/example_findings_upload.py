@@ -1,10 +1,4 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import datetime
-import sys
 
 from teamscale_client import TeamscaleClient
 from teamscale_client.constants import Enablement
@@ -22,28 +16,24 @@ if __name__ == '__main__':
 
     # Add a new group that will contain findings
     response = client.add_findings_group("Group 1", "externals-.*")
-    print("Request result: %s" % (response.text,))
+    print(f"Request result: {response.status_code}")
 
     # Make Teamscale aware of a new findings type, which mappes to the previously
     # created group
     descriptions = [
-        FindingDescription("externals-1", "A test finding description", Enablement.RED),
+        FindingDescription("externals-1", "A test finding description", Enablement.RED, "externals-1"),
         FindingDescription("externals-2", "Another finding description", Enablement.YELLOW, "externals-2")
     ]
     response = client.add_finding_descriptions(descriptions)
-    print("Request result: %s" % (response.text,))
+    print(f"Request result: {response.status_code}")
 
     # A manual step to add the new groups to existing analysis profiles has to be done.
-    if sys.version_info[0] == 2:
-        raw_input(
-            "Please create the project or update the analysis profile used by the project to contain the new groups. Then Press ENTER to continue.")
-    else:
-        input(
-            "Please create the project or update the analysis profile used by the project to contain the new groups. Then Press ENTER to continue.")
+    input("Please create the project or update the analysis profile used by the project to contain the new groups. "
+          "Then Press ENTER to continue.")
 
     # Update existing project to use new findings
     response = client.update_findings_schema()
-    print("Request result: %s" % (response.text,))
+    print(f"Request result: {response.status_code}")
 
     # Upload findings to Teamscale
     findings = [
@@ -53,5 +43,5 @@ if __name__ == '__main__':
         ],
             "src/Foo.java")
     ]
-    response = client.upload_findings(findings, datetime.datetime.now(), "TestCommit", "test-partition")
-    print("Request result: %s" % (response.text,))
+    response = client.upload_findings(findings, "TestCommit", "test-partition", timestamp=datetime.datetime.now())
+    print(f"Request result: {response.status_code}")
