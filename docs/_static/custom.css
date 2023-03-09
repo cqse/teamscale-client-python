@@ -1,4 +1,0 @@
-/* This overrides the default behavior and hides long class names in the sidebar, rather then overflowing */
-div.sphinxsidebar {
-    overflow-x: hidden;
-}
