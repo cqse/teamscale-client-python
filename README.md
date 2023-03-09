@@ -8,7 +8,7 @@ http://cqse.github.io/teamscale-client-python
 # Installation
 
 We recommend to use at least Python 3.7 for running the Teamscale Python Client.
-Install from the [PyPi](https://pypi.org/project/teamscale-client/):
+Install from [PyPi](https://pypi.org/project/teamscale-client/):
     
     pip install teamscale-client
 
@@ -21,8 +21,8 @@ Copy the file `examples/.teamscale-client.config` into your home directory and u
 This way, you can easily create the `TeamscaleClient` from the configuration
 file via a `TeamscaleClientConfig`.
 
-Please have a look at the `examples` folder of this repository to get an
-overview on common usage scenarios.
+To get an overview on common usage scenarios, please have a look
+at the `examples` folder of this repository.
 
 # Development
 
@@ -31,8 +31,11 @@ the client, create a new environment and execute:
 
     pip install -r requirements.txt
 
-We are happy to add additional service calls to the client. Please make sure you include a test, if you add a service call. To run them use:
+We are happy to add additional service calls to the client.
+Please make sure you include a test, if you add a service call.
+To run them use:
 
     python setup.py test
 
-Tests are written using the [responses library](https://pypi.org/project/responses/), to mock the requests passed to the server using the [requests api](http://docs.python-requests.org/en/master/).
+Tests are written using the [responses library](https://pypi.org/project/responses/),
+to mock the requests passed to the server using the [requests api](http://docs.python-requests.org/en/master/).
