@@ -11,7 +11,7 @@ The Teamscale Service Client in Python is meant to provide a way to easily acces
 Contents:
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    teamscale_client
    constants
