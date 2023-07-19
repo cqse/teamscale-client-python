@@ -15,7 +15,7 @@ setup(
         "Topic :: Utilities",
     ],
     install_requires=[
-        'requests>=2.0',
+        'requests>=2.31.0',
         'configparser',
         'packaging'
     ],
