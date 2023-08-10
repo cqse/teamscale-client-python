@@ -10,6 +10,7 @@ import simplejson as json
 from requests.auth import HTTPBasicAuth
 
 from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task
+from teamscale_client.merge_request import MergeRequest, FindingsChurnCount
 from teamscale_client.utils import to_json
 
 
@@ -132,6 +133,28 @@ class TeamscaleClient:
         """
         headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         response = requests.post(url, params=parameters, json=json, data=data,
+                                 headers=headers, auth=self.auth_header,
+                                 verify=self.sslverify, timeout=self.timeout)
+        if response.status_code != 200:
+            raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=url, r=response))
+        return response
+
+    def post(self, url, parameters=None, data=None):
+        """Sends a POST request to the given service url with the json payload as content.
+
+        Args:
+            url (str):  The URL for which to execute a POST request
+            parameters (dict): parameters to attach to the url
+            data ([str]): Array of form url encoded data to be sent in the request payload
+
+        Returns:
+            requests.Response: request's response
+
+        Raises:
+            ServiceError: If anything goes wrong
+        """
+        headers = {'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded'}
+        response = requests.post(url, params=parameters, data=data,
                                  headers=headers, auth=self.auth_header,
                                  verify=self.sslverify, timeout=self.timeout)
         if response.status_code != 200:
@@ -715,6 +738,7 @@ class TeamscaleClient:
 
         Raises:
             ServiceError: If anything goes wrong
+
         """
         service_url = self.get_project_service_url("findings") + uniform_path
         parameters = {
@@ -918,3 +942,41 @@ class TeamscaleClient:
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return [architecture_overview['uniformPath'] for architecture_overview in response.json()]
+
+    def get_merge_requests(self):
+        """Returns all the merge requests known to Teamscale given the project config.
+
+            Returns:
+                List[MergeRequest] The list of merge requests.
+        """
+        service_url = self.get_new_project_service_url("merge-requests")
+        response = self.get(service_url)
+        if not response.ok:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        for merge_request in response.json()['mergeRequests']:
+            print(merge_request) #TODO: for debugging. Remove later
+
+        return [MergeRequest.from_json(merge_request) for merge_request in response.json()['mergeRequests']]
+
+    def get_mr_findings_churn(self, merge_request):
+        """Returns the findings churn count for a given merge request
+
+        Returns:
+            List[FindingsChurnCount] The list of merge requests.
+        """
+        service_url = self.get_new_project_service_url("merge-requests/"+merge_request.get_id_with_repo()
+                                                       .replace("/", "%2F")+"/delta")
+        response = self.get(service_url)
+        if response.status_code == 204:
+            # MR not analyzed
+            return
+        if not response.ok:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        findings_churn_from_json = response.json()['findingChurn']
+        finding_churn_count = FindingsChurnCount(len(findings_churn_from_json['addedFindings']),
+                                                     len(findings_churn_from_json['findingsAddedInBranch']),
+                                                     len(findings_churn_from_json['findingsInChangedCode']),
+                                                     len(findings_churn_from_json['removedFindings']),
+                                                     len(findings_churn_from_json['findingsRemovedInBranch']))
+
+        return finding_churn_count
