@@ -138,7 +138,17 @@ class FindingsChurnCount(object):
 
     def get_findings_removed_in_branch(self):
         return self.findings_removed_in_branch
+
+    def print_churn(self):
+        print("  => Findings Churn Count:")
+        print(f"    Added:  {self.get_added_findings()}")
+        print(f"    Added in branch: {self.get_findings_added_in_branch()}")
+        print(f"    In changed code: {self.get_findings_in_changed_code()}")
+        print(f"    Removed: {self.get_removed_findings()}")
+        print(f"    Removed in branch: {self.get_findings_removed_in_branch()}")
     @classmethod
     def from_json(cls, json):
+        if json is None:
+            return
         return FindingsChurnCount(json['addedFindings'], json['findingsAddedInBranch'], json['findingsInChangedCode'],
                                   json['removedFindings'], json['findingsRemovedInBranch'])

@@ -139,8 +139,8 @@ class TeamscaleClient:
             raise ServiceError("ERROR: POST {url}: {r.status_code}:{r.text}".format(url=url, r=response))
         return response
 
-    def post(self, url, parameters=None, data=None):
-        """Sends a POST request to the given service url with the json payload as content.
+    def post_url_encoded_data(self, url, parameters=None, data=None):
+        """Sends a POST request to the given service url with the url encoded data as payload.
 
         Args:
             url (str):  The URL for which to execute a POST request
@@ -961,6 +961,8 @@ class TeamscaleClient:
     def get_mr_findings_churn(self, merge_request):
         """Returns the findings churn count for a given merge request
 
+        Args:
+            merge_request (MergeRequest): The merge request object
         Returns:
             List[FindingsChurnCount] The list of merge requests.
         """
@@ -968,7 +970,7 @@ class TeamscaleClient:
                                                        .replace("/", "%2F")+"/delta")
         response = self.get(service_url)
         if response.status_code == 204:
-            # MR not analyzed
+            # MR not analyzed by TS
             return
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
@@ -978,5 +980,56 @@ class TeamscaleClient:
                                                      len(findings_churn_from_json['findingsInChangedCode']),
                                                      len(findings_churn_from_json['removedFindings']),
                                                      len(findings_churn_from_json['findingsRemovedInBranch']))
-
         return finding_churn_count
+
+    def get_mr_commits_timestamps(self, merge_request):
+        """Fecthes the MR delta and returns a list of timestamps from the merge request commits
+
+        Args:
+            merge_request (MergeRequest): The merge request object
+        Returns:
+            List[double] The list of timestamps corresponding to the merge request commits
+        """
+        service_url = self.get_new_project_service_url("merge-requests/"+merge_request.get_id_with_repo()
+                                                       .replace("/", "%2F")+"/delta")
+        response = self.get(service_url)
+        if response.status_code == 204:
+            # MR not analyzed
+            return
+        if not response.ok:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        timestamps = []
+        for ancestorSource in response.json()['mergeBase']['ancestorsOfSource']:
+            timestamps.append(ancestorSource['timestamp'])
+        return timestamps
+
+    def get_commits_findings_churn(self, source_branch, commit_timestamps):
+        """Fecthes the findings churn count for a list of commits
+        Args:
+            source_branch (str): The source branch name usually taken from a merge request
+            commit_timestamps (List[double]): List of commit timestamps
+
+        Returns:
+            List[FindingsChurnCount] The list of findings churn count for every commit that matched the input
+        """
+        service_url = self.get_new_project_service_url("finding-churn/count")
+        encoded_branch_and_timestamps = ""
+        source_branch = source_branch.replace("/", "%2F")
+        for timestamp in commit_timestamps:
+            encoded_branch_and_timestamps += "commit=" + source_branch + "%3A" + str(timestamp) + "&"
+        if len(encoded_branch_and_timestamps) > 0:
+            encoded_branch_and_timestamps.rstrip(encoded_branch_and_timestamps[-1])
+        response = self.post_url_encoded_data(service_url, None, encoded_branch_and_timestamps)
+        if response.status_code == 204:
+            # MR not analyzed by TS
+            return
+        if not response.ok:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        findings_churn_list = []
+        for finding_churn in response.json():
+            if finding_churn is None:
+                continue
+            findings_churn_list.append(FindingsChurnCount.from_json(finding_churn))
+        return findings_churn_list
+        # TODO: how to make the following one line work by skipping the finding churns that are none?
+        # return [FindingsChurnCount.from_json(finding_churn) for finding_churn in response.json()]
