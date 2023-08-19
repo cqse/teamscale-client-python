@@ -34,6 +34,9 @@ class MergeRequest(object):
     def print_mr(self):
         print(f"{self.id_with_repo} - {self.status} : {self.url}")
 
+    def print_teamscale_mr_url(self, teamscale_base_url, project):
+        print(f"{self.id_with_repo} - {self.status} : {teamscale_base_url}{project}/{self.id_with_repo}")
+
     def get_id_with_repo(self):
         return self.id_with_repo
 

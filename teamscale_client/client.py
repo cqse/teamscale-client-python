@@ -943,18 +943,23 @@ class TeamscaleClient:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
         return [architecture_overview['uniformPath'] for architecture_overview in response.json()]
 
-    def get_merge_requests(self):
+    def get_merge_requests(self, status='OPEN'):
         """Returns all the merge requests known to Teamscale given the project config.
 
+            Args:
+                status (str): The merge request status filter (OPEN, MERGED, OTHER)
             Returns:
                 List[MergeRequest] The list of merge requests.
         """
         service_url = self.get_new_project_service_url("merge-requests")
-        response = self.get(service_url)
+        parameters = {
+            "status": status
+        }
+        response = self.get(service_url, parameters)
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
-        for merge_request in response.json()['mergeRequests']:
-            print(merge_request) #TODO: for debugging. Remove later
+        # for merge_request in response.json()['mergeRequests']:
+        #     print(merge_request) #TODO: for debugging. Remove later
 
         return [MergeRequest.from_json(merge_request) for merge_request in response.json()['mergeRequests']]
 
@@ -983,7 +988,7 @@ class TeamscaleClient:
         return finding_churn_count
 
     def get_mr_commits_timestamps(self, merge_request):
-        """Fecthes the MR delta and returns a list of timestamps from the merge request commits
+        """Fetches the MR delta and returns a list of timestamps from the merge request commits
 
         Args:
             merge_request (MergeRequest): The merge request object
@@ -1003,8 +1008,26 @@ class TeamscaleClient:
             timestamps.append(ancestorSource['timestamp'])
         return timestamps
 
-    def get_commits_findings_churn(self, source_branch, commit_timestamps):
-        """Fecthes the findings churn count for a list of commits
+    def get_commit_findings(self, branch, timestamp):
+        """Fetches the findings churn count for a list of commits
+         Args:
+             branch (str): The source branch
+             timestamp (double): The commit timestamp
+
+         Returns:
+             json The raw json response
+        """
+        service_url = self.get_new_project_service_url("finding-churn/list")
+        parameters = {
+            "t": branch + ":" + str(timestamp)
+        }
+        response = self.get(service_url, parameters)
+        if not response.ok:
+            raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+        return response.json()
+
+    def get_commit_findings_churn(self, source_branch, commit_timestamps):
+        """Fetches the findings churn count for a list of commits
         Args:
             source_branch (str): The source branch name usually taken from a merge request
             commit_timestamps (List[double]): List of commit timestamps
