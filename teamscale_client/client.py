@@ -10,7 +10,7 @@ import simplejson as json
 from requests.auth import HTTPBasicAuth
 
 from teamscale_client.data import ServiceError, Baseline, ProjectInfo, Finding, Task
-from teamscale_client.merge_request import MergeRequest, FindingsChurnCount
+from teamscale_client.merge_request import MergeRequest, FindingsChurnCount, CommitFindings
 from teamscale_client.utils import to_json
 
 
@@ -1015,7 +1015,7 @@ class TeamscaleClient:
              timestamp (double): The commit timestamp
 
          Returns:
-             json The raw json response
+             CommitFindings The commit findings data
         """
         service_url = self.get_new_project_service_url("finding-churn/list")
         parameters = {
@@ -1024,7 +1024,8 @@ class TeamscaleClient:
         response = self.get(service_url, parameters)
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
-        return response.json()
+        # return response.json() TODO: remove
+        return CommitFindings.from_json(response.json())
 
     def get_commit_findings_churn(self, source_branch, commit_timestamps):
         """Fetches the findings churn count for a list of commits
