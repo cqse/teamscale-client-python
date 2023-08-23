@@ -958,8 +958,6 @@ class TeamscaleClient:
         response = self.get(service_url, parameters)
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
-        # for merge_request in response.json()['mergeRequests']:
-        #     print(merge_request) #TODO: for debugging. Remove later
 
         return [MergeRequest.from_json(merge_request) for merge_request in response.json()['mergeRequests']]
 
@@ -1024,7 +1022,6 @@ class TeamscaleClient:
         response = self.get(service_url, parameters)
         if not response.ok:
             raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
-        # return response.json() TODO: remove
         return CommitFindings.from_json(response.json())
 
     def get_commit_findings_churn(self, source_branch, commit_timestamps):
@@ -1055,5 +1052,3 @@ class TeamscaleClient:
                 continue
             findings_churn_list.append(FindingsChurnCount.from_json(finding_churn))
         return findings_churn_list
-        # TODO: how to make the following one line work by skipping the finding churns that are none?
-        # return [FindingsChurnCount.from_json(finding_churn) for finding_churn in response.json()]

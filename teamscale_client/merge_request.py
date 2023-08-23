@@ -20,7 +20,6 @@ class MergeRequest(object):
         findings_churn_count (FindingsChurnCount): the findings churn stats
     """
 
-    # TODO not getting all the identifier fields from the reponse. Let's add the rest if needed
     def __init__(self, id, id_with_repo, status, title, source_branch, source_head, target_branch, url, voting_record,
                  findings_churn_count):
         self.id = id
@@ -39,6 +38,9 @@ class MergeRequest(object):
 
     def print_teamscale_mr_url(self, teamscale_base_url, project):
         print(f"{self.id_with_repo} - {self.status} : {teamscale_base_url}{project}/{self.id_with_repo}")
+
+    def get_id(self):
+        return self.id
 
     def get_id_with_repo(self):
         return self.id_with_repo
@@ -100,7 +102,6 @@ class Commit(object):
         timestamp (double): when Teamscale created the voting commit
     """
 
-    # TODO: not getting here parentCommits field. Let's add it if necessary
     def __init__(self, type, branch_name, timestamp):
         self.type = type
         self.branch_name = branch_name
@@ -224,6 +225,9 @@ class Finding(object):
     def get_birth(self):
         return self.birth
 
+    def get_death(self):
+        return self.death
+
     def get_id(self):
         return self.f_id
 
@@ -277,8 +281,24 @@ class FindingLocation(object):
     def from_json(cls, json):
         if json is None:
             return
-        return FindingLocation(json['type'], json['uniformPath'], json['rawStartOffset'], json['rawEndOffset'],
-                               json['rawStartLine'], json['rawEndLine'], json['location'])
+        try:
+            raw_start_offset = json['rawStartOffset']
+        except KeyError:
+            raw_start_offset = None
+        try:
+            raw_end_offset = json['rawEndOffset']
+        except KeyError:
+            raw_end_offset = None
+        try:
+            raw_start_line = json['rawStartLine']
+        except KeyError:
+            raw_start_line = None
+        try:
+            raw_end_line = json['rawEndLine']
+        except KeyError:
+            raw_end_line = None
+        return FindingLocation(json['type'], json['uniformPath'], raw_start_offset, raw_end_offset,
+                               raw_start_line, raw_end_line, json['location'])
 
 
 @auto_str
@@ -326,6 +346,9 @@ class FindingDeath(object):
 
     def get_timestamp(self):
         return self.timestamp
+
+    def get_branch_name(self):
+        return self.branch_name
 
     @classmethod
     def from_json(cls, json):
