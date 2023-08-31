@@ -961,6 +961,51 @@ class TeamscaleClient:
 
         return [MergeRequest.from_json(merge_request) for merge_request in response.json()['mergeRequests']]
 
+    '''returns test gap treemap for given project, branch and timestamps'''
+
+    def get_testgap_result(self, merge_request,timestamp):
+        service_url = self.get_global_service_url("api/projects") + f"{self.project}"+"/test-gaps/treemap"
+        parameters = {
+            "baseline": merge_request.get_source_branch()+":"+timestamp,
+            "end": merge_request.get_target_branch()+":"+timestamp,
+            "merge-request-mode": "true",
+            "merge-request-identifier": merge_request.get_id_with_repo(),
+            "auto-select-branch": "false",
+            "include-child-issues": "false",
+            "only-executed-methods": "false",
+            "exclude-unchanged-methods": "true",
+            "churn": "false",
+            "execution-only": "false",
+            "all-partitions": "true"
+        }
+        try:
+            response = self.get(service_url, parameters=parameters)
+            if not response.ok:
+                raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+            return response.json()
+        except ServiceError:
+            print("No treemap because did not find actual commit for merge ", merge_request.get_id())
+            return
+
+    '''Returns all commits in the merge request'''
+    def get_mr_commits(self, merge_request):
+
+        service_url = self.get_new_project_service_url("merge-requests/repository-churn")
+
+        parameters = {
+            "source": merge_request.get_source_branch()+":HEAD",
+            "target": merge_request.get_target_branch()+":HEAD"
+        }
+        try:
+            response = self.get(service_url, parameters=parameters)
+            if not response.ok:
+                raise ServiceError("ERROR: GET {url}: {r.status_code}:{r.text}".format(url=service_url, r=response))
+            return response.json().get('logEntries')
+        except ServiceError:
+            print("Did not find actual commit for merge ", merge_request.get_id())
+            return
+
+
     def get_mr_findings_churn(self, merge_request):
         """Returns the findings churn count for a given merge request
 

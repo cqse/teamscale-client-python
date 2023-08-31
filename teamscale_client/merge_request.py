@@ -48,6 +48,9 @@ class MergeRequest(object):
     def get_source_branch(self):
         return self.source_branch
 
+    def get_target_branch(self):
+        return self.target_branch
+
     @classmethod
     def from_json(cls, json):
         try:
