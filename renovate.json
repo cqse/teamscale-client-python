@@ -1,6 +1,19 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "rangeStrategy": "bump",
+  "separateMajorMinor": false,
   "extends": [
-    "config:base"
+    "workarounds:all",
+    "group:monorepos"
+  ],
+  "packageRules": [
+    {
+      "matchPackagePatterns": [
+        "*"
+      ],
+      "reviewers": [
+        "M8is"
+      ]
+    }
   ]
 }
