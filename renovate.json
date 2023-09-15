@@ -11,7 +11,10 @@
       "matchPackagePatterns": [
         "*"
       ],
-      "matchUpdateTypes": ["major", "minor"],
+      "matchUpdateTypes": [
+        "major", 
+        "minor"
+      ],
       "reviewers": [
         "M8is"
       ]
