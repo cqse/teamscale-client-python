@@ -88,7 +88,24 @@ class Finding:
         """Checks if this finding is less than the given finding."""
         return (self.uniformPath, self.startLine, self.endLine) < (other.uniformPath, other.startLine, other.endLine)
 
-
+    def __hash__(self) -> int:
+        if self.finding_id:
+            return hash(self.finding_id)
+        else:
+            return hash(
+                (
+                    self.uniformPath,
+                    self.startLine,
+                    self.assessment,
+                    self.message,
+                    self.endLine,
+                    self.endOffset,
+                    self.findingTypeId,
+                    self.identifier,
+                    self.startOffset,
+                )
+            )
+        
 @auto_str
 class FileFindings:
     """Representation of a file and its findings.
