@@ -11,6 +11,7 @@
       "matchPackagePatterns": [
         "*"
       ],
+      "matchUpdateTypes": ["major", "minor"],
       "reviewers": [
         "M8is"
       ]
