@@ -554,6 +554,19 @@ class SubversionSourceCodeConnectorConfiguration(SourceCodeConnectorConfiguratio
 
 
 @auto_str
+class AzureDevOpsGitSourceCodeConnectorConfiguration(GitSourceCodeConnectorConfiguration):
+    """Represents a Teamscale Azure DevOps Git connector configuration.
+
+    Args:
+        repository_name (str): Name of the repository. In the form "<Project-Name>/<Repository-Name>",
+        also if Project- and Repository-Name are the same.
+    """
+    def __init__(self, repository_name, default_branch_name, account, include_submodules=False, submodule_recursion_depth=10, connector_type=ConnectorType.ADO_GIT, *args, **kwargs):
+        super(AzureDevOpsGitSourceCodeConnectorConfiguration, self).__init__(default_branch_name, account, "", include_submodules, submodule_recursion_depth, connector_type, *args, **kwargs)
+        self.options["Repository name"] = repository_name
+
+
+@auto_str
 class Task:
     """Represents a task in Teamscale
 
