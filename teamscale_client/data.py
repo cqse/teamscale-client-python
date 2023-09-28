@@ -558,13 +558,23 @@ class AzureDevOpsGitSourceCodeConnectorConfiguration(GitSourceCodeConnectorConfi
     """Represents a Teamscale Azure DevOps Git connector configuration.
 
     Args:
-        repository_name (str): Name of the repository. In the form "<Project-Name>/<Repository-Name>",
-        also if Project- and Repository-Name are the same.
+        repository_name (str): Name of the repository. In the form "<Project-Name>/<Repository-Name>", also if Project-
+                               and Repository-Name are the same.
+        enable_findings_in_merge_requests (Optional[bool]=False): Whether to enable findings integration in merge requests.
+                                                                  False by default.
+        enable_tga_in_merge_requests (Optional[bool]=False): Whether to enable Test Gap integration in merge requests.
+                                                             False by default.
+        enable_commit_alerts_in_merge_requests (Optional[bool]=False): Whether to enable Commit Alerts in merge requests.
+                                                                       False by default.
     """
-    def __init__(self, repository_name, default_branch_name, account, include_submodules=False, submodule_recursion_depth=10, connector_type=ConnectorType.ADO_GIT, *args, **kwargs):
+    def __init__(self, repository_name, default_branch_name, account, include_submodules=False, submodule_recursion_depth=10,
+                 connector_type=ConnectorType.ADO_GIT, enable_findings_in_merge_requests=False,
+                 enable_tga_in_merge_requests=False, enable_commit_alerts_in_merge_requests=False, *args, **kwargs):
         super(AzureDevOpsGitSourceCodeConnectorConfiguration, self).__init__(default_branch_name, account, "", include_submodules, submodule_recursion_depth, connector_type, *args, **kwargs)
         self.options["Repository name"] = repository_name
-
+        self.options["Enable Findings integration for merge requests"] = enable_findings_in_merge_requests
+        self.options["Enable Test Gap integration for merge requests"] = enable_tga_in_merge_requests
+        self.options["Enable Commit Alerts for merge requests"] = enable_commit_alerts_in_merge_requests
 
 @auto_str
 class Task:
