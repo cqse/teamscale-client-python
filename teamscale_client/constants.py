@@ -204,6 +204,8 @@ class ConnectorType(str, Enum):
 
     GERRIT = "Gerrit"
 
+    ADO_GIT = "Azure DevOps Git"
+
 
 class TaskStatus(str, Enum):
     """Different statuses a task in Teamscale can have"""
