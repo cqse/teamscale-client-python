@@ -1,6 +1,6 @@
 setuptools~=67.5.1
 requests~=2.28.2
 packaging~=23.1
-configparser~=5.3.0
+configparser~=6.0.0
 pytest~=7.4.2
 responses~=0.21.0
