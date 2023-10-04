@@ -1,4 +1,4 @@
-setuptools~=67.5.1
+setuptools~=68.2.2
 requests~=2.31.0
 packaging~=23.1
 configparser~=6.0.0
