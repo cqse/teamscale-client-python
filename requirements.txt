@@ -3,4 +3,4 @@ requests~=2.31.0
 packaging~=23.1
 configparser~=6.0.0
 pytest~=7.4.2
-responses~=0.21.0
+responses~=0.23.3
