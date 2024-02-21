@@ -4,6 +4,12 @@ A simple client to access Teamscale's REST API written in Python
 Find the documentation here:
 http://cqse.github.io/teamscale-client-python
 
+> [!CAUTION]
+> The Teamscale Python Client is **deprecated** since February 2024.
+> If you need to interact with [Teamscale's REST API](https://docs.teamscale.com/reference/rest-api/) using Python (or any other programming language), we recommend that you generate an appropriate client from the OpenAPI specification accessible within Teamscale (_?_ > _API Reference_ > _OpenAPI specification_).
+> This approach offers two benefits:
+> You get full access to Teamscale's extensive REST API and you are not restricted to Python but can use a programming language of your choice.
+
 
 # Installation
 
